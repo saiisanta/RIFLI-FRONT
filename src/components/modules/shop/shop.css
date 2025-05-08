@@ -1,0 +1,10 @@
+.shop-section{
+  padding: 0; /* Elimina cualquier padding extra */
+  margin: 0;  /* Asegura que no haya márgenes adicionales */
+  min-height: 100vh; /* Asegura que el slider ocupe toda la pantalla */
+  display: flex; /* Utilizamos flexbox para alinear el contenido */
+  flex-direction: column; /* Alineamos verticalmente */
+  justify-content: center; /* Centra el contenido verticalmente */
+  background-color: #f2f2f2;
+  position: relative;
+}

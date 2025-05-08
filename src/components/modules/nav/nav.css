@@ -1,0 +1,128 @@
+
+/* -----------------------------------
+   NAVBAR GENERAL STYLES
+------------------------------------*/
+
+.Nav {
+  background-color: rgba(0, 0, 0, 0) !important; /* Transparente para superponer sobre hero */
+  margin: 0;
+  top: 0;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.Nav a {
+  font-size: 3vh;
+  font-weight: 450;
+  color: white;
+  margin-left: 15vh;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+/* Al pasar el mouse por cualquier enlace */
+.Nav a:hover {
+  color: white;
+  text-shadow: 0 0 5px black;
+  transform: scale(1.05);
+}
+
+/* Enlace clickeado (estilo temporal al presionar) */
+.Nav a.clicked {
+  color: black !important;
+  text-shadow: none !important;
+  transform: scale(1.1);
+  transition: color 0.2s ease, s;
+}
+
+.Nav {
+  transition: transform 0.4s ease, opacity 0.4s ease;
+}
+
+.navbar-hidden {
+  transform: translateY(-100%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.Nav {
+  transition: transform 0.4s ease, opacity 0.4s ease;
+}
+
+.navbar-hidden {
+  transform: translateY(-100%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+
+/* Posicionamiento del branding/logo */
+.Brand {
+  margin-left: -15vh;
+}
+
+.icono {
+  margin-left: -15vh;
+}
+
+
+/* -----------------------------------
+   NAVLINK PERSONALIZADOS (light-hover)
+------------------------------------*/
+
+/* Estilo general */
+.Nav a.light-hover {
+  color: white !important;
+  text-shadow: 1px 1px 3px black;
+  transition: all 0.3s ease;
+}
+
+/* Hover con sombra y zoom */
+.Nav a.light-hover:hover {
+  transform: scale(1.08);
+  text-shadow: 2px 2px 5px black;
+  color: white !important;
+}
+
+/* Estados activos, focus, visitados */
+.Nav a.light-hover:active,
+.Nav a.light-hover:focus,
+.Nav a.light-hover:visited {
+  color: white !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+
+/* -----------------------------------
+   LOGIN ICON (PersonCircle)
+------------------------------------*/
+
+.icon {
+  margin-left: 15vh;
+  transition: transform 0.3s ease;
+}
+
+.icon:hover {
+  transform: scale(1.1);
+}
+
+/* Clase específica para garantizar que el icono nunca cambie de color */
+.login-icon {
+  color: white !important;
+  transition: transform 0.3s ease, color 0.2s ease;
+}
+
+.login-icon:hover {
+  transform: scale(1.1);
+  color: white !important;
+  text-shadow: 2px 2px 5px black;
+}
+
+.login-icon:active,
+.login-icon:focus,
+.login-icon:visited {
+  color: white !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  outline: none !important;
+}

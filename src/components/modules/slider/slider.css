@@ -1,0 +1,97 @@
+/* Slider section */
+.slider-section {
+  padding: 0; /* Elimina cualquier padding extra */
+  margin: 0;  /* Asegura que no haya márgenes adicionales */
+  min-height: 100vh; /* Asegura que el slider ocupe toda la pantalla */
+  display: flex; /* Utilizamos flexbox para alinear el contenido */
+  flex-direction: column; /* Alineamos verticalmente */
+  justify-content: center; /* Centra el contenido verticalmente */
+  background-color: #f2f2f2;
+  position: relative;
+}
+
+/* Títulos y párrafos dentro del slider */
+.slider-section h2 {
+  font-size: 7vh;
+}
+
+.slider-section p {
+  font-size: 3vh;
+}
+
+.slider-section button {
+  font-size: 2.5vh;
+}
+
+/* Slider wrapper para manejar el contenido deslizable */
+.slider-wrapper {
+  overflow: hidden;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto; /* Centramos el slider en la pantalla */
+  position: relative;
+  mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
+}
+
+/* Track para los logos */
+.slider-track {
+  display: flex;
+  width: fit-content;
+}
+
+/* Cada logo dentro del slider */
+.slider-logo {
+  flex: 0 0 33.333%; /* 3 logos visibles */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: transform 0.8s ease-in-out;
+  padding: 0 50px; /* Espaciado entre los logos */
+}
+
+.slider-logo img {
+  width: 100%;
+  max-width: 280px;
+  height: auto;
+  transition: transform 0.8s ease-in-out;
+}
+
+/* Agranda el logo del medio */
+.slider-logo:nth-child(2) img {
+  transform: scale(1.55);
+}
+
+/* Sombra interna en los lados del slider */
+.slider-section {
+  box-shadow: inset 60px 0 50px -30px rgba(0, 0, 0, 0.3), 
+              inset -60px 0 50px -30px rgba(0, 0, 0, 0.3);
+}
+
+/* Divider arriba de la sección */
+.section-top-divider {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 40px;
+  background-color: #ffca2c;
+  border-bottom-left-radius: 30% 80%;
+  border-bottom-right-radius: 30% 80%;
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* Divider abajo de la sección */
+.section-bottom-divider {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 40px; /* Altura de la curva */
+  background-color: #ffca2c;
+  border-top-left-radius: 30% 80%; /* Curva hacia arriba */
+  border-top-right-radius: 30% 80%; /* Curva hacia arriba */
+  z-index: 2;
+  pointer-events: none; /* Para que no interfiera con clics */
+}

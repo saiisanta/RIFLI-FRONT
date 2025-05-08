@@ -2,9 +2,8 @@
   "name": "tpi",
   "private": true,
   "version": "0.0.0",
-  "type": "module",
   "scripts": {
-    "dev:backend": "nodemon ../backend-tpi/app.js",
+    "dev:backend": "nodemon ../backend-tpi/index.js",
     "dev:frontend": "vite",
     "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
     "build": "vite build",

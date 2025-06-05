@@ -42,50 +42,40 @@ const servicesData = [
 ];
 
 const Services = () => {
-  // Índice del servicio seleccionado (null si no hay ninguno)
   const [selectedIndex, setSelectedIndex] = useState(null);
-  // Nueva bandera que indica si estamos reproduciendo la animación de cierre
   const [isClosing, setIsClosing] = useState(false);
-  // Ref a la sección de servicios (fila superior)
+  const [allowOpenScroll, setAllowOpenScroll] = useState(true); // 👈 bandera de control
+
   const servicesRef = useRef(null);
-  // Ref a la sección expandida (aparece al hacer click)
   const expandedRef = useRef(null);
 
-  // Efecto: cuando selectedIndex cambia a un servicio real, hacemos scroll hasta expandedRef
   useEffect(() => {
-    if (selectedIndex !== null && expandedRef.current) {
-      // Espera mínima para asegurar que el DOM haya renderizado expandedRef
-      // (en la práctica suele bastar con un requestAnimationFrame)
+    if (selectedIndex !== null && expandedRef.current && allowOpenScroll) {
       requestAnimationFrame(() => {
         expandedRef.current.scrollIntoView({ behavior: "smooth" });
       });
     }
-  }, [selectedIndex]);
+  }, [selectedIndex, allowOpenScroll]);
 
   const handleClose = () => {
-    // 1) Primero ponemos la bandera de “closing” para que se ejecute la animación inversa
     setIsClosing(true);
 
-    // 2) Tras 500ms (duración de fadeOutUp), ya quitamos realmente el componente
     setTimeout(() => {
       setSelectedIndex(null);
       setIsClosing(false);
+      setAllowOpenScroll(true); // 👈 habilita scroll para la próxima vez
     }, 500);
 
-    // 3) Opcional: desplazarse hacia arriba mientras se reproduce la animación
     if (servicesRef.current) {
       servicesRef.current.scrollIntoView({ behavior: "smooth" });
     }
   };
 
-
-  // Obtenemos el objeto del servicio seleccionado (null si ninguno)
   const selectedService = selectedIndex !== null ? servicesData[selectedIndex] : null;
 
   return (
     <>
       {/* ─── 1. FILA DE SERVICIOS HORIZONTALES ─── */}
-      {/* Añadimos ref={servicesRef} para poder hacer scroll aquí */}
       <section className="services-section-vertical" ref={servicesRef}>
         {servicesData.map((service, index) => (
           <div
@@ -96,7 +86,8 @@ const Services = () => {
             }
             onClick={() => {
               setSelectedIndex(index);
-              setIsClosing(false); // asegurarse de que no haya “closing” previo
+              setIsClosing(false);
+              setAllowOpenScroll(false); // 👈 evita scroll al abrir
             }}
           >
             <div className="service-card">
@@ -111,7 +102,6 @@ const Services = () => {
 
       {/* ─── 2. ÁREA EXPANDIDA (DEBAJO) ─── */}
       {selectedService && (
-        // Añadimos ref={expandedRef} para hacer scrollIntoView
         <div
           className={`service-expanded-area${isClosing ? " closing" : ""}`}
           ref={expandedRef}
@@ -122,8 +112,8 @@ const Services = () => {
           </div>
           <div className="expanded-image-wrapper">
             <img
-              src={selectedService.image}
-              alt={selectedService.title}
+              // src={selectedService.image}
+              // alt={selectedService.title}
               className="expanded-service-image"
             />
           </div>

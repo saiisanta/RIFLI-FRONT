@@ -63,11 +63,21 @@ const Services = () => {
     setTimeout(() => {
       setSelectedIndex(null);
       setIsClosing(false);
-      setAllowOpenScroll(true); // 👈 habilita scroll para la próxima vez
+      setAllowOpenScroll(true); // habilita scroll para la próxima vez
     }, 500);
 
+    // ========= NUEVA LÓGICA: SOLO SCROLLEAR SI ESTAMOS MÁS ABAJO QUE servicesRef =========
     if (servicesRef.current) {
-      servicesRef.current.scrollIntoView({ behavior: "smooth" });
+      // Obtenemos la distancia de servicesRef respecto al top del documento
+      const serviciosTop = servicesRef.current.getBoundingClientRect().top + window.pageYOffset;
+      // Obtenemos la posición actual del scroll (píxeles scrolleados desde arriba)
+      const scrollActual = window.pageYOffset;
+
+      // Si el scroll actual está POR DEBAJO de la sección de servicios, entonces sí scrollear
+      if (scrollActual > serviciosTop) {
+        servicesRef.current.scrollIntoView({ behavior: "smooth" });
+      }
+      // Si scrollActual <= serviciosTop, no hacemos nada: ya estamos arriba o justo en la posición
     }
   };
 
@@ -92,7 +102,7 @@ const Services = () => {
           >
             <div className="service-card">
               <div className="icon-wrapper">
-                <img src={service.icon} alt={service.title} />
+                  <img src={service.icon} alt={service.title} />
               </div>
               <h3>{service.title}</h3>
             </div>

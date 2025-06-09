@@ -15,26 +15,32 @@
   /* =========================
      1) GRID DE PRODUCTOS
      ========================= */
-  .shop-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 1rem;
-    padding: 1rem;
-  }
+     .shop-container {
+      flex: 1;   /* <--- importante: expande para llenar el espacio sobrante */
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 1rem;
+    }
   
   /* =========================
      2) TARJETA DE PRODUCTO
      ========================= */
-  .shop-card {
-    background-color: #fff;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 1rem;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-  }
+     .shop-card {
+      background-color: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 1rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    
+      width: 100%;
+      max-width: 400px;   /* <--- no crecer más de 400px */
+      margin: 0 auto;     /* centrar dentro de la celda */
+      box-sizing: border-box;
+    }
   
   /* =========================
      3) IMAGEN DE PRODUCTO (fija altura)
@@ -210,7 +216,99 @@
     color: #000000;
     font-size: 1.2rem;
   }
-  
+
+  /* =========================
+   FILTROS Y ESTRUCTURA PRINCIPAL
+   ========================= */
+   .shop-wrapper {
+    display: flex;
+    gap: 2rem;
+    padding: 1rem;
+    width: 100%;    /* asegurar que ocupe todo el ancho */
+    box-sizing: border-box;
+  }
+
+.shop-filters {
+  flex: 0 0 240px;
+  padding: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #fafafa;
+}
+
+.shop-filters h3 {
+  margin-bottom: 1rem;
+}
+
+.shop-filters label {
+  font-weight: bold;
+  display: block;
+  margin: 1rem 0 0.3rem;
+}
+
+.shop-filters select,
+.shop-filters input {
+  width: 100%;
+  padding: 0.4rem;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+.price-range {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* =========================
+   HEADER Y BUSCADOR
+   ========================= */
+.shop-header {
+  padding: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #ffffff;
+  border-bottom: 1px solid #ddd;
+  flex-wrap: wrap;
+  margin-top: 3vh;
+}
+
+.shop-heading {
+  font-size: 2rem;
+  font-weight: 700;
+  font-family: Roboto;
+  color: #333;
+  margin: 0;
+}
+
+.shop-search {
+  padding: 0.5rem;
+  font-size: 1rem;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  min-width: 250px;
+  width: 50%;
+}
+
+.btn-clear-filters {
+  margin-top: 1rem;
+  padding: 0.5rem;
+  width: 100%;
+  background: #eee;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.btn-clear-filters:hover {
+  background: #ddd;
+}
+
+.results-info {
+  grid-column: 1 / -1; /* ocupa toda la fila en la grilla */
+  padding: 0.5rem 0;
+  color: #333;
+}
+
   /* Responsive */
   @media (max-width: 600px) {
     .modal-body {
@@ -219,6 +317,13 @@
     .modal-image,
     .modal-info {
       width: 100%;
+    }
+    .shop-wrapper {
+      flex-direction: column;
+    }
+    .shop-filters {
+      width: 100%;
+      margin-bottom: 1rem;
     }
   }
   

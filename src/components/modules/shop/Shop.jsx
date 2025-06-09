@@ -3,10 +3,20 @@ import "./shop.css";
 
 const Shop = () => {
   const [products, setProducts] = useState([]);
+  const [filtered, setFiltered] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filters, setFilters] = useState({
+    categoria: "",
+    marca: "",
+    priceOrder: "",
+    min: "",
+    max: "",
+  });
+  const [modalProduct, setModalProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [modalProduct, setModalProduct] = useState(null);
 
+  // ─── Cargar productos ───
   useEffect(() => {
     fetch("http://localhost:4001/api/products")
       .then((res) => {
@@ -15,6 +25,7 @@ const Shop = () => {
       })
       .then((data) => {
         setProducts(data);
+        setFiltered(data);
         setLoading(false);
       })
       .catch((err) => {
@@ -24,71 +35,179 @@ const Shop = () => {
       });
   }, []);
 
+  // ─── Filtrar productos ───
+  useEffect(() => {
+    let temp = [...products];
+
+    if (filters.categoria) {
+      temp = temp.filter(p => p.categoria === filters.categoria);
+    }
+    if (filters.marca) {
+      temp = temp.filter(p => p.marca === filters.marca);
+    }
+    if (filters.min) {
+      const minVal = parseFloat(filters.min);
+      if (!isNaN(minVal)) temp = temp.filter(p => p.price >= minVal);
+    }
+    if (filters.max) {
+      const maxVal = parseFloat(filters.max);
+      if (!isNaN(maxVal)) temp = temp.filter(p => p.price <= maxVal);
+    }
+    if (filters.priceOrder === "asc") {
+      temp.sort((a, b) => a.price - b.price);
+    } else if (filters.priceOrder === "desc") {
+      temp.sort((a, b) => b.price - a.price);
+    }
+    if (searchTerm.trim() !== "") {
+      temp = temp.filter(p =>
+        p.name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    setFiltered(temp);
+  }, [filters, searchTerm, products]);
+
+  // ─── Estado UI ───
   if (loading) return <p>Cargando productos…</p>;
   if (error) return <p>Error: {error}</p>;
   if (!products.length) return <p>No hay productos disponibles.</p>;
 
+  // Limpiador de filtros
+  const handleClearFilters = () => {
+    setFilters({ categoria: "", marca: "", priceOrder: "", min: "", max: "" });
+    setSearchTerm("");
+  };
+
   return (
     <>
-      {/* ─── Section Top Divider ─── */}
       <section className="shop-section">
         <div className="section-top-divider"></div>
       </section>
 
-      {/* ─── Grid de Productos ─── */}
-      <div className="shop-container">
-        {products.map((prod) => (
-          <div key={prod.id} className="shop-card">
-            <img
-              src={`http://localhost:4001${prod.imageUrl}`}
-              alt={`Foto de ${prod.name}`}
-              loading="lazy"
-              className="shop-image"
-              onError={(e) => {
-                if (!e.currentTarget.dataset.fallback) {
-                  e.currentTarget.src = "/api/images/placeholder.png";
-                  e.currentTarget.dataset.fallback = "true";
-                }
-              }}
-            />
-            <h3 className="shop-title">{prod.name}</h3>
-            <p className="shop-subinfo">
-              <strong>Marca:</strong> {prod.marca}
-            </p>
-            <p className="shop-price">${prod.price.toFixed(2)}</p>
-
-            {/* ==== Botones ==== */}
-            <div className="shop-actions">
-              <button
-                className="btn-details"
-                onClick={() => setModalProduct(prod)}
-              >
-                Ver detalles
-              </button>
-              <button
-                className="btn-add"
-                onClick={() => {/* lógica añadir al carrito */ }}
-              >
-                + Agregar al carrito
-              </button>
-            </div>
-          </div>
-        ))}
+      {/* ─── Encabezado ─── */}
+      <div className="shop-header">
+        <h1 className="shop-heading">Tienda Online</h1>
+        <input
+          className="shop-search"
+          type="text"
+          placeholder="Buscar por nombre..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
       </div>
 
-      {/* ==== Modal de detalles ==== */}
+      <div className="shop-wrapper">
+        {/* ─── Filtros ─── */}
+        <aside className="shop-filters">
+          <h3>Filtros</h3>
+
+          <label htmlFor="f-categoria">Categoría:</label>
+          <select
+            id="f-categoria"
+            value={filters.categoria}
+            onChange={(e) => setFilters({ ...filters, categoria: e.target.value })}
+          >
+            <option value="">Todas</option>
+            <option value="Cámaras">Cámaras</option>
+            <option value="Cables">Cables</option>
+            <option value="Herramientas">Herramientas</option>
+            <option value="Durlock">Durlock</option>
+            <option value="DVR">DVR</option>
+          </select>
+
+          <label htmlFor="f-marca">Marca:</label>
+          <select
+            id="f-marca"
+            value={filters.marca}
+            onChange={(e) => setFilters({ ...filters, marca: e.target.value })}
+          >
+            <option value="">Todas</option>
+            <option value="Hikvision">Hikvision</option>
+            <option value="DSC">DSC</option>
+            <option value="Imou">Imou</option>
+            <option value="Dahua">Dahua</option>
+            <option value="Garnet">Garnet</option>
+            <option value="Bosch">Bosch</option>
+            <option value="TP-Link">TP-Link</option>
+            <option value="Durlock">Durlock</option>
+            <option value="Stanley">Stanley</option>
+            <option value="Belkin">Belkin</option>
+            <option value="Black+Decker">Black+Decker</option>
+            <option value="Generic">Generic</option>
+          </select>
+
+          <label htmlFor="f-priceOrder">Orden de precio:</label>
+          <select
+            id="f-priceOrder"
+            value={filters.priceOrder}
+            onChange={(e) => setFilters({ ...filters, priceOrder: e.target.value })}
+          >
+            <option value="">---</option>
+            <option value="asc">Menor a mayor</option>
+            <option value="desc">Mayor a menor</option>
+          </select>
+
+          <label>Rango de precio:</label>
+          <div className="price-range">
+            <input
+              type="number"
+              placeholder="Mín"
+              value={filters.min}
+              onChange={(e) => setFilters({ ...filters, min: e.target.value })}
+            />
+            <input
+              type="number"
+              placeholder="Máx"
+              value={filters.max}
+              onChange={(e) => setFilters({ ...filters, max: e.target.value })}
+            />
+          </div>
+
+          <button
+            className="btn-clear-filters"
+            onClick={handleClearFilters}
+          >
+            Limpiar filtros
+          </button>
+        </aside>
+
+        {/* ─── Productos ─── */}
+        <div className="shop-container">
+          {/* Opcional: mostrar cantidad de resultados */}
+          <div className="results-info">
+            {filtered.length} producto{filtered.length !== 1 ? "s" : ""} encontrado{filtered.length !== 1 ? "s" : ""}
+          </div>
+          {filtered.map((prod) => (
+            <div key={prod.id} className="shop-card">
+              <img
+                src={`http://localhost:4001${prod.imageUrl}`}
+                alt={`Foto de ${prod.name}`}
+                loading="lazy"
+                className="shop-image"
+                onError={(e) => {
+                  if (!e.currentTarget.dataset.fallback) {
+                    e.currentTarget.src = "/api/images/placeholder.png";
+                    e.currentTarget.dataset.fallback = "true";
+                  }
+                }}
+              />
+              <h3 className="shop-title">{prod.categoria} - {prod.name}</h3>
+              <p className="shop-subinfo"><strong>Marca:</strong> {prod.marca}</p>
+              <p className="shop-price">${prod.price.toFixed(2)}</p>
+              <div className="shop-actions">
+                <button className="btn-details" onClick={() => setModalProduct(prod)}>Ver detalles</button>
+                <button className="btn-add">+ Agregar</button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ─── Modal ─── */}
       {modalProduct && (
         <div className="modal-overlay" onClick={() => setModalProduct(null)}>
-          <div
-            className="modal-content"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              className="modal-close"
-              onClick={() => setModalProduct(null)}
-            >
-              &times;
-            </button>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <button className="modal-close" onClick={() => setModalProduct(null)}>&times;</button>
             <div className="modal-body">
               <img
                 src={`http://localhost:4001${modalProduct.imageUrl}`}
@@ -101,11 +220,7 @@ const Shop = () => {
                 <p><strong>Marca:</strong> {modalProduct.marca}</p>
                 <p><strong>Categoría:</strong> {modalProduct.categoria}</p>
                 <p className="shop-stock">
-                <strong>Stock: </strong>
-                  {modalProduct.stock > 0
-                    ? `${modalProduct.stock}`
-                    : <span className="out-of-stock">Sin stock</span>
-                  }
+                  <strong>Stock:</strong> {modalProduct.stock > 0 ? modalProduct.stock : <span className="out-of-stock">Sin stock</span>}
                 </p>
                 <p className="modal-description">{modalProduct.description}</p>
               </div>

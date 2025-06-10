@@ -80,13 +80,9 @@ const Shop = () => {
 
   return (
     <>
-      <section className="shop-section">
-        <div className="section-top-divider"></div>
-      </section>
-
       {/* ─── Encabezado ─── */}
       <div className="shop-header">
-        <h1 className="shop-heading">Tienda Online</h1>
+        <h1 className="shop-heading">TIENDA DIGITAL</h1>
         <input
           className="shop-search"
           type="text"
@@ -202,6 +198,10 @@ const Shop = () => {
           ))}
         </div>
       </div>
+
+      <section className="shop-section">
+        <div className="section-bottom-divider"></div>
+      </section>
 
       {/* ─── Modal ─── */}
       {modalProduct && (

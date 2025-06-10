@@ -17,8 +17,8 @@ function App() {
         <NavBar/>
         <Hero />
         <Slider />
-        <Services/>
         <Shop />
+        <Services/>
       </div>
     </>
   )

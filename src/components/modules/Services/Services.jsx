@@ -102,7 +102,7 @@ const Services = () => {
           >
             <div className="service-card">
               <div className="icon-wrapper">
-                  <img src={service.icon} alt={service.title} />
+                <img src={service.icon} alt={service.title} />
               </div>
               <h3>{service.title}</h3>
             </div>
@@ -134,6 +134,10 @@ const Services = () => {
           </div>
         </div>
       )}
+
+      <section className="slider-section">
+        <div className="section-top-divider"></div>
+      </section>
     </>
   );
 };

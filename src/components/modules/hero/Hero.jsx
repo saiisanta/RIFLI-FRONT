@@ -44,11 +44,11 @@ const Hero = () => {
           </p>
           {/* Botones de acción */}
           <div className="d-flex flex-column flex-md-row gap-3">
-            <Button className="presupuesto" href='#presupuesto' variant="warning" size="lg"> {/* Botón para solicitar presupuesto */}
+            <Button className="presupuesto" href='#servicios' variant="warning" size="lg"> {/* Botón para solicitar presupuesto */}
               Solicitar presupuesto
             </Button>
-            <Button className="servicios" href='#servicios' variant="outline-light" size="lg"> {/* Botón para ver servicios */}
-              Ver servicios
+            <Button className="shop" href='#shop' variant="outline-light" size="lg"> {/* Botón para ver servicios */}
+              Ver Catálogo
             </Button>
           </div>
         </div>

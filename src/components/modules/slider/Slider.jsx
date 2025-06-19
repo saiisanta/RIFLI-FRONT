@@ -57,7 +57,7 @@ const Slider = () => {
           </div>
         </div>
 
-        <Button id="servicios" variant="outline-dark" size="lg" className="mt-5">
+        <Button variant="outline-dark" size="lg" className="mt-5">
           Conocé más...
         </Button>
       </Container>

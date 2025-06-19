@@ -58,11 +58,19 @@ const Shop = () => {
     } else if (filters.priceOrder === "desc") {
       temp.sort((a, b) => b.price - a.price);
     }
+    // Normaliza textos: elimina tildes y convierte a minúsculas
+    const normalize = (str) =>
+      str?.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+
     if (searchTerm.trim() !== "") {
+      const term = normalize(searchTerm);
       temp = temp.filter(p =>
-        p.name.toLowerCase().includes(searchTerm.toLowerCase())
+        normalize(p.name).includes(term) ||
+        normalize(p.categoria).includes(term) ||
+        normalize(p.marca).includes(term)
       );
     }
+
 
     setFiltered(temp);
   }, [filters, searchTerm, products]);
@@ -81,15 +89,14 @@ const Shop = () => {
   return (
     <>
       {/* ─── Encabezado ─── */}
-      <div className="shop-header">
-        <h1 className="shop-heading">TIENDA DIGITAL</h1>
-        <input
-          className="shop-search"
-          type="text"
-          placeholder="Buscar por nombre..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
+      <div className="shop-header " id="shop">
+        <div className="shop-logo-wrapper">
+          <img
+            className="shop-logo"
+            src="./src/assets/img/rifli/icono_rifli.png"
+            alt="Logo"
+          />
+        </div>
       </div>
 
       <div className="shop-wrapper">
@@ -169,10 +176,21 @@ const Shop = () => {
 
         {/* ─── Productos ─── */}
         <div className="shop-container">
-          {/* Opcional: mostrar cantidad de resultados */}
-          <div className="results-info">
-            {filtered.length} producto{filtered.length !== 1 ? "s" : ""} encontrado{filtered.length !== 1 ? "s" : ""}
+          {/* ─── Resultados + Búsqueda ─── */}
+          <div className="results-search-wrapper">
+            <div className="results-info">
+              {filtered.length} producto{filtered.length !== 1 ? "s" : ""} encontrado{filtered.length !== 1 ? "s" : ""}
+            </div>
+            <input
+              className="shop-search"
+              type="text"
+              placeholder="Buscar productos por nombre..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
           </div>
+
+
           {filtered.map((prod) => (
             <div key={prod.id} className="shop-card">
               <img
@@ -198,10 +216,6 @@ const Shop = () => {
           ))}
         </div>
       </div>
-
-      <section className="shop-section">
-        <div className="section-bottom-divider"></div>
-      </section>
 
       {/* ─── Modal ─── */}
       {modalProduct && (

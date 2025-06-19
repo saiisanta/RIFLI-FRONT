@@ -8,137 +8,286 @@ import secoIcon from "/src/assets/img/icons/seco1.svg";
 import gasistaIcon from "/src/assets/img/icons/gasista1.svg";
 import distribucionIcon from "/src/assets/img/icons/distribucion1.svg";
 
-const servicesData = [
+export const serviceDetails = [
   {
-    icon: seguridadIcon,
     title: "Sistemas de Seguridad",
-    image: "/src/assets/img/servicios/seguridadHero1.png",
-    description: "Instalación y mantenimiento de alarmas, cámaras y sistemas de vigilancia 24/7 para máxima protección."
+    description: (
+      <>
+        Instalación y mantenimiento de alarmas, cámaras<br />
+        y sistemas de vigilancia 24/7 para máxima protección.
+      </>
+    ),
+    icon: seguridadIcon,
+    backgroundImageUrl: "/src/assets/img/servicios/seguridadHero.png",
+    form: (
+      <form className="quote-form">
+        <div className="field-group">
+          <label>Nombre Completo</label>
+          <input type="text" name="name" placeholder="Tu nombre" required />
+        </div>
+        <div className="field-group">
+          <label>Teléfono de Contacto</label>
+          <input type="tel" name="phone" placeholder="+54 9 11 1234‑5678" required />
+        </div>
+        <div className="field-group">
+          <label>Email</label>
+          <input type="email" name="email" placeholder="tu@ejemplo.com" required />
+        </div>
+        <div className="field-group">
+          <label>Tipo de Servicio</label>
+          <select name="serviceType" required>
+            <option value="">Selecciona...</option>
+            <option value="alarm-install">Instalación de Alarma</option>
+            <option value="camera-install">Instalación de Cámaras</option>
+            <option value="monitoring">Monitoreo 24/7</option>
+            <option value="maintenance">Mantenimiento</option>
+          </select>
+        </div>
+        <div className="field-group">
+          <label>Cantidad de Puntos</label>
+          <input type="number" name="points" min="1" placeholder="Ej. 4 cámaras / 2 sensores" required />
+        </div>
+        <div className="field-group">
+          <label>Ubicación del Proyecto</label>
+          <input type="text" name="location" placeholder="Dirección o descripción" required />
+        </div>
+        <div className="field-group full-width">
+          <label>Detalles Adicionales</label>
+          <textarea name="notes" rows="4" placeholder="Requerimientos extra..." />
+        </div>
+        <button type="submit">Enviar Solicitud</button>
+      </form>
+    ),
   },
   {
-    icon: electricidadIcon,
     title: "Instalaciones Eléctricas",
-    image: "/src/assets/img/servicios/electricidadHero1.png",
-    description: "Soluciones eléctricas completas desde cableado básico hasta instalaciones industriales certificadas."
+    description: (
+      <>
+        Soluciones eléctricas completas desde cableado básico<br />
+        hasta instalaciones industriales certificadas.
+      </>
+    ),
+    icon: electricidadIcon,
+    backgroundImageUrl: "/src/assets/img/servicios/electricidadHero.png",
+    form: (
+      <form className="quote-form">
+        <div className="field-group">
+          <label>Nombre Completo</label>
+          <input type="text" name="name" placeholder="Tu nombre" required />
+        </div>
+        <div className="field-group">
+          <label>Teléfono de Contacto</label>
+          <input type="tel" name="phone" placeholder="+54 9 11 1234‑5678" required />
+        </div>
+        <div className="field-group">
+          <label>Email</label>
+          <input type="email" name="email" placeholder="tu@ejemplo.com" required />
+        </div>
+        <div className="field-group">
+          <label>Tipo de Instalación</label>
+          <select name="installType" required>
+            <option value="">Selecciona...</option>
+            <option value="residential">Residencial</option>
+            <option value="commercial">Comercial</option>
+            <option value="industrial">Industrial</option>
+          </select>
+        </div>
+        <div className="field-group">
+          <label>Superficie Aproximada</label>
+          <input type="text" name="area" placeholder="Metros cuadrados" required />
+        </div>
+        <div className="field-group">
+          <label>Voltaje / Requerimientos</label>
+          <input type="text" name="voltage" placeholder="Ej. 220V monofásico" />
+        </div>
+        <div className="field-group full-width">
+          <label>Detalles Adicionales</label>
+          <textarea name="notes" rows="4" placeholder="Particularidades..." />
+        </div>
+        <button type="submit">Solicitar Presupuesto</button>
+      </form>
+    ),
   },
   {
-    icon: secoIcon,
     title: "Trabajos en Seco",
-    image: "/src/assets/img/servicios/secoHero1.png",
-    description: "Construcción y remodelación con placas de yeso, cielorrasos y tabiquería de alta calidad."
+    description: (
+      <>
+        Construcción y remodelación con placas de yeso,<br />
+        cielorrasos y tabiquería de alta calidad.
+      </>
+    ),
+    icon: secoIcon,
+    backgroundImageUrl: "/src/assets/img/servicios/secoHero.png",
+    form: (
+      <form className="quote-form">
+        <div className="field-group">
+          <label>Nombre Completo</label>
+          <input type="text" name="name" placeholder="Tu nombre" required />
+        </div>
+        <div className="field-group">
+          <label>Teléfono de Contacto</label>
+          <input type="tel" name="phone" placeholder="+54 9 11 1234‑5678" required />
+        </div>
+        <div className="field-group">
+          <label>Email</label>
+          <input type="email" name="email" placeholder="tu@ejemplo.com" required />
+        </div>
+        <div className="field-group">
+          <label>Tipo de Trabajo</label>
+          <select name="dryType" required>
+            <option value="">Selecciona...</option>
+            <option value="pladur-wall">Tabiques de Pladur</option>
+            <option value="false-ceiling">Cielorrasos</option>
+            <option value="remodel">Remodelación</option>
+          </select>
+        </div>
+        <div className="field-group">
+          <label>Metros Cuadrados</label>
+          <input type="number" name="sqm" min="1" placeholder="Ej. 25" required />
+        </div>
+        <div className="field-group">
+          <label>Altura de Techo</label>
+          <input type="text" name="height" placeholder="Ej. 2.5 m" />
+        </div>
+        <div className="field-group full-width">
+          <label>Detalles Adicionales</label>
+          <textarea name="notes" rows="4" placeholder="Acabados, colores..." />
+        </div>
+        <button type="submit">Obtener Cotización</button>
+      </form>
+    ),
   },
   {
-    icon: gasistaIcon,
     title: "Gasista Matriculado",
-    image: "/src/assets/img/servicios/gasistaHero.png",
-    description: "Instalaciones seguras de gas natural y envasado, con certificación oficial y garantía."
+    description: (
+      <>
+        Instalaciones seguras de gas natural y envasado,<br />
+        con certificación oficial y garantía.
+      </>
+    ),
+    icon: gasistaIcon,
+    backgroundImageUrl: "/src/assets/img/servicios/gasistaHero.png",
+    form: (
+      <form className="quote-form">
+        <div className="field-group">
+          <label>Nombre Completo</label>
+          <input type="text" name="name" placeholder="Tu nombre" required />
+        </div>
+        <div className="field-group">
+          <label>Teléfono de Contacto</label>
+          <input type="tel" name="phone" placeholder="+54 9 11 1234‑5678" required />
+        </div>
+        <div className="field-group">
+          <label>Email</label>
+          <input type="email" name="email" placeholder="tu@ejemplo.com" required />
+        </div>
+        <div className="field-group">
+          <label>Tipo de Instalación de Gas</label>
+          <select name="gasType" required>
+            <option value="">Selecciona...</option>
+            <option value="natural">Gas Natural</option>
+            <option value="envasado">Gas Envasado</option>
+            <option value="calefon">Calefón</option>
+          </select>
+        </div>
+        <div className="field-group">
+          <label>Puntos de Consumo</label>
+          <input type="number" name="points" min="1" placeholder="Ej. 2 hornallas" required />
+        </div>
+        <div className="field-group">
+          <label>Ubicación / Acceso</label>
+          <input type="text" name="location" placeholder="Descripción del lugar" />
+        </div>
+        <div className="field-group full-width">
+          <label>Detalles Adicionales</label>
+          <textarea name="notes" rows="4" placeholder="Permisos, urgencia..." />
+        </div>
+        <button type="submit">Pedir Presupuesto</button>
+      </form>
+    ),
   },
   {
+    title: "Distribución de Productos",
+    description: (
+      <>
+        Suministro de materiales eléctricos, de seguridad<br />
+        y construcción con entrega a domicilio.
+      </>
+    ),
     icon: distribucionIcon,
-    title: "Distribución",
-    image: "/src/assets/img/servicios/distribucionHero1.png",
-    description: "Suministro de materiales eléctricos, de seguridad y construcción con entrega a domicilio."
-  }
+    backgroundImageUrl: "/src/assets/img/servicios/distribucionHero.png",
+    form: (
+      <form className="quote-form">
+        <div className="field-group">
+          <label>Nombre Completo</label>
+          <input type="text" name="name" placeholder="Tu nombre" required />
+        </div>
+        <div className="field-group">
+          <label>Teléfono de Contacto</label>
+          <input type="tel" name="phone" placeholder="+54 9 11 1234‑5678" required />
+        </div>
+        <div className="field-group">
+          <label>Email</label>
+          <input type="email" name="email" placeholder="tu@ejemplo.com" required />
+        </div>
+        <div className="field-group">
+          <label>Tipo de Producto</label>
+          <select name="productType" required>
+            <option value="">Selecciona...</option>
+            <option value="electricos">Eléctricos</option>
+            <option value="seguridad">Seguridad</option>
+            <option value="construccion">Construcción</option>
+          </select>
+        </div>
+        <div className="field-group">
+          <label>Cantidad Estimada</label>
+          <input type="text" name="quantity" placeholder="Ej. 50 unidades" required />
+        </div>
+        <div className="field-group">
+          <label>Lugar de Entrega</label>
+          <input type="text" name="address" placeholder="Dirección completa" required />
+        </div>
+        <div className="field-group full-width">
+          <label>Detalles Adicionales</label>
+          <textarea name="notes" rows="4" placeholder="Embalaje especial..." />
+        </div>
+        <button type="submit">Cotizar Productos</button>
+      </form>
+    ),
+  },
 ];
 
-const Services = () => {
+const Services = ({ onSelect }) => {
   const [selectedIndex, setSelectedIndex] = useState(null);
-  const [isClosing, setIsClosing] = useState(false);
-  const [allowOpenScroll, setAllowOpenScroll] = useState(true); // 👈 bandera de control
-
   const servicesRef = useRef(null);
-  const expandedRef = useRef(null);
 
-  useEffect(() => {
-    if (selectedIndex !== null && expandedRef.current && allowOpenScroll) {
-      requestAnimationFrame(() => {
-        expandedRef.current.scrollIntoView({ behavior: "smooth" });
-      });
-    }
-  }, [selectedIndex, allowOpenScroll]);
-
-  const handleClose = () => {
-    setIsClosing(true);
-
-    setTimeout(() => {
-      setSelectedIndex(null);
-      setIsClosing(false);
-      setAllowOpenScroll(true); // habilita scroll para la próxima vez
-    }, 500);
-
-    // ========= NUEVA LÓGICA: SOLO SCROLLEAR SI ESTAMOS MÁS ABAJO QUE servicesRef =========
-    if (servicesRef.current) {
-      // Obtenemos la distancia de servicesRef respecto al top del documento
-      const serviciosTop = servicesRef.current.getBoundingClientRect().top + window.pageYOffset;
-      // Obtenemos la posición actual del scroll (píxeles scrolleados desde arriba)
-      const scrollActual = window.pageYOffset;
-
-      // Si el scroll actual está POR DEBAJO de la sección de servicios, entonces sí scrollear
-      if (scrollActual > serviciosTop) {
-        servicesRef.current.scrollIntoView({ behavior: "smooth" });
-      }
-      // Si scrollActual <= serviciosTop, no hacemos nada: ya estamos arriba o justo en la posición
-    }
+  const handleClick = (idx) => {
+    const newIndex = selectedIndex === idx ? null : idx;
+    setSelectedIndex(newIndex);
+    if (onSelect) onSelect(newIndex);
   };
-
-  const selectedService = selectedIndex !== null ? servicesData[selectedIndex] : null;
+  
 
   return (
-    <>
-      {/* ─── 1. FILA DE SERVICIOS HORIZONTALES ─── */}
-      <section className="services-section-vertical" ref={servicesRef}>
-        {servicesData.map((service, index) => (
-          <div
-            key={index}
-            className={
-              `service-band-vertical ${index % 2 === 0 ? "dark" : "darker"} ` +
-              `${selectedIndex === index ? "selected" : ""}`
-            }
-            onClick={() => {
-              setSelectedIndex(index);
-              setIsClosing(false);
-              setAllowOpenScroll(false); // 👈 evita scroll al abrir
-            }}
-          >
-            <div className="service-card">
-              <div className="icon-wrapper">
-                <img src={service.icon} alt={service.title} />
-              </div>
-              <h3>{service.title}</h3>
-            </div>
-          </div>
-        ))}
-      </section>
-
-      {/* ─── 2. ÁREA EXPANDIDA (DEBAJO) ─── */}
-      {selectedService && (
+    <section id="servicios" className="services-section-vertical" ref={servicesRef}>
+      {serviceDetails.map((svc, idx) => (
         <div
-          className={`service-expanded-area${isClosing ? " closing" : ""}`}
-          ref={expandedRef}
+          key={idx}
+          className={
+            `service-band-vertical ${idx % 2 === 0 ? "dark" : "darker"} ` +
+            (selectedIndex === idx ? " selected" : "")
+          }
+          onClick={() => handleClick(idx)}
         >
-          <div className="expanded-text">
-            <h2 className="fw-bold display-4 mb-3">{selectedService.title}</h2>
-            <p className="lead mb-3">{selectedService.description}</p>
-          </div>
-          <div className="expanded-image-wrapper">
-            <img
-              // src={selectedService.image}
-              // alt={selectedService.title}
-              className="expanded-service-image"
-            />
-          </div>
-          <div className="close-button-container">
-            <button className="close-button" onClick={handleClose}>
-              ▲ Cerrar
-            </button>
+          <div className="service-card">
+            <div className="icon-wrapper">
+              <img src={svc.icon} alt={svc.title} />
+            </div>
+            <h3>{svc.title}</h3>
           </div>
         </div>
-      )}
-
-      <section className="slider-section">
-        <div className="section-top-divider"></div>
-      </section>
-    </>
+      ))}
+    </section>
   );
 };
 

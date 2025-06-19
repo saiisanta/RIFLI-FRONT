@@ -5,7 +5,7 @@ import Hero from './components/modules/hero/Hero.jsx'
 import Slider from './components/modules/slider/Slider.jsx'
 import Services from './components/modules/Services/Services.jsx'
 import Shop from './components/modules/shop/Shop.jsx'
-//import Libros from './components/usuarios/Usuarios.jsx'
+import Quotes from './components/modules/quotes/Quotes.jsx'
 
 
 function App() {
@@ -18,7 +18,7 @@ function App() {
         <Hero />
         <Slider />
         <Shop />
-        <Services/>
+        <Quotes />
       </div>
     </>
   )

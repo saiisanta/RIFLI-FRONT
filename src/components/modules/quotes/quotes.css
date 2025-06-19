@@ -1,0 +1,199 @@
+/* ==============================
+   quotes.css
+   ============================== */
+
+/* 0) Reset y tipografía global */
+html,
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Roboto', sans-serif;
+}
+
+/* 1) Contenedor con sombras laterales */
+.quotes-section {
+  position: relative;
+  background-color: #f2f2f2;
+  box-shadow:
+    inset 60px 0 50px -30px rgba(0,0,0,0.3),
+    inset -60px 0 50px -30px rgba(0,0,0,0.3);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* 2) Dividers superior e inferior */
+.section-top-divider,
+.section-bottom-divider {
+  width: 100%;
+  height: 25px;
+  background-color: #ffca2c;
+}
+
+/* 3) Contenedor de la fila de servicios */
+.quotes-services {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+/* 4) Contenedor del detalle (cerrado por defecto) */
+.quotes-detail {
+  position: relative;
+  overflow: hidden;
+  max-height: 0;
+}
+
+/* 4.1) Apertura vertical tipo persiana */
+.quotes-detail.vertical-open {
+  animation: slideDown 0.5s ease-out forwards;
+}
+
+/* 4.2) Cierre vertical tipo persiana */
+.quotes-detail.vertical-close {
+  animation: slideUp 0.5s ease-out forwards;
+}
+
+/* 4.3) Cambio lateral: mantengo la altura abierta */
+.quotes-detail.lateral {
+  max-height: 100vh;
+}
+
+/* Keyframes persiana */
+@keyframes slideDown {
+  from { max-height: 0; }
+  to   { max-height: 100vh; }
+}
+@keyframes slideUp {
+  from { max-height: 100vh; }
+  to   { max-height: 0; }
+}
+
+/* 5) Wrapper interno del detalle */
+.detail-block-wrapper {
+  position: relative;
+  width: 100%;
+  min-height: 75vh;
+}
+
+/* 5.1) Divider fijo dentro del detalle */
+.quotes-divider-fixed {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 25px;
+  background-color: #ffca2c;
+  border-bottom-left-radius: 30% 80%;
+  border-bottom-right-radius: 30% 80%;
+  z-index: 10;
+}
+
+/* 6) Capas de fondo del detalle */
+.background-layer {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-size: cover;
+  background-position: center;
+  will-change: transform, opacity;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 2rem;
+}
+
+/* Capa previa (para transición lateral) */
+.background-layer.previous {
+  z-index: 1;
+}
+
+/* Capa actual */
+.background-layer.current {
+  z-index: 2;
+  box-shadow:
+    inset 60px 0 50px -30px rgba(0,0,0,0.3),
+    inset -60px 0 50px -30px rgba(0,0,0,0.3);
+}
+
+/* 6.1) Animación lateral de la capa actual */
+.background-layer.animate-bg {
+  animation: bgPushIn 0.6s ease-out forwards;
+}
+@keyframes bgPushIn {
+  from { transform: translateX(100%); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+
+/* 7) Contenedor del formulario, alineado a la izquierda */
+.form-container {
+  position: relative;
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  opacity: 0;
+  transform: translateX(-20px);
+  will-change: transform, opacity;
+}
+.form-container.animate-form {
+  animation: formFadeIn 0.5s ease-out 0.3s forwards;
+}
+@keyframes formFadeIn {
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* 8) Estilos del formulario en dos columnas */
+.quote-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  width: 100%;
+  max-width: 700px;
+  margin-top: 2rem;
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+}
+.field-group.full-width {
+  grid-column: 1 / -1;
+}
+
+.field-group label {
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+  font-size: 1.1rem;
+}
+
+.field-group input,
+.field-group select,
+.field-group textarea {
+  padding: 0.75rem;
+  background-color: #f3f3f3;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1.1rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.field-group textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+/* 9) Botón de envío */
+.quote-form button {
+  grid-column: 1 / -1;
+  padding: 1rem;
+  background-color: #ffca2c;
+  color: #000;
+  border: none;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+}
+.quote-form button:hover {
+  background-color: #ffc107;
+  transform: translateY(-2px);
+}

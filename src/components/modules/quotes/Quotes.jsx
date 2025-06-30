@@ -47,11 +47,26 @@ export default function Quotes() {
   useEffect(() => {
     if (animType === "vertical-open") {
       const t = setTimeout(() => {
-        detailRef.current?.scrollIntoView({ behavior: "smooth" });
+        const el = detailRef.current;
+        if (el) {
+          const rect = el.getBoundingClientRect();
+  
+          const isFullyVisible =
+            rect.top >= 0 &&
+            rect.bottom <= (window.innerHeight || document.documentElement.clientHeight);
+  
+          if (!isFullyVisible) {
+            el.scrollIntoView({
+              behavior: "smooth",
+              block: "end" // hace que el final del bloque quede justo visible
+            });
+          }
+        }
       }, 500);
       return () => clearTimeout(t);
     }
   }, [animType]);
+  
 
   return (
     <div className="quotes-section">

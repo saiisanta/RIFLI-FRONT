@@ -125,3 +125,62 @@
      transform: scale(0.7);
    }
    
+
+   @media(max-width: 1320px) {
+    .icon-wrapper{
+      width: 130px;
+      height: 130px;
+    }
+
+    .icon-wrapper img{
+      transform: scale(1.2);
+    }
+
+    .service-card h3 {
+      font-size: 1.3rem;
+    }
+
+  }
+
+   @media(max-width: 1260px) {
+    .icon-wrapper{
+      width: 120px;
+      height: 120px;
+    }
+
+    .icon-wrapper img{
+      transform: scale(1.15);
+    }
+
+    .service-card h3 {
+      font-size: 1rem;
+    }
+
+  }
+
+   @media(max-width: 950px) {
+    .icon-wrapper{
+      width: 110px;
+      height: 110px;
+    }
+
+    .icon-wrapper img{
+      transform: scale(1.1);
+    }
+
+  }
+
+  @media(max-width: 670px) {
+    .icon-wrapper{
+      width: 100px;
+      height: 100px;
+    }
+
+    .icon-wrapper img{
+      transform: scale(1);
+    }
+
+    .service-card h3 {
+      font-size: 0.7rem;
+    }
+  }

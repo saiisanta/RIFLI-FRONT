@@ -102,4 +102,79 @@
    }
 
 
+
+  @media(max-width: 1580px) {
+    .Brand-text {
+      margin-left: -10vh;      
+    }
+  }
+
+  @media(max-width: 1500px) {
+    .Brand-text {
+      margin-left: -5vh;      
+    }
+  }
+
+  @media(max-width: 1300px) {
+    .Brand-text {
+      margin-left: -2vh;      
+    }
+  }
+
+  @media(max-width: 990px) {
+    .Brand-text {
+      margin-left: -2vh;    
+    }
+    .hero-section h1 {
+      font-size: 6vh;          
+    }
+    
+    .hero-section p {
+      font-size: 3vh;          
+    }
+    
+    .hero-section button {
+      font-size: 2.5vh;        
+    }
+  }
+
+  @media(max-width: 620px) {
+    .hero-section h1 {
+      font-size: 5vh;          
+    }
+    
+    .hero-section p {
+      font-size: 2.5vh;          
+    }
+    
+    .hero-section button {
+      font-size: 2vh;         
+    }
+  }
+
+  @media(max-width: 580px) {
+    .hero-section h1 {
+      font-size: 5vh;
+    }
+    
+    .hero-section p {
+      font-size: 2.3vh;            
+    }
+    
+    .hero-section button {
+      font-size: 2.7vh;
+      width: 20%;
+    }
+    .presupuesto{
+      width: 60%;
+      align-self: center;
+    }
+    .shop{
+      width: 50%;
+      align-self: center;
+    }
+  }
+
+
+
    

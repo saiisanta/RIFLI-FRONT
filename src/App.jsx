@@ -1,27 +1,22 @@
-import { useState } from 'react'
-import './App.css'
-import NavBar from './components/modules/nav/Nav.jsx'
-import Hero from './components/modules/hero/Hero.jsx'
-import Slider from './components/modules/slider/Slider.jsx'
-import Services from './components/modules/Services/Services.jsx'
-import Shop from './components/modules/shop/Shop.jsx'
-import Quotes from './components/modules/quotes/Quotes.jsx'
-
+// src/App.jsx
+import NavBar from './components/modules/nav/Nav';
+import Footer from './components/modules/footer/Footer';
+import Hero from './components/modules/hero/Hero';
+import Slider from './components/modules/slider/Slider';
+import Shop from './components/modules/shop/Shop';
+import Quotes from './components/modules/quotes/Quotes';
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
     <>
-      <div style={{ margin: 0, padding: 0 }}>
-        <NavBar/>
-        <Hero />
-        <Slider />
-        <Shop />
-        <Quotes />
-      </div>
+      <NavBar />
+      <Hero />
+      <Slider />
+      <Shop />
+      <Quotes />
+      <Footer />
     </>
-  )
+  );
 }
 
 export default App;

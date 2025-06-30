@@ -95,3 +95,10 @@
   z-index: 2;
   pointer-events: none; /* Para que no interfiera con clics */
 }
+
+
+@media(max-width: 767px) {
+  .slider-logo{
+    padding: 0 25px;
+  }
+}

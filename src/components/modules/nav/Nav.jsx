@@ -51,7 +51,7 @@ const NavBar = () => {
             <div className="d-flex align-items-center gap-lg-4">
               {/* NAVLINKS (AHORA A LA DERECHA) */}
               <Nav className="me-lg-3">
-                {['servicios', 'quienes-somos', 'contacto'].map(item => (
+                {['servicios', 'contacto'].map(item => (
                   <Nav.Link 
                     key={item} 
                     href={`#${item}`} 

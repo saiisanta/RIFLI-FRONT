@@ -159,32 +159,108 @@ body {
 }
 
 /* MODAL CARRITO DETALLES */
+/* 🌑 Modal general */
 .cart-details-modal {
-  max-width: 800px;
+  max-width: 900px;
   width: 95%;
-  padding: 20px;
+  padding: 24px 30px;
+  background-color: #1a1a1a;
+  color: #f5f5f5;
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
+  max-height: 80vh;
+  overflow-y: auto;
 }
 
+/* 🧱 Grid de tarjetas */
 .cart-details-grid {
   display: flex;
   flex-wrap: wrap;
-  gap: 20px;
+  gap: 24px;
   margin-top: 20px;
   justify-content: center;
 }
 
+/* 🪪 Tarjeta individual */
 .cart-details-card {
-  width: 220px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  padding: 12px;
-  background-color: #f9f9f9;
+  width: 230px;
+  background-color: #2a2a2a;
+  border: 1px solid #444;
+  border-radius: 10px;
+  padding: 16px;
   text-align: center;
+  transition: transform 0.2s ease;
 }
+
+.cart-details-card:hover {
+  transform: translateY(-4px);
+}
+
+/* 🖼 Imagen */
 .cart-details-img {
   width: 100%;
   height: 140px;
   object-fit: cover;
+  border-radius: 6px;
+  margin-bottom: 10px;
+}
+
+/* 📋 Info del producto */
+.cart-details-info h4 {
+  margin: 8px 0 6px;
+  font-size: 1.1rem;
+  color: #ffca2c;
+}
+
+.cart-details-info p {
+  margin: 4px 0;
+  font-size: 0.95rem;
+  color: #ddd;
+}
+
+/* 🔢 Controles de cantidad */
+.cart-details-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 10px 0;
+  gap: 10px;
+  color: white;
+}
+
+.cart-details-controls button {
+  padding: 4px 10px;
+  font-size: 1rem;
+  background-color: #ffca2c;
+  color: #000;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.cart-details-controls span {
+  min-width: 24px;
+  text-align: center;
+  font-size: 1.1rem;
+}
+
+/* ❌ Botón eliminar */
+.btn-remove {
+  margin-top: 8px;
+  background-color: transparent;
+  border: 1px solid #ff4d4d;
+  color: #ff4d4d;
+  padding: 6px 12px;
+  border-radius: 5px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.btn-remove:hover {
+  background-color: #ff4d4d;
+  color: #fff;
 }
 
 .btn-details,

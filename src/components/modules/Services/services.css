@@ -1,29 +1,33 @@
-/* =========================
-   0) Importar Roboto
-   ========================= */
+/* ===================================================
+   0) Importación de fuente Roboto
+   =================================================== */
    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
 
-   /* =========================
-      1) Reset global
-      ========================= */
+   /* ===================================================
+      1) Reset global y tipografía base
+      =================================================== */
    html, body {
      margin: 0;
      padding: 0;
      font-family: 'Roboto', sans-serif;
    }
    
-   /* =========================
-      2) Sección Horizontal de Servicios
-      ========================= */
+   /* ===================================================
+      2) Sección de Servicios Verticales
+      ---------------------------------------------------
+      Contenedor horizontal donde cada servicio es una banda
+      =================================================== */
    .services-section-vertical {
      width: 100%;
      display: flex;
      height: 30vh;
    }
    
-   /* =========================
-      3) Banda Individual
-      ========================= */
+   /* ===================================================
+      3) Banda individual de servicio
+      ---------------------------------------------------
+      Cada una ocupa el mismo ancho, se alternan dark/darker
+      =================================================== */
    .service-band-vertical {
      flex: 1;
      display: flex;
@@ -32,55 +36,70 @@
      cursor: pointer;
      transition: background-color 0.3s ease;
    }
-   .service-band-vertical.dark   { background-color: #000; }
-   .service-band-vertical.darker { background-color: #1a1a1a; }
    
-   /* =========================
-      4) Estado “Selected”
-      ========================= */
+   .service-band-vertical.dark {
+     background-color: #000;
+   }
+   
+   .service-band-vertical.darker {
+     background-color: #1a1a1a;
+   }
+   
+   /* ===================================================
+      4) Estado activo (selected)
+      ---------------------------------------------------
+      Se aplica cuando el servicio está desplegado
+      =================================================== */
    .service-band-vertical.selected .service-card h3 {
      color: #fff;
-     text-shadow: 0 0 10px rgba(255,202,44,0.7);
+     text-shadow: 0 0 10px rgba(255, 202, 44, 0.7);
    }
+   
    .service-band-vertical.selected .icon-wrapper::before {
-     background: conic-gradient(#ffca2c 0%,#ffca2c 100%,#e6e6e6 100%);
+     background: conic-gradient(#ffca2c 0%, #ffca2c 100%, #e6e6e6 100%);
      box-shadow:
-       inset 0 0 12px rgba(255,255,255,0.6),
-       inset 0 0 40px rgba(255,235,120,0.8),
-       0 0 15px rgba(255,202,44,0.4);
-     filter: drop-shadow(0 0 5px rgba(255,202,44,0.3));
+       inset 0 0 12px rgba(255, 255, 255, 0.6),
+       inset 0 0 40px rgba(255, 235, 120, 0.8),
+       0 0 15px rgba(255, 202, 44, 0.4);
+     filter: drop-shadow(0 0 5px rgba(255, 202, 44, 0.3));
    }
+   
    .service-band-vertical.selected .icon-wrapper img {
      filter: brightness(0) invert(1);
      transform: scale(1.4);
    }
+   
    .service-band-vertical.selected .icon-wrapper {
      transform: scale(0.8);
    }
    
-   /* =========================
-      5) Card & Texto
-      ========================= */
+   /* ===================================================
+      5) Tarjeta del servicio (contenido centrado)
+      =================================================== */
    .service-card {
      text-align: center;
      display: flex;
      flex-direction: column;
      align-items: center;
    }
+   
    .service-card h3 {
      margin: 0;
      font-size: 1.5rem;
      color: #ffca2c;
      transition: color 0.6s ease, text-shadow 0.6s ease;
    }
+   
    .service-card:hover h3 {
      color: #fff;
-     text-shadow: 0 0 10px rgba(255,202,44,0.7);
+     text-shadow: 0 0 10px rgba(255, 202, 44, 0.7);
    }
    
-   /* =========================
-      6) Icon Wrapper
-      ========================= */
+   /* ===================================================
+      6) Wrapper circular de ícono
+      ---------------------------------------------------
+      Efecto hover + conic gradient de brillo dorado
+      =================================================== */
    .icon-wrapper {
      position: relative;
      width: 145px;
@@ -91,96 +110,108 @@
      display: flex;
      align-items: center;
      justify-content: center;
-     transition: transform 0.5s cubic-bezier(0.25,0.1,0.25,1);
+     transition: transform 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
      overflow: hidden;
    }
+   
    .icon-wrapper::before {
      content: '';
      position: absolute;
      inset: 0;
-     background: conic-gradient(#ffca2c 0%,#ffca2c 0%,#e6e6e6 0%);
+     background: conic-gradient(#ffca2c 0%, #ffca2c 0%, #e6e6e6 0%);
      border-radius: 50%;
-     transition: all 0.8s cubic-bezier(0.65,0,0.35,1);
+     transition: all 0.8s cubic-bezier(0.65, 0, 0.35, 1);
    }
+   
    .icon-wrapper:hover::before {
-     background: conic-gradient(#ffca2c 0%,#ffca2c 100%,#e6e6e6 100%);
+     background: conic-gradient(#ffca2c 0%, #ffca2c 100%, #e6e6e6 100%);
      box-shadow:
-       inset 0 0 12px rgba(255,255,255,0.6),
-       inset 0 0 40px rgba(255,235,120,0.8),
-       0 0 15px rgba(255,202,44,0.4);
-     filter: drop-shadow(0 0 5px rgba(255,202,44,0.3));
+       inset 0 0 12px rgba(255, 255, 255, 0.6),
+       inset 0 0 40px rgba(255, 235, 120, 0.8),
+       0 0 15px rgba(255, 202, 44, 0.4);
+     filter: drop-shadow(0 0 5px rgba(255, 202, 44, 0.3));
    }
+   
    .icon-wrapper img {
      position: relative;
      width: 100px;
      height: 100px;
      z-index: 1;
-     transition: filter 0.4s ease, transform 0.7s cubic-bezier(0.25,0.1,0.25,1);
+     transition: filter 0.4s ease, transform 0.7s cubic-bezier(0.25, 0.1, 0.25, 1);
    }
+   
    .icon-wrapper:hover img {
      filter: brightness(0) invert(1);
      transform: scale(1.4);
    }
+   
    .icon-wrapper:hover {
      transform: scale(0.7);
    }
    
-
+   /* ===================================================
+      7) Breakpoints responsive
+      ---------------------------------------------------
+      Ajustes de tamaño progresivos para iconos y texto
+      =================================================== */
+   
+   /* Pantallas medianas */
    @media(max-width: 1320px) {
-    .icon-wrapper{
-      width: 130px;
-      height: 130px;
-    }
-
-    .icon-wrapper img{
-      transform: scale(1.2);
-    }
-
-    .service-card h3 {
-      font-size: 1.3rem;
-    }
-
-  }
-
+     .icon-wrapper {
+       width: 130px;
+       height: 130px;
+     }
+   
+     .icon-wrapper img {
+       transform: scale(1.2);
+     }
+   
+     .service-card h3 {
+       font-size: 1.3rem;
+     }
+   }
+   
+   /* Más angosto */
    @media(max-width: 1260px) {
-    .icon-wrapper{
-      width: 120px;
-      height: 120px;
-    }
-
-    .icon-wrapper img{
-      transform: scale(1.15);
-    }
-
-    .service-card h3 {
-      font-size: 1rem;
-    }
-
-  }
-
+     .icon-wrapper {
+       width: 120px;
+       height: 120px;
+     }
+   
+     .icon-wrapper img {
+       transform: scale(1.15);
+     }
+   
+     .service-card h3 {
+       font-size: 1rem;
+     }
+   }
+   
+   /* Tablets y similares */
    @media(max-width: 950px) {
-    .icon-wrapper{
-      width: 110px;
-      height: 110px;
-    }
-
-    .icon-wrapper img{
-      transform: scale(1.1);
-    }
-
-  }
-
-  @media(max-width: 670px) {
-    .icon-wrapper{
-      width: 100px;
-      height: 100px;
-    }
-
-    .icon-wrapper img{
-      transform: scale(1);
-    }
-
-    .service-card h3 {
-      font-size: 0.7rem;
-    }
-  }
+     .icon-wrapper {
+       width: 110px;
+       height: 110px;
+     }
+   
+     .icon-wrapper img {
+       transform: scale(1.1);
+     }
+   }
+   
+   /* Dispositivos chicos (teléfonos) */
+   @media(max-width: 670px) {
+     .icon-wrapper {
+       width: 100px;
+       height: 100px;
+     }
+   
+     .icon-wrapper img {
+       transform: scale(1);
+     }
+   
+     .service-card h3 {
+       font-size: 0.7rem;
+     }
+   }
+   

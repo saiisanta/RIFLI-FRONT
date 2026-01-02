@@ -12,4 +12,7 @@
     height: 100%;
     overflow-x: hidden; /* Evita scroll horizontal */
     background-color: black; /* Para notar si algo blanco se cuela */
+    scroll-behavior: smooth;
   }
+
+  

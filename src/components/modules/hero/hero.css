@@ -1,180 +1,160 @@
-/* =======================================
-   RESET DE MÁRGENES Y PADDINGS PARA EL HTML Y BODY
-   --------------------------------------- */
-   html,
-   body {
-     margin: 0;             /* Eliminar márgenes predeterminados */
-     padding: 0;            /* Eliminar paddings predeterminados */
-     width: 100vw;          /* Asegura que el ancho cubra toda la ventana */
-     height: 100vh;         /* Asegura que la altura cubra toda la ventana */
-     overflow-x: hidden;    /* Evitar desplazamiento horizontal */
-     background-color: black; /* Fondo negro (útil para depuración) */
-   }
-   
-   /* =======================================
-      SECCIÓN HERO: Fondo y efectos visuales
-      --------------------------------------- */
-   .hero-section {
-     background: url('../src/assets/img/rifli/hero.png'); /* Imagen de fondo */
-     background-size: cover;    /* Asegura que la imagen cubra todo el área */
-     background-position: center; /* Centra la imagen de fondo */
-     background-repeat: no-repeat; /* Evita que la imagen se repita */
-     position: relative;         /* Posicionamiento relativo para contener elementos hijos */
-     width: 100vw;               /* Asegura que ocupe todo el ancho de la ventana */
-     height: 100vh;              /* Asegura que ocupe toda la altura de la ventana */
-     display: flex;              /* Flexbox para centrar contenido */
-     align-items: center;       /* Centrado vertical */
-     justify-content: center;    /* Centrado horizontal */
-     overflow: hidden;          /* Elimina cualquier desbordamiento */
-   }
-   
-   /* =======================================
-      SOMBRA Y FILTRO OSCURO SOBRE LA SECCIÓN HERO
-      --------------------------------------- */
-   .hero-section::before {
-     content: "";               /* Se necesita para crear un pseudo-elemento */
-     position: absolute;        /* Posicionamiento absoluto para superponerse */
-     inset: 0;                  /* Ocupa toda el área de la sección */
-     background-color: rgba(0, 0, 0, 0.5); /* Filtro oscuro con transparencia */
-     z-index: 0;                /* Coloca debajo del contenido */
-   }
-   
-   /* =======================================
-      CONTENEDOR DE ELEMENTOS EN HERO
-      --------------------------------------- */
-   .hero-section .container {
-     position: relative;        /* Posicionamiento relativo para manejar el z-index */
-     z-index: 2;                /* Asegura que esté por encima del pseudo-elemento */
-   }
-   
-   /* =======================================
-      ESTILOS DEL TEXTO EN HERO
-      --------------------------------------- */
-   .Brand-text {
-     margin-left: -15vh;        /* Alineación personalizada */
-     margin-top: 15vh;          /* Alineación personalizada */
-   }
-   
-   .hero-section h1 {
-     font-size: 7vh;            /* Tamaño de fuente ajustado al 7% de la altura de la ventana */
-   }
-   
-   .hero-section p {
-     font-size: 3vh;            /* Tamaño de fuente ajustado al 3% de la altura de la ventana */
-   }
-   
-   .hero-section button {
-     font-size: 2.5vh;          /* Tamaño de fuente ajustado al 2.5% de la altura de la ventana */
-   }
-   
-   /* =======================================
-      EFECTO DE LUZ AL PASAR EL MOUSE
-      --------------------------------------- */
-   .hero-section.light-spot::before {
-     background: radial-gradient(
-       circle at var(--mouse-x, 50%) var(--mouse-y, 0%), /* Gradiente en el punto del mouse */
-       rgba(0, 0, 0, 0) 40px,                         /* Centro transparente */
-       rgba(0, 0, 0, 0.4) 100px,                      /* Transición ligera */
-       rgba(0, 0, 0, 0.5) 200px                       /* Oscurecimiento rápido */
-     );
-   }
+/* =============================
+   RESET Y CONFIGURACIÓN BASE
+============================= */
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow-x: hidden;
+  background-color: black;
+}
 
-    /* =======================================
-      EFECTO PARA BOTON PRESUPUESTO
-      --------------------------------------- */
+/* =============================
+   SECCIÓN HERO
+============================= */
+.hero-section {
+  background: url('../src/assets/img/rifli/hero.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
 
-   .presupuesto:hover{
-    transform: scale(1.10);
-    transition: transform 0.3s ease;                     /* Transición ligera */
-   }
+.hero-section::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 0;
+}
 
-   
-   /* =======================================
-      TRANSICIÓN DE FONDO AL MOVIMIENTO DEL MOUSE
-      --------------------------------------- */
-   .hero-section.light-spot::before {
-     background: radial-gradient(
-       circle at var(--mouse-x, 50%) var(--mouse-y, 50%), /* Punto de inicio del gradiente */
-       rgba(255, 255, 255, 0.15),                       /* Color blanco con transparencia */
-       rgba(0, 0, 0, 0.5) 55%                           /* Transición a negro con opacidad */
-     );
-     transition: background 0.05s ease;                 /* Transición suave en 50ms */
-   }
+.hero-section .container {
+  position: relative;
+  z-index: 2;
+}
 
+/* =============================
+   TEXTO Y BOTONES
+============================= */
+.Brand-text {
+  margin-left: -15vh;
+  margin-top: 15vh;
+}
 
+.hero-section h1 {
+  font-size: 7vh;
+}
 
-  @media(max-width: 1580px) {
-    .Brand-text {
-      margin-left: -10vh;      
-    }
+.hero-section p {
+  font-size: 3vh;
+}
+
+.hero-section button {
+  font-size: 2.5vh;
+}
+
+/* =============================
+   EFECTO DE LUZ EN MOUSEOVER
+============================= */
+.hero-section.light-spot::before {
+  background: radial-gradient(
+    circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(255, 255, 255, 0.15),
+    rgba(0, 0, 0, 0.5) 55%
+  );
+  transition: background 0.05s ease;
+}
+
+/* =============================
+   EFECTO HOVER EN BOTÓN
+============================= */
+.presupuesto:hover {
+  transform: scale(1.10);
+  transition: transform 0.3s ease;
+}
+
+/* =============================
+   RESPONSIVE DESIGN
+============================= */
+@media(max-width: 1580px) {
+  .Brand-text {
+    margin-left: -10vh;
+  }
+}
+
+@media(max-width: 1500px) {
+  .Brand-text {
+    margin-left: -5vh;
+  }
+}
+
+@media(max-width: 1300px) {
+  .Brand-text {
+    margin-left: -2vh;
+  }
+}
+
+@media(max-width: 990px) {
+  .Brand-text {
+    margin-left: -2vh;
   }
 
-  @media(max-width: 1500px) {
-    .Brand-text {
-      margin-left: -5vh;      
-    }
+  .hero-section h1 {
+    font-size: 6vh;
   }
 
-  @media(max-width: 1300px) {
-    .Brand-text {
-      margin-left: -2vh;      
-    }
+  .hero-section p {
+    font-size: 3vh;
   }
 
-  @media(max-width: 990px) {
-    .Brand-text {
-      margin-left: -2vh;    
-    }
-    .hero-section h1 {
-      font-size: 6vh;          
-    }
-    
-    .hero-section p {
-      font-size: 3vh;          
-    }
-    
-    .hero-section button {
-      font-size: 2.5vh;        
-    }
+  .hero-section button {
+    font-size: 2.5vh;
+  }
+}
+
+@media(max-width: 620px) {
+  .hero-section h1 {
+    font-size: 5vh;
   }
 
-  @media(max-width: 620px) {
-    .hero-section h1 {
-      font-size: 5vh;          
-    }
-    
-    .hero-section p {
-      font-size: 2.5vh;          
-    }
-    
-    .hero-section button {
-      font-size: 2vh;         
-    }
+  .hero-section p {
+    font-size: 2.5vh;
   }
 
-  @media(max-width: 580px) {
-    .hero-section h1 {
-      font-size: 5vh;
-    }
-    
-    .hero-section p {
-      font-size: 2.3vh;            
-    }
-    
-    .hero-section button {
-      font-size: 2.7vh;
-      width: 20%;
-    }
-    .presupuesto{
-      width: 60%;
-      align-self: center;
-    }
-    .shop{
-      width: 50%;
-      align-self: center;
-    }
+  .hero-section button {
+    font-size: 2vh;
+  }
+}
+
+@media(max-width: 580px) {
+  .hero-section h1 {
+    font-size: 5vh;
   }
 
+  .hero-section p {
+    font-size: 2.3vh;
+  }
 
+  .hero-section button {
+    font-size: 2.7vh;
+    width: 20%;
+  }
 
-   
+  .presupuesto {
+    width: 60%;
+    align-self: center;
+  }
+
+  .shop {
+    width: 50%;
+    align-self: center;
+  }
+}

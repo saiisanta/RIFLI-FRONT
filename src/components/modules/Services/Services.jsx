@@ -1,13 +1,16 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import "./services.css";
 
-// Íconos
+// Importación de íconos de cada servicio
 import seguridadIcon from "/src/assets/img/icons/seguridad1.svg";
 import electricidadIcon from "/src/assets/img/icons/electricidad1.svg";
 import secoIcon from "/src/assets/img/icons/seco1.svg";
 import gasistaIcon from "/src/assets/img/icons/gasista1.svg";
 import distribucionIcon from "/src/assets/img/icons/distribucion1.svg";
 
+// ===========================
+// Detalles de cada servicio
+// ===========================
 export const serviceDetails = [
   {
     title: "Sistemas de Seguridad",
@@ -21,6 +24,7 @@ export const serviceDetails = [
     backgroundImageUrl: "/src/assets/img/servicios/seguridadHero.png",
     form: (
       <form className="quote-form">
+        {/* Campos del formulario */}
         <div className="field-group">
           <label>Nombre Completo</label>
           <input type="text" name="name" placeholder="Tu nombre" required />
@@ -45,7 +49,7 @@ export const serviceDetails = [
         </div>
         <div className="field-group">
           <label>Cantidad de Puntos</label>
-          <input type="number" name="points" min="1" placeholder="Ej. 4 cámaras / 2 sensores" required />
+          <input type="number" name="points" placeholder="Ej. 4 cámaras / 2 sensores" required />
         </div>
         <div className="field-group">
           <label>Ubicación del Proyecto</label>
@@ -59,6 +63,8 @@ export const serviceDetails = [
       </form>
     ),
   },
+
+  // Instalaciones eléctricas
   {
     title: "Instalaciones Eléctricas",
     description: (
@@ -108,6 +114,8 @@ export const serviceDetails = [
       </form>
     ),
   },
+
+  // Trabajos en seco
   {
     title: "Trabajos en Seco",
     description: (
@@ -143,7 +151,7 @@ export const serviceDetails = [
         </div>
         <div className="field-group">
           <label>Metros Cuadrados</label>
-          <input type="number" name="sqm" min="1" placeholder="Ej. 25" required />
+          <input type="number" name="sqm" placeholder="Ej. 25" required />
         </div>
         <div className="field-group">
           <label>Altura de Techo</label>
@@ -157,6 +165,8 @@ export const serviceDetails = [
       </form>
     ),
   },
+
+  // Gasista
   {
     title: "Gasista Matriculado",
     description: (
@@ -192,7 +202,7 @@ export const serviceDetails = [
         </div>
         <div className="field-group">
           <label>Puntos de Consumo</label>
-          <input type="number" name="points" min="1" placeholder="Ej. 2 hornallas" required />
+          <input type="number" name="points" placeholder="Ej. 2 hornallas" required />
         </div>
         <div className="field-group">
           <label>Ubicación / Acceso</label>
@@ -206,6 +216,8 @@ export const serviceDetails = [
       </form>
     ),
   },
+
+  // Distribución
   {
     title: "Distribución de Productos",
     description: (
@@ -257,16 +269,19 @@ export const serviceDetails = [
   },
 ];
 
+// ===========================
+// Componente de selección visual
+// ===========================
 const Services = ({ onSelect }) => {
   const [selectedIndex, setSelectedIndex] = useState(null);
   const servicesRef = useRef(null);
 
+  // Manejo de clic sobre un servicio
   const handleClick = (idx) => {
     const newIndex = selectedIndex === idx ? null : idx;
     setSelectedIndex(newIndex);
     if (onSelect) onSelect(newIndex);
   };
-  
 
   return (
     <section id="servicios" className="services-section-vertical" ref={servicesRef}>

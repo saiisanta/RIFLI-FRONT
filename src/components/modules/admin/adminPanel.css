@@ -1,253 +1,271 @@
+/* =============================
+   Variables de color y base
+============================= */
+
 :root {
-    --dark-bg: #1a1a1a;
-    --primary: #ffca2c;
-    --text: #f0f0f0;
-    --card-bg: #232323;
-    --border: #2c2c2c;
-  }
-  
-  body {
-    margin: 0;
-    font-family: 'Segoe UI', sans-serif;
-    background-color: var(--dark-bg);
-    color: var(--text);
-  }
+  --dark-bg: #1a1a1a;
+  --primary: #ffca2c;
+  --text: #f0f0f0;
+  --card-bg: #232323;
+  --border: #2c2c2c;
+}
 
-  .admin-dashboard {
-    display: flex;
-    justify-content: center;
-    align-items: start;
-    height: 100%;
-    background-color: var(--border); /* fondo exterior */
-    padding: 4vh 1vh;
-    box-sizing: border-box;
-  }
-  
-  .dashboard-container {
-    display: flex;
-    flex-grow: 1;
-    max-width: 1750px;
-    background-color: var(--dark-bg); /* color interno */
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow: 0 0 15px #00000033;
-  }
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: var(--dark-bg);
+  color: var(--text);
+}
 
-  
-  .sidebar {
-    width: 220px;
-    background-color: var(--card-bg);
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-  }
-  
+/* =============================
+   Layout general del panel
+============================= */
+.admin-dashboard {
+  display: flex;
+  justify-content: center;
+  align-items: start;
+  height: 100%;
+  background-color: var(--border);
+  /* fondo exterior */
+  padding: 4vh 1vh;
+  box-sizing: border-box;
+}
+
+.dashboard-container {
+  display: flex;
+  flex-grow: 1;
+  max-width: 1750px;
+  background-color: var(--dark-bg);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 0 15px #00000033;
+}
+
+/* =============================
+   Barra lateral (sidebar)
+============================= */
+.sidebar {
+  width: 220px;
+  background-color: var(--card-bg);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar .logo {
+  color: var(--primary);
+  font-size: 1.5rem;
+  margin-bottom: 30px;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar li {
+  padding: 10px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  border-radius: 5px;
+  color: var(--text);
+  /* ✅ visibilidad */
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.sidebar li:hover,
+.sidebar li.active {
+  background-color: var(--primary);
+  color: #000;
+}
+
+.sidebar-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 30px;
+  height: 32px;
+}
+
+.sidebar-top .btn-back {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background: none;
+  border: none;
+  color: var(--primary);
+  cursor: pointer;
+  height: 100%;
+  aspect-ratio: 1 / 1;
+}
+
+.sidebar-top .icon {
+  display: block;
+  margin-top: 1px;
+}
+
+.sidebar-top .logo {
+  margin: 0;
+  padding: 0;
+  line-height: 1;
+  font-size: 1.3rem;
+  display: flex;
+  align-items: center;
+}
+
+/* =============================
+   Contenido principal
+============================= */
+
+.dashboard-content {
+  flex: 1;
+  padding: 40px 60px;
+  background-color: var(--dark-bg);
+  overflow-y: auto;
+}
+
+.dashboard-header h1 {
+  font-size: 2rem;
+  margin-bottom: 30px;
+  color: var(--primary);
+}
+
+/* =============================
+   Sección de formulario
+============================= */
+
+.form-section,
+.table-section {
+  background-color: var(--card-bg);
+  padding: 30px;
+  margin-bottom: 30px;
+  border-radius: 14px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.form-grid label {
+  grid-column: span 2;
+  font-weight: 600;
+  color: var(--text);
+  font-size: 0.95rem;
+}
+
+.form-grid input,
+.form-grid textarea {
+  padding: 10px;
+  font-size: 0.9rem;
+  border: none;
+  background-color: #2e2e2e;
+  color: white;
+  border-radius: 5px;
+}
+
+.form-buttons {
+  grid-column: span 2;
+  display: flex;
+  gap: 12px;
+  margin-top: 10px;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.form-buttons button {
+  height: 44px;
+  min-width: 120px;
+  padding: 0 20px;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+}
+
+.form-buttons button[type="submit"] {
+  background-color: var(--primary);
+  color: #000;
+}
+
+#cancel {
+  background-color: #666;
+  color: #fff;
+  margin-top: 13px;
+}
+
+#cancel:hover {
+  background-color: #888;
+}
+
+.form-buttons button[type="submit"]:hover {
+  background-color: #eab400;
+}
 
 
-  .sidebar .logo {
-    color: var(--primary);
-    font-size: 1.5rem;
-    margin-bottom: 30px;
-  }
-  
-  .sidebar ul {
-    list-style: none;
-    padding: 0;
-  }
-  
-  .sidebar li {
-    padding: 10px;
-    margin-bottom: 10px;
-    cursor: pointer;
-    border-radius: 5px;
-    color: var(--text); /* ✅ visibilidad */
-    transition: background-color 0.3s, color 0.3s;
-  }
-  
-  .sidebar li:hover,
-  .sidebar li.active {
-    background-color: var(--primary);
-    color: #000;
-  }
 
-  .dashboard-content {
-    flex: 1;
-    padding: 40px 60px; /* ✅ padding lateral más amplio */
-    background-color: var(--dark-bg);
-    overflow-y: auto;
-  }
-  
-  .dashboard-header h1 {
-    font-size: 2rem;
-    margin-bottom: 30px;
-    color: var(--primary);
-  }
-  
-  .form-section,
-  .table-section {
-    background-color: var(--card-bg);
-    padding: 30px;
-    margin-bottom: 30px;
-    border-radius: 14px;
-  }
-  
-  .form-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-  }
-  
-  .form-grid label {
-    grid-column: span 2;
-    font-weight: 600;
-    color: var(--text); /* ✅ asegurar visibilidad */
-    font-size: 0.95rem;
-  }
-  
-  .form-grid input,
-  .form-grid textarea {
-    padding: 10px;
-    font-size: 0.9rem;
-    border: none;
-    background-color: #2e2e2e;
-    color: white;
-    border-radius: 5px;
-  }
-  
-  .form-buttons {
-    grid-column: span 2;
-    display: flex;
-    gap: 12px;
-    margin-top: 10px;
-    justify-content: flex-start;
-    align-items: center;
-  }
-  
-  .form-buttons button {
-    height: 44px;
-    min-width: 120px;
-    padding: 0 20px;
-    font-size: 15px;
-    font-weight: 600;
-    border-radius: 6px;
-    border: none;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    transition: background-color 0.2s ease;
-  }
-  
-  .form-buttons button[type="submit"] {
-    background-color: var(--primary);
-    color: #000;
-  }
-  
-  #cancel {
-    background-color: #666;
-    color: #fff;
-    margin-top: 13px;
-  }
-  
-  #cancel:hover {
-    background-color: #888;
-  }
-  
-  .form-buttons button[type="submit"]:hover {
-    background-color: #eab400;
-  }
-  
-  
-  
 
-  
-  .form-buttons button:hover {
-    opacity: 0.9;
-  }
-  
-  .error-box {
-    background-color: #ffdddd;
-    color: #a00;
-    padding: 12px;
-    border-radius: 6px;
-    margin-bottom: 20px;
-  }
-  
-  .table-section table {
-    width: 100%;
-    border-collapse: collapse;
-    color: var(--text);
-  }
-  
-  .table-section th,
-  .table-section td {
-    padding: 14px 12px;
-    text-align: left;
-    border-bottom: 1px solid var(--border);
-  }
-  
-  .table-section th {
-    background-color: #1f1f1f;
-    color: var(--primary);
-    font-weight: bold;
-  }
-  
-  .table-section button {
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: var(--primary);
-    font-size: 1.5rem;
-  }
 
-  .form-section h2{
-    color: var(--text);
-    margin-bottom: 2rem;
-  }
+.form-buttons button:hover {
+  opacity: 0.9;
+}
 
-  .table-section h2{
-    color: var(--text);
-    margin-bottom: 2rem;
-  }
-  
-  .sidebar-top {
-    display: flex;
-    align-items: center; /* 🔧 esto ya debería alinear verticalmente */
-    gap: 10px;
-    margin-bottom: 30px;
-    height: 32px; /* 🔧 forzar altura común */
-  }
-  
-  .sidebar-top .btn-back {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
-    background: none;
-    border: none;
-    color: var(--primary);
-    cursor: pointer;
-    height: 100%; /* 🔧 igual que el contenedor */
-    aspect-ratio: 1 / 1;
-  }
-  
-  .sidebar-top .icon {
-    display: block;
-    margin-top: 1px; /* 🔧 leve ajuste vertical si es necesario */
-  }
-  
-  .sidebar-top .logo {
-    margin: 0;
-    padding: 0;
-    line-height: 1;
-    font-size: 1.3rem;
-    display: flex;
-    align-items: center;
-  }
-  
-  
-  
-  .btn-back:hover {
-    opacity: 0.8;
-  }
-  
+.error-box {
+  background-color: #ffdddd;
+  color: #a00;
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+}
+
+/* =============================
+   Tabla de productos
+============================= */
+
+.table-section table {
+  width: 100%;
+  border-collapse: collapse;
+  color: var(--text);
+}
+
+.table-section th,
+.table-section td {
+  padding: 14px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.table-section th {
+  background-color: #1f1f1f;
+  color: var(--primary);
+  font-weight: bold;
+}
+
+.table-section button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--primary);
+  font-size: 1.5rem;
+}
+
+.form-section h2 {
+  color: var(--text);
+  margin-bottom: 2rem;
+}
+
+.table-section h2 {
+  color: var(--text);
+  margin-bottom: 2rem;
+}
+
+.btn-back:hover {
+  opacity: 0.8;
+}

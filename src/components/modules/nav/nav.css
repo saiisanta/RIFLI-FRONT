@@ -1,7 +1,8 @@
 /* src/components/nav.css */
-/* -----------------------------------
+
+/* ================================
    NAVBAR GENERAL
-------------------------------------*/
+================================= */
 .Nav {
   position: fixed;
   top: 0;
@@ -18,50 +19,52 @@
   pointer-events: none;
 }
 
-/* -----------------------------------
-   CONTAINER FLEX
-------------------------------------*/
+/* ================================
+   CONTENEDOR FLEX
+================================= */
 .NavbarContainer {
   display: flex;
   align-items: center;
 }
 
-/* -----------------------------------
-   LOGOTIPO
-------------------------------------*/
+/* ================================
+   LOGOTIPO (IZQUIERDA)
+================================= */
 .logotipo {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin-right: auto; /* Empuja todo lo demás a la derecha */
+  margin-right: auto;
 }
-.icono, .logo {
+
+.icono,
+.logo {
   max-height: 60px;
   height: auto;
   display: block;
 }
 
-/* -----------------------------------
-   TOGGLE (Hamburguesa)
-------------------------------------*/
+/* ================================
+   BOTÓN HAMBURGUESA
+================================= */
 .navbar-toggler {
   border: none !important;
   box-shadow: none !important;
   padding: 0.25rem 0.5rem;
-  margin-left: auto; /* Posiciona a la derecha */
+  margin-left: auto;
 }
 
 .navbar-toggler-icon {
   background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(255,255,255,0.8)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
 }
 
-/* -----------------------------------
-   LINKS NAVEGACIÓN (GRANDES Y A LA DERECHA)
-------------------------------------*/
+/* ================================
+   LINKS DE NAVEGACIÓN
+================================= */
 .nav-link-custom {
   color: white !important;
   text-decoration: none !important;
-  font-size: 2rem !important; /* Tamaño aumentado */
+  font-size: 2rem !important;
   padding: 0.5rem 1rem !important;
   margin-right: 8rem;
   transition: transform 0.2s ease, color 0.2s ease;
@@ -74,9 +77,9 @@
   text-shadow: 0 0 5px black;
 }
 
-/* -----------------------------------
-   LOGIN ICON
-------------------------------------*/
+/* ================================
+   ICONO DE LOGIN
+================================= */
 .login-icon {
   display: flex;
   align-items: center;
@@ -85,20 +88,20 @@
 .login-icon .icon {
   color: white;
   transition: transform 0.3s ease;
-  font-size: 1.8rem; /* Tamaño aumentado */
+  font-size: 1.8rem;
 }
 
 .login-icon .icon:hover {
   transform: scale(1.1);
 }
 
-/* -----------------------------------
-   RESPONSIVE (<992px)
-------------------------------------*/
+/* ================================
+   RESPONSIVE (TABLET Y MÓVIL)
+================================= */
 @media (max-width: 991.98px) {
   .NavbarContainer {
     padding: 0 1rem;
-    flex-wrap: wrap; /* Permite que los elementos se apilen */
+    flex-wrap: wrap;
   }
 
   .navbar-collapse {
@@ -113,7 +116,7 @@
   .nav-link-custom {
     flex-direction: column;
     align-items: flex-start;
-    font-size: 1.9rem !important; /* Más grande en móvil */
+    font-size: 1.9rem !important;
     padding: 0.75rem 0 !important;
   }
 
@@ -122,9 +125,8 @@
     flex-direction: column;
     margin-top: 1rem;
     width: 100%;
-    
-    display: flex !important; /* Asegura que sea visible */
-    justify-content: flex-end; /* Alinea a la izquierda */
+    display: flex !important;
+    justify-content: flex-end;
   }
 
   .login-icon .icon {
@@ -132,6 +134,9 @@
   }
 }
 
+/* ================================
+   REDUCCIÓN DE MÁRGENES EN BREAKPOINTS
+================================= */
 @media (max-width: 1380px) {
   .nav-link-custom {
     margin-right: 6rem;

@@ -1,12 +1,15 @@
+// src/components/Footer.jsx
 import React from "react";
 import "./footer.css";
 
 export default function Footer() {
+  // Obtiene el año actual para mostrarlo dinámicamente
   const currentYear = new Date().getFullYear();
 
   return (
     <footer className="site-footer">
       <div className="footer-content">
+        {/* Sección izquierda: marca y descripción */}
         <div className="footer-brand">
           <h2>RIFLI</h2>
           <p>
@@ -16,7 +19,9 @@ export default function Footer() {
           </p>
         </div>
 
+        {/* Sección derecha: enlaces y contacto */}
         <div className="footer-side">
+          {/* Lista de servicios */}
           <div className="footer-links">
             <h4>Servicios</h4>
             <ul>
@@ -28,6 +33,7 @@ export default function Footer() {
             </ul>
           </div>
 
+          {/* Información de contacto */}
           <div className="footer-contact">
             <h4>Contacto</h4>
             <ul>
@@ -39,6 +45,7 @@ export default function Footer() {
         </div>
       </div>
 
+      {/* Pie inferior con derechos */}
       <div className="footer-bottom">
         <p>&copy; {currentYear} RIFLI. Todos los derechos reservados.</p>
       </div>

@@ -40,7 +40,7 @@ const Slider = () => {
 
   return (
     <section className="slider-section">
-      <div className="section-top-divider"></div>
+      <div id='marcas' className="section-top-divider"></div>
       <Container className="text-center">
         <h2 className="fw-bold display-4 mb-3">Las Marcas que eligen los Profesionales</h2>
         <p className="lead mb-3">

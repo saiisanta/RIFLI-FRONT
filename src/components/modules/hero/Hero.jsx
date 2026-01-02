@@ -1,53 +1,59 @@
-import React, { useEffect } from 'react';  // Importación de React y useEffect
-import { Button, Container } from 'react-bootstrap';  // Importación de componentes de React Bootstrap
-import './Hero.css';  // Importación de estilos CSS específicos para el Hero
+// src/components/Hero.jsx
 
-// Componente Hero principal
+import React, { useEffect } from 'react';
+import { Button, Container } from 'react-bootstrap';
+import './Hero.css';
+
+// Componente principal de la sección Hero
 const Hero = () => {
 
-  // Hook useEffect para manejar el movimiento del mouse y aplicar la animación
+  // Efecto de luz que sigue el cursor sobre la sección Hero
   useEffect(() => {
-    const hero = document.querySelector('.hero-section');  // Selecciona la sección hero
+    const hero = document.querySelector('.hero-section');
 
-    // Función que maneja el movimiento del mouse
     const handleMouseMove = (e) => {
-      const rect = hero.getBoundingClientRect();  // Obtiene las dimensiones de la sección hero
-      const x = e.clientX - rect.left;  // Calcula la posición X del mouse respecto a la sección
-      const y = e.clientY - rect.top;   // Calcula la posición Y del mouse respecto a la sección
+      const rect = hero.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
 
-      // Actualiza las variables CSS para el gradiente en base a la posición del mouse
       hero.style.setProperty('--mouse-x', `${x}px`);
       hero.style.setProperty('--mouse-y', `${y}px`);
-      
-      // Agrega la clase que activa el efecto de luz
       hero.classList.add('light-spot');
     };
 
-    // Añade el evento de movimiento del mouse a la sección hero
     hero?.addEventListener('mousemove', handleMouseMove);
 
-    // Limpieza del evento al desmontar el componente
     return () => {
       hero?.removeEventListener('mousemove', handleMouseMove);
     };
   }, []);
 
   return (
-    <div className="hero-section">  {/* Contenedor principal de la sección Hero */}
-      <Container className="text-white text-center text-md-start roboto"> {/* Contenedor con clases de estilo */}
-        <div className="Brand-text"> {/* Contenedor del texto de la marca */}
-          <h1 className="fw-bold display-5"> {/* Título de la sección */}
+    <div className="hero-section">
+      <Container className="text-white text-center text-md-start roboto">
+        <div className="Brand-text">
+          <h1 className="fw-bold display-5">
             Soluciones Eléctricas <br /> y de Seguridad a Medida
           </h1>
-          <p className="lead mb-4">  {/* Descripción corta */}
+          <p className="lead mb-4">
             Instalaciones profesionales, confiables y modernas para tu hogar o empresa
           </p>
-          {/* Botones de acción */}
+
           <div className="d-flex flex-column flex-md-row gap-3">
-            <Button className="presupuesto" href='#servicios' variant="warning" size="lg"> {/* Botón para solicitar presupuesto */}
+            <Button
+              className="presupuesto"
+              href="#servicios"
+              variant="warning"
+              size="lg"
+            >
               Solicitar presupuesto
             </Button>
-            <Button className="shop" href='#shop' variant="outline-light" size="lg"> {/* Botón para ver servicios */}
+            <Button
+              className="shop"
+              href="#shop"
+              variant="outline-light"
+              size="lg"
+            >
               Ver Catálogo
             </Button>
           </div>
@@ -57,4 +63,4 @@ const Hero = () => {
   );
 };
 
-export default Hero;  // Exporta el componente Hero
+export default Hero;

@@ -6,6 +6,7 @@ import "./adminPanel.css";
 const API = "http://localhost:4001/api/products";
 
 export default function AdminPanel() {
+  // Estados principales
   const [productos, setProductos] = useState([]);
   const [form, setForm] = useState({
     name: "",
@@ -19,10 +20,12 @@ export default function AdminPanel() {
   const [editId, setEditId] = useState(null);
   const [errorMsg, setErrorMsg] = useState("");
 
+  // Al montar, se cargan productos existentes
   useEffect(() => {
     cargarProductos();
   }, []);
 
+  // Consulta a la API para traer todos los productos
   const cargarProductos = async () => {
     try {
       const res = await fetch(API);
@@ -33,6 +36,7 @@ export default function AdminPanel() {
     }
   };
 
+  // Resetea el formulario y borra errores
   const resetForm = () => {
     setForm({
       name: "",
@@ -47,6 +51,7 @@ export default function AdminPanel() {
     setErrorMsg("");
   };
 
+  // Maneja cambios de inputs y archivos
   const handleChange = (e) => {
     const { name, value, files } = e.target;
     setForm((prev) => ({
@@ -55,6 +60,7 @@ export default function AdminPanel() {
     }));
   };
 
+  // Enviar formulario para crear o actualizar producto
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData();
@@ -77,12 +83,14 @@ export default function AdminPanel() {
     }
   };
 
+  // Carga los datos en el formulario para editar
   const handleEdit = (p) => {
     setEditId(p.id);
     setForm({ ...p, image: null });
     window.scrollTo(0, 0);
   };
 
+  // Elimina un producto después de confirmación
   const handleDelete = async (id) => {
     if (!window.confirm("¿Eliminar producto?")) return;
     try {
@@ -113,10 +121,10 @@ export default function AdminPanel() {
           </div>
 
           <ul>
-            <li className="active">📦 Productos</li>
-            <li>📈 Estadísticas</li>
-            <li>👤 Usuarios</li>
-            <li>🛠 Servicios</li>
+            <li className="active">Productos</li>
+            <li>Estadísticas</li>
+            <li>Usuarios</li>
+            <li>Servicios</li>
           </ul>
         </aside>
 

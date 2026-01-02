@@ -1,7 +1,8 @@
 // src/components/NavBar.jsx
+
 import React, { useState, useEffect, useContext } from 'react';
 import { Container, Navbar, Nav } from 'react-bootstrap';
-import { PersonCircle , BoxArrowRight} from 'react-bootstrap-icons';
+import { PersonCircle , BoxArrowRight } from 'react-bootstrap-icons';
 import { AuthContext } from '../../../context/AuthContext';
 import AuthModal from '../authModal/AuthModal';
 import './nav.css';
@@ -12,9 +13,11 @@ const NavBar = () => {
   const [isHeroVisible, setIsHeroVisible] = useState(true);
   const [expanded, setExpanded] = useState(false);
 
+  // Detecta si la sección hero está visible para ocultar el navbar al hacer scroll
   useEffect(() => {
     const hero = document.querySelector('.hero-section');
     if (!hero) return;
+
     const obs = new IntersectionObserver(
       ([e]) => setIsHeroVisible(e.isIntersecting),
       { threshold: 0.1 }
@@ -34,24 +37,26 @@ const NavBar = () => {
         onToggle={setExpanded}
       >
         <Container fluid className="NavbarContainer px-3">
-          {/* LOGOTIPO (IZQUIERDA) */}
+          
+          {/* LOGOTIPO IZQUIERDA */}
           <Navbar.Brand href="#" className="logotipo">
             <img src="./src/assets/img/rifli/icono_white.png" alt="Icono" className="icono" />
             <img src="./src/assets/img/rifli/rifli_white.png" alt="RIFLI" className="logo" />
           </Navbar.Brand>
 
-          {/* TOGGLE (SOLO MÓVIL) */}
+          {/* BOTÓN HAMBURGUESA (MOBILE) */}
           <Navbar.Toggle 
             aria-controls="navbar-content" 
             className="d-lg-none border-0"
           />
 
-          {/* CONTENIDO DEL NAVBAR - AHORA TODO A LA DERECHA */}
+          {/* MENÚ PRINCIPAL (DERECHA) */}
           <Navbar.Collapse id="navbar-content" className="justify-content-end">
             <div className="d-flex align-items-center gap-lg-4">
-              {/* NAVLINKS (AHORA A LA DERECHA) */}
+
+              {/* NAVLINKS */}
               <Nav className="me-lg-3">
-                {['servicios', 'contacto'].map(item => (
+                {['servicios', 'marcas'].map(item => (
                   <Nav.Link 
                     key={item} 
                     href={`#${item}`} 
@@ -62,9 +67,11 @@ const NavBar = () => {
                       ? 'Servicios'
                       : item === 'quienes-somos'
                       ? 'Quiénes somos'
-                      : 'Contacto'}
+                      : 'Marcas'}
                   </Nav.Link>
                 ))}
+                
+                {/* LINK AL PANEL ADMIN SI HAY USUARIO ADMIN */}
                 {user && user.role === 'admin' && (
                   <Nav.Link href="/admin" onClick={() => setExpanded(false)} className="nav-link-custom">
                     Admin
@@ -72,7 +79,7 @@ const NavBar = () => {
                 )}
               </Nav>
 
-              {/* LOGIN (DERECHA) */}
+              {/* LOGIN / LOGOUT ICON */}
               <Nav className="login-icon">
                 {user ? (
                   <Nav.Link onClick={logout}>
@@ -89,6 +96,7 @@ const NavBar = () => {
         </Container>
       </Navbar>
 
+      {/* MODAL DE LOGIN / REGISTER */}
       <AuthModal show={showAuth} onClose={() => setShowAuth(false)} />
     </>
   );

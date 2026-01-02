@@ -1,0 +1,114 @@
+@use "../../../styles/breakpoints" as *;
+
+.hero-section {
+  background: url('../../../assets/img/rifli/hero.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1;
+  }
+
+  &.light-spot::before {
+    background: radial-gradient(
+      circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+      rgba(255, 255, 255, 0.15),
+      rgba(0, 0, 0, 0.5) 55%
+    );
+    transition: background 0.05s ease;
+  }
+
+  .container {
+    position: relative;
+    z-index: 2;
+  }
+
+  h1 {
+    font-size: 7vh;
+
+    @include respond-down("burger") {
+      font-size: 6vh;
+    }
+
+    @include respond-down("mobile-lg") {
+      font-size: 5vh;
+    }
+  }
+
+  p {
+    font-size: 3vh;
+
+    @include respond-down("mobile-lg") {
+      font-size: 2.5vh;
+    }
+
+    @include respond-down("mobile-l") {
+      font-size: 2.3vh;
+    }
+  }
+
+  .btn {
+    font-size: 2.5vh;
+    transition: all 0.3s ease;
+
+    @include respond-down("mobile-lg") {
+      font-size: 2vh;
+    }
+
+    @include respond-down("mobile-l") {
+      font-size: 2.7vh;
+      align-self: center;
+    }
+  }
+}
+
+.Brand-text {
+  margin-left: -15vh;
+  margin-top: 15vh;
+
+  @include respond-down("desktop") {
+    margin-left: -10vh;
+  }
+
+  @include respond-down("desktop-lg") {
+    margin-left: -5vh;
+  }
+
+  @include respond-down("desktop-md") {
+    margin-left: -2vh;
+  }
+
+  @include respond-down("burger") {
+    margin-left: 0;
+    margin-top: 5vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+}
+
+.presupuesto {
+
+  @include respond-down("mobile-l") {
+    width: 80% !important;
+  }
+}
+
+.shop {
+  @include respond-down("mobile-l") {
+    width: 60% !important;
+  }
+}

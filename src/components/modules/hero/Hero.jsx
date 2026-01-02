@@ -2,7 +2,7 @@
 
 import React, { useEffect } from 'react';
 import { Button, Container } from 'react-bootstrap';
-import './Hero.css';
+import './Hero.scss';
 
 // Componente principal de la sección Hero
 const Hero = () => {

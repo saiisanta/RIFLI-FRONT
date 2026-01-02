@@ -12,6 +12,10 @@ const NavBar = () => {
   const [expanded, setExpanded] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
+  const closeMenu = () => {
+    setExpanded(false);
+  };
+
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
@@ -40,7 +44,7 @@ const NavBar = () => {
         expand="lg"
         className={`Nav ${!isHeroVisible ? 'Nav--hidden' : ''} ${isScrolled ? 'Nav--scrolled' : ''}`}
         expanded={expanded}
-        onToggle={setExpanded}
+        onToggle={(val) => setExpanded(val)}
       >
         <Container fluid className="Nav__container px-4">
           
@@ -65,14 +69,14 @@ const NavBar = () => {
                     key={item} 
                     href={`#${item}`} 
                     className="Nav__link"
-                    onClick={() => setExpanded(false)}
+                    onClick={closeMenu}
                   >
                     {item === 'servicios' ? 'Servicios' : 'Marcas'}
                   </Nav.Link>
                 ))}
                 
                 {user && user.role === 'admin' && (
-                  <Nav.Link href="/admin" onClick={() => setExpanded(false)} className="Nav__link">
+                  <Nav.Link href="/admin" onClick={closeMenu} className="Nav__link">
                     Admin
                   </Nav.Link>
                 )}
@@ -80,11 +84,11 @@ const NavBar = () => {
 
               <Nav className="Nav__auth">
                 {user ? (
-                  <button onClick={logout} className="Nav__auth-btn">
+                  <button onClick={() => { logout(); closeMenu(); }} className="Nav__auth-btn">
                     <BoxArrowRight size={30} />
                   </button>
                 ) : (
-                  <button onClick={() => setShowAuth(true)} className="Nav__auth-btn">
+                  <button onClick={() => { setShowAuth(true); closeMenu(); }} className="Nav__auth-btn">
                     <PersonCircle size={30} />
                   </button>
                 )}

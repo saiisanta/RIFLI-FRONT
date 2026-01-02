@@ -12,8 +12,6 @@ function App() {
       <NavBar />
       <Hero />
       <Slider />
-      <Shop />
-      <Quotes />
       <Footer />
     </>
   );

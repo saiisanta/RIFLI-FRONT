@@ -1,11 +1,35 @@
 @use "./styles/breakpoints" as *;
 
-
 :root {
   --fz-title: #{clamp(2.5rem, 5vw + 1rem, 4.5rem)};
   --fz-subtitle: #{clamp(1.5rem, 3vw + 0.5rem, 2.2rem)};
   --fz-body: #{clamp(1rem, 1.5vw + 0.2rem, 1.25rem)};
   --bg-dark: #000000;
+  --accent-yellow: #ffca2c;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent-yellow) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--accent-yellow);
+  border-radius: 20px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #e0b226;
 }
 
 html, 
@@ -26,7 +50,6 @@ body {
   font-style: normal;
   font-variation-settings: "wdth" 100;
 }
-
 
 h1, .h1-style {
   font-size: var(--fz-title);

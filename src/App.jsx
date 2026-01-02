@@ -1,4 +1,3 @@
-// src/App.jsx
 import NavBar from './components/modules/nav/Nav';
 import Footer from './components/modules/footer/Footer';
 import Hero from './components/modules/hero/Hero';

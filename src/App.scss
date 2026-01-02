@@ -1,0 +1,55 @@
+@use "./styles/breakpoints" as *;
+
+
+:root {
+  --fz-title: #{clamp(2.5rem, 5vw + 1rem, 4.5rem)};
+  --fz-subtitle: #{clamp(1.5rem, 3vw + 0.5rem, 2.2rem)};
+  --fz-body: #{clamp(1rem, 1.5vw + 0.2rem, 1.25rem)};
+  --bg-dark: #000000;
+}
+
+html, 
+body {
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow-x: hidden;
+  background-color: var(--bg-dark);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.roboto {
+  font-family: "Roboto", sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+  font-variation-settings: "wdth" 100;
+}
+
+
+h1, .h1-style {
+  font-size: var(--fz-title);
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+h2, .h2-style {
+  font-size: var(--fz-subtitle);
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+p, .body-text {
+  font-size: var(--fz-body);
+  line-height: 1.6;
+}
+
+@include reduced-motion {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

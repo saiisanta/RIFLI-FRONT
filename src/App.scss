@@ -6,11 +6,26 @@
   --fz-body: #{clamp(1rem, 1.5vw + 0.2rem, 1.25rem)};
   --bg-dark: #000000;
   --accent-yellow: #ffca2c;
+  --accent-yellow-transparent: rgba(255, 202, 44, 0.3);
 }
 
 * {
   scrollbar-width: thin;
   scrollbar-color: var(--accent-yellow) transparent;
+  -webkit-user-drag: none;
+}
+
+::selection {
+  background-color: var(--accent-yellow-transparent) !important;
+  color: white !important;
+}
+
+img {
+  user-select: none !important;
+  -webkit-user-drag: none !important;
+  -webkit-touch-callout: none !important;
+  -moz-user-select: none !important;
+  pointer-events: none;
 }
 
 ::-webkit-scrollbar {

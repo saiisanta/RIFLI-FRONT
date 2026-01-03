@@ -50,7 +50,7 @@ const NavBar = () => {
           
           <Navbar.Brand href="#" className="Nav__brand">
             <div className="Nav__logo-wrapper">
-              <img src="./src/assets/img/rifli/rifli_white.png" alt="RIFLI" className="logo" />
+              <img src="./src/assets/img/rifli/rifli_white.png" alt="RIFLI" className="logo" draggable="false"/>
             </div>
           </Navbar.Brand>
 

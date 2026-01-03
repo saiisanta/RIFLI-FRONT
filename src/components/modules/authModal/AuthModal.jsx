@@ -1,28 +1,23 @@
-// src/components/modules/auth/AuthModal.jsx
 import React, { useState, useContext } from 'react';
 import { AuthContext } from '../../../context/AuthContext.jsx';
+import { useNavigate } from 'react-router-dom';
 import './authModal.css';
 
 export default function AuthModal({ show, onClose }) {
-  // Contexto de autenticación
   const { login, register } = useContext(AuthContext);
+  const navigate = useNavigate();
 
-  // Modo actual del formulario: 'login' o 'register'
   const [mode, setMode] = useState('login');
 
-  // Estado del formulario
   const [form, setForm] = useState({ name: '', email: '', password: '' });
 
-  // Estados de error y carga
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // Manejo de cambios en inputs
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // Envío del formulario según modo activo
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -34,7 +29,8 @@ export default function AuthModal({ show, onClose }) {
       } else {
         await register(form);
       }
-      onClose(); // Cierra el modal si fue exitoso
+      onClose();
+      navigate('/dashboard');
     } catch (err) {
       setError(err.message || 'Error en la autenticación');
     } finally {
@@ -42,7 +38,6 @@ export default function AuthModal({ show, onClose }) {
     }
   };
 
-  // Si no se debe mostrar, no renderiza nada
   if (!show) return null;
 
   return (
@@ -54,7 +49,6 @@ export default function AuthModal({ show, onClose }) {
         {error && <div className="error-message">{error}</div>}
 
         <form onSubmit={handleSubmit}>
-          {/* Campo nombre solo si está en modo registro */}
           {mode === 'register' && (
             <div className="form-group">
               <label>Nombre</label>
@@ -68,7 +62,6 @@ export default function AuthModal({ show, onClose }) {
             </div>
           )}
 
-          {/* Campo email */}
           <div className="form-group">
             <label>Email</label>
             <input
@@ -80,7 +73,6 @@ export default function AuthModal({ show, onClose }) {
             />
           </div>
 
-          {/* Campo contraseña */}
           <div className="form-group">
             <label>Contraseña</label>
             <input
@@ -93,13 +85,11 @@ export default function AuthModal({ show, onClose }) {
             />
           </div>
 
-          {/* Botón de envío */}
           <button type="submit" disabled={loading}>
             {loading ? 'Cargando...' : mode === 'login' ? 'Iniciar Sesión' : 'Registrarse'}
           </button>
         </form>
 
-        {/* Switch entre modos */}
         <div className="switch-mode">
           {mode === 'login' ? (
             <p>¿No tienes cuenta? <span onClick={() => setMode('register')}>Regístrate</span></p>

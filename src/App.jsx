@@ -1,16 +1,18 @@
-import NavBar from './components/modules/nav/Nav';
 import Footer from './components/modules/footer/Footer';
 import Hero from './components/modules/hero/Hero';
 import Slider from './components/modules/slider/Slider';
-import Shop from './components/modules/shop/Shop';
-import Quotes from './components/modules/quotes/Quotes';
+import Preloader from './components/modules/preloader/Preloader';
 
 function App() {
   return (
     <>
-      <NavBar />
-      <Hero />
-      <Slider />
+      <Preloader />
+
+      <main>
+        <Hero />
+        <Slider />
+      </main>
+
       <Footer />
     </>
   );

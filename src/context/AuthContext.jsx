@@ -7,15 +7,28 @@ export function AuthProvider({ children }) {
   const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Cargar token al iniciar
   useEffect(() => {
-    const savedToken = localStorage.getItem('token');
-    if (savedToken) {
-      setToken(savedToken);
-      fetchProfile(savedToken).finally(() => setLoading(false));
-    } else {
-      setLoading(false);
-    }
+    const initAuth = async () => {
+      const savedToken = localStorage.getItem('token');
+      if (savedToken) {
+        setToken(savedToken);
+        try {
+          const res = await fetch('http://localhost:4001/api/users/me', {
+            headers: { Authorization: `Bearer ${savedToken}` }
+          });
+          if (res.ok) {
+            const userData = await res.json();
+            setUser(userData);
+          } else {
+            logout();
+          }
+        } catch (error) {
+          logout();
+        }
+      }
+      setLoading(false); 
+    };
+    initAuth();
   }, []);
 
   const fetchProfile = async (token) => {
@@ -24,10 +37,13 @@ export function AuthProvider({ children }) {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (!res.ok) throw new Error('Error al cargar perfil');
+      
       const userData = await res.json();
       setUser(userData);
+      return userData;
     } catch (error) {
       logout();
+      return null;
     }
   };
 
@@ -66,7 +82,6 @@ export function AuthProvider({ children }) {
         throw new Error(errorData.error || 'Error al registrar');
       }
 
-      // Auto-login después de registrar
       await login({ email, password });
     } catch (error) {
       throw error;

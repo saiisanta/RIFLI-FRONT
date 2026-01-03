@@ -36,40 +36,42 @@
   }
 
   h1 {
-    font-size: 7vh;
-
-    @include respond-down("burger") {
-      font-size: 6vh;
-    }
-
-    @include respond-down("mobile-lg") {
-      font-size: 5vh;
-    }
+    font-size: var(--fz-title);
   }
 
   p {
-    font-size: 3vh;
+    font-size: var(--fz-subtitle);
 
-    @include respond-down("mobile-lg") {
-      font-size: 2.5vh;
+    @include respond-down("desktop-sm"){
+      margin-top: 1.5rem;
+    }
+  }
+
+  .btn-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 15px;
+    justify-content: flex-start;
+    @include respond-down("burger") {
+      justify-content: center;
     }
 
     @include respond-down("mobile-l") {
-      font-size: 2.3vh;
+      gap: 8px;
     }
   }
 
   .btn {
-    font-size: 2.5vh;
+    font-size: var(--fz-body);
     transition: all 0.3s ease;
-
-    @include respond-down("mobile-lg") {
-      font-size: 2vh;
-    }
-
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 0 1 auto;
     @include respond-down("mobile-l") {
-      font-size: 2.7vh;
-      align-self: center;
+      font-size: 0.85rem;
+      padding: 8px 12px;
     }
   }
 }
@@ -97,18 +99,5 @@
     flex-direction: column;
     align-items: center;
     text-align: center;
-  }
-}
-
-.presupuesto {
-
-  @include respond-down("mobile-l") {
-    width: 80% !important;
-  }
-}
-
-.shop {
-  @include respond-down("mobile-l") {
-    width: 60% !important;
   }
 }

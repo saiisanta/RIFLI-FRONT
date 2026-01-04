@@ -62,7 +62,7 @@ const Dashboard = () => {
           <h1>Hola, <span>{user.nombre || "Usuario"}</span></h1>
         </header>
 
-        <Row className="dashboard-grid justify-content-center">
+        <Row className="dashboard-grid">
           <DashboardCard title="Mi Perfil" icon={FaUserCircle} path="/perfil" onClick={navigate} type="profile" />
           <DashboardCard title="Servicios" icon={FaTools} path="/servicios" onClick={navigate} type="tools" />
           <DashboardCard title="Tienda" icon={FaShoppingCart} path="/shop" onClick={navigate} type="shop" />

@@ -198,12 +198,12 @@ const Shop = () => {
               <ul className="cart-list">
                 {cart.map((item) => (
                   <li key={item.id}>
-                    {item.quantity}x {item.name} - ${item.price.toFixed(2)}
+                    {item.quantity}x {item.name} - ${item.price}
                   </li>
                 ))}
               </ul>
             )}
-            <p><strong>Total: ${cartTotal.toFixed(2)}</strong></p>
+            <p><strong>Total: ${cartTotal}</strong></p>
 
             <div className="btns-cart">
               {cart.length > 0 && (
@@ -251,7 +251,7 @@ const Shop = () => {
               />
               <h3 className="shop-title">{prod.categoria} - {prod.name}</h3>
               <p className="shop-subinfo"><strong>Marca:</strong> {prod.marca}</p>
-              <p className="shop-price">${prod.price.toFixed(2)}</p>
+              <p className="shop-price">${prod.price}</p>
               <div className="shop-actions">
                 <button className="btn-details" onClick={() => setModalProduct(prod)}>Detalles</button>
                 <button className="btn-add" onClick={() => addToCart(prod)}>+ Agregar</button>
@@ -274,7 +274,7 @@ const Shop = () => {
               />
               <div className="modal-info">
                 <h2>{modalProduct.name}</h2>
-                <p><strong>Precio:</strong> ${modalProduct.price.toFixed(2)}</p>
+                <p><strong>Precio:</strong> ${modalProduct.price}</p>
                 <p><strong>Marca:</strong> {modalProduct.marca}</p>
                 <p><strong>Categoría:</strong> {modalProduct.categoria}</p>
                 <p className="shop-stock">
@@ -310,7 +310,7 @@ const Shop = () => {
                   <div className="cart-details-info">
                     <h4>{item.name}</h4>
                     <p><strong>Marca:</strong> {item.marca}</p>
-                    <p><strong>Precio:</strong> ${item.price.toFixed(2)}</p>
+                    <p><strong>Precio:</strong> ${item.price}</p>
                     <div className="cart-details-controls">
                       <button onClick={() => changeQuantity(item.id, -1)}>-</button>
                       <span>{item.quantity}</span>

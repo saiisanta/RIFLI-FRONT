@@ -57,7 +57,7 @@ const NavBar = () => {
     };
   }, [pathname]);
 
-  if (pathname === "/dashboard" || pathname === "/admin") {
+  if (pathname === "/dashboard" || pathname === "/admin" || pathname === "/shop") {
     return null;
   }
 

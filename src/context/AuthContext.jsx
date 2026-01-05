@@ -48,45 +48,44 @@ export function AuthProvider({ children }) {
   };
 
   const login = async ({ email, password }) => {
-    try {
-      const res = await fetch('http://localhost:4001/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
-      });
+    const res = await fetch('http://localhost:4001/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
 
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.error || 'Credenciales incorrectas');
-      }
+    const data = await res.json();
 
-      const { token: jwt } = await res.json();
-      localStorage.setItem('token', jwt);
-      setToken(jwt);
-      await fetchProfile(jwt);
-    } catch (error) {
-      throw error;
+    if (!res.ok) {
+      throw new Error(data.error || 'Credenciales incorrectas');
     }
+
+    const { token: jwt } = data;
+    localStorage.setItem('token', jwt);
+    setToken(jwt);
+    await fetchProfile(jwt);
   };
 
-  const register = async ({ name, email, password }) => {
-    try {
-      const res = await fetch('http://localhost:4001/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password })
-      });
+const register = async ({ name, email, password }) => {
+  const res = await fetch('http://localhost:4001/api/auth/register', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, email, password })
+  });
 
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.error || 'Error al registrar');
-      }
+  const data = await res.json();
 
-      await login({ email, password });
-    } catch (error) {
-      throw error;
+  if (!res.ok) {
+    // Manejar errores de validación de express-validator
+    if (data.errors && Array.isArray(data.errors)) {
+      const messages = data.errors.map(err => err.msg).join(', ');
+      throw new Error(messages);
     }
-  };
+    throw new Error(data.error || 'Error al registrar');
+  }
+
+  await login({ email, password });
+};
 
   const logout = () => {
     localStorage.removeItem('token');

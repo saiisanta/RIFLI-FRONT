@@ -1,0 +1,151 @@
+@use "../../styles/breakpoints" as *;
+
+:root {
+  --d-bg: #0a0a0a;
+  --d-bg-secondary: #151515;
+  --d-surface: #1a1a1a;
+  --d-accent: #ffca2c;
+  --d-accent-hover: #ffd95a;
+  --d-border: rgba(255, 255, 255, 0.08);
+  --d-text: #ffffff;
+  --d-text-muted: #9ca3af;
+  --d-shadow: rgba(0, 0, 0, 0.5);
+}
+
+.dashboard-wrapper {
+  position: relative;
+  min-height: 100vh;
+  background: var(--d-bg);
+  background-image: 
+    radial-gradient(ellipse at top, rgba(255, 202, 44, 0.08) 0%, transparent 60%),
+    radial-gradient(ellipse at bottom right, rgba(255, 202, 44, 0.04) 0%, transparent 50%);
+  color: var(--d-text);
+  padding-bottom: 4rem;
+  overflow-x: hidden;
+}
+
+.dashboard-content {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.dashboard-welcome {
+  margin: 3.5rem 0 5rem;
+  text-align: center;
+  position: relative;
+
+  .welcome-label {
+    color: var(--d-accent);
+    text-transform: uppercase;
+    letter-spacing: 6px;
+    font-size: 0.7rem;
+    font-weight: 800;
+    margin-bottom: 1.5rem;
+    display: inline-block;
+    position: relative;
+    text-shadow: 0 0 20px rgba(255, 202, 44, 0.4);
+    
+    &::after {
+      content: "";
+      position: absolute;
+      bottom: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--d-accent), transparent);
+      box-shadow: 0 0 10px var(--d-accent);
+    }
+  }
+
+  h1 {
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 900;
+    margin: 0;
+    line-height: 1.2;
+    
+    span {
+      color: var(--d-text-muted);
+      font-weight: 400;
+      display: inline-block;
+      margin-left: 0.5rem;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+    }
+  }
+}
+
+.dashboard-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  justify-content: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0;
+  height: 50vh;
+
+  @include respond-down("laptop") {
+    margin-bottom: 10rem;
+  }
+
+  @include respond-down("tablet") {
+    margin-bottom: 25rem;
+  }
+
+  @include respond-down("mobile-l") {
+    margin-bottom: 5rem;
+  }
+}
+
+.dashboard-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: var(--d-bg);
+}
+
+@include respond-down("mobile-lg") {
+  .dashboard-wrapper {
+    padding-bottom: 3rem;
+  }
+
+  .dashboard-content {
+    padding: 0 1.25rem;
+  }
+
+  .dashboard-welcome {
+    margin: 2rem 0 3rem;
+
+    .welcome-label {
+      font-size: 0.6rem;
+      letter-spacing: 3px;
+      margin-bottom: 1.25rem;
+
+      &::after {
+        width: 50px;
+        height: 2px;
+      }
+    }
+
+    h1 {
+      font-size: clamp(1.75rem, 5vw, 2.25rem);
+
+      span {
+        display: block;
+        margin: 0.5rem 0 0 0;
+      }
+    }
+  }
+
+  .dashboard-grid {
+    gap: 1rem;
+    max-width: 500px;
+    height: auto;
+  }
+}

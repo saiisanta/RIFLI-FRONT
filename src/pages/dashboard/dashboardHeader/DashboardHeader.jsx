@@ -1,6 +1,5 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { Button } from "react-bootstrap";
 import { FaArrowLeft, FaSignOutAlt } from "react-icons/fa";
 import "./DashboardHeader.scss";
 
@@ -9,19 +8,21 @@ const DashboardHeader = ({ onLogout }) => {
 
   return (
     <div className="dashboard-header-bar">
-      <Button 
-        className="btn-back" 
+      <button 
+        className="dashboard-btn-back" 
         onClick={() => navigate("/")}
       >
-        <FaArrowLeft /> <span>Sitio Principal</span>
-      </Button>
+        <FaArrowLeft /> 
+        <span>Sitio Principal</span>
+      </button>
       
-      <Button 
-        className="btn-logout" 
+      <button 
+        className="dashboard-btn-logout" 
         onClick={onLogout}
       >
-        <FaSignOutAlt /> <span>Salir</span>
-      </Button>
+        <FaSignOutAlt /> 
+        <span>Salir</span>
+      </button>
     </div>
   );
 };

@@ -23,7 +23,8 @@ const useAuth = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    checkAuthStatus();
+   // checkAuthStatus(); TEMPORAL
+   setLoading(false);
   }, []);
 
   const checkAuthStatus = useCallback(async () => {

@@ -1,8 +1,13 @@
-import React from "react";
+import React, { useContext } from "react";
+import { useNavigate } from "react-router-dom";
 import { Shield, Lightning, Fire } from "react-bootstrap-icons";
+import { AuthContext } from "../../../context/AuthContext";
 import "./servicesShowcase.scss";
 
 const ServicesShowcase = () => {
+  const navigate = useNavigate();
+  const { user } = useContext(AuthContext);
+
   const services = [
     {
       id: 1,
@@ -30,8 +35,16 @@ const ServicesShowcase = () => {
     }
   ];
 
+  const handleViewMore = () => {
+    if (user && user.email) {
+      navigate("/dashboard");
+    } else {
+      navigate("/login");
+    }
+  };
+
   return (
-    <section id="servicios"className="services-showcase">
+    <section id="servicios" className="services-showcase">
       <div className="showcase-header">
         <span className="section-label">Nuestros Servicios</span>
         <h2 className="section-title">
@@ -72,7 +85,10 @@ const ServicesShowcase = () => {
                 ))}
               </ul>
 
-              <button className="btn-service">
+              <button 
+                className="btn-service"
+                onClick={handleViewMore}
+              >
                 Ver más
                 <span className="btn-arrow">→</span>
               </button>

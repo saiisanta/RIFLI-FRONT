@@ -1,5 +1,7 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useContext } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button, Container } from "react-bootstrap";
+import { AuthContext } from "../../../context/AuthContext";
 import "./Slider.scss";
 
 const logos = [
@@ -14,6 +16,8 @@ const logos = [
 
 const Slider = () => {
   const trackRef = useRef(null);
+  const navigate = useNavigate();
+  const { user } = useContext(AuthContext);
 
   useEffect(() => {
     const moveSlider = () => {
@@ -38,6 +42,14 @@ const Slider = () => {
     const interval = setInterval(moveSlider, 3000);
     return () => clearInterval(interval);
   }, []);
+
+  const handleKnowMore = () => {
+    if (user && user.email) {
+      navigate("/shop");
+    } else {
+      navigate("/login");
+    }
+  };
 
   return (
     <section id="shop" className="slider-section">
@@ -66,7 +78,12 @@ const Slider = () => {
           </div>
         </div>
 
-        <Button variant="outline-dark" size="lg" className="mt-5">
+        <Button 
+          variant="outline-dark" 
+          size="lg" 
+          className="mt-5"
+          onClick={handleKnowMore}
+        >
           Conocé más...
         </Button>
       </Container>

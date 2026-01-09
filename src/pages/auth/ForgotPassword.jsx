@@ -6,7 +6,7 @@ import AuthPageLayout from './components/AuthPageLayout';
 import './auth.scss';
 
 const ForgotPassword = () => {
-  const { resetPassword, loading: authLoading, error: authError, clearError } = useAuthContext();
+  const { forgotPassword, loading: authLoading, error: authError, clearError } = useAuthContext();
   const [emailSent, setEmailSent] = useState(false);
 
   const validationRules = {
@@ -35,7 +35,7 @@ const ForgotPassword = () => {
 
   const onSubmit = async (formData) => {
     try {
-      await resetPassword(formData.email);
+      await forgotPassword(formData.email);
       setEmailSent(true);
       reset();
     } catch (err) {

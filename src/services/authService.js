@@ -40,7 +40,7 @@ const authService = {
 
   forgotPassword: async (email) => {
     try {
-      const response = await api.post('/auth/forgot-password', { email });
+      const response = await api.post('/user/forgot-password', { email });
       return response.data;
     } catch (error) {
       throw error.response?.data || error;
@@ -49,9 +49,8 @@ const authService = {
 
   resetPassword: async (token, newPassword) => {
     try {
-      const response = await api.post('/auth/reset-password', {
-        token,
-        password: newPassword,
+      const response = await api.post(`/user/reset-password/${token}`, {
+        newPassword
       });
       return response.data;
     } catch (error) {
@@ -61,7 +60,7 @@ const authService = {
 
   verifyEmail: async (token) => {
     try {
-      const response = await api.get(`/auth/verify-email?token=${token}`);
+      const response = await api.get(`/auth/verify-email/${token}`);
       return response.data;
     } catch (error) {
       throw error.response?.data || error;

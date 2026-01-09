@@ -1,34 +1,41 @@
-import React from 'react';
-import { useNavigate, useSearchParams, Link } from 'react-router-dom';
-import { useAuthContext } from '../../context/AuthContext';
-import useForm from '../../hooks/useForm';
-import AuthPageLayout from './components/AuthPageLayout';
-import './auth.scss';
+import React from "react";
+import { useNavigate, useSearchParams, Link } from "react-router-dom";
+import { useAuthContext } from "../../context/AuthContext";
+import useForm from "../../hooks/useForm";
+import AuthPageLayout from "./components/AuthPageLayout";
+import "./auth.scss";
 
 const Login = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { login, loading: authLoading, error: authError, clearError } = useAuthContext();
-  const redirect = searchParams.get('redirect');
-  const sessionExpired = searchParams.get('session_expired');
-  const registered = searchParams.get('registered');
-  const logout = searchParams.get('logout');
+  const {
+    login,
+    loading: authLoading,
+    error: authError,
+    clearError,
+  } = useAuthContext();
+
+  const redirect = searchParams.get("redirect");
+  const sessionExpired = searchParams.get("session_expired");
+  const registered = searchParams.get("registered");
+  const verified = searchParams.get("verified");
+  const logout = searchParams.get("logout");
 
   const validationRules = {
     email: {
-      required: { message: 'El email es requerido' },
+      required: { message: "El email es requerido" },
       pattern: {
         value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-        message: 'Email inválido'
-      }
+        message: "Email inválido",
+      },
     },
     password: {
-      required: { message: 'La contraseña es requerida' },
-      minLength: { 
-        value: 6, 
-        message: 'La contraseña debe tener al menos 6 caracteres' 
-      }
-    }
+      required: { message: "La contraseña es requerida" },
+      minLength: {
+        value: 6,
+        message: "La contraseña debe tener al menos 6 caracteres",
+      },
+    },
   };
 
   const {
@@ -39,28 +46,25 @@ const Login = () => {
     handleChange,
     handleBlur,
     handleSubmit,
-    reset
-  } = useForm(
-    { email: '', password: '' },
-    validationRules
-  );
+    reset,
+  } = useForm({ email: "", password: "" }, validationRules);
 
   const onSubmit = async (formData) => {
     try {
       await login({
         email: formData.email,
-        password: formData.password
+        password: formData.password,
       });
-      
+
       reset();
-      
+
       if (redirect) {
         navigate(redirect);
       } else {
-        navigate('/dashboard');
+        navigate("/dashboard");
       }
     } catch (err) {
-      console.error('Error en login:', err);
+      console.error("Error en login:", err);
     }
   };
 
@@ -74,8 +78,7 @@ const Login = () => {
         <h2>Iniciar Sesión</h2>
         <p className="auth-subtitle">Accede a tu cuenta</p>
       </div>
-
-      {/* Mensajes contextuales */}
+      
       {sessionExpired && (
         <div className="info-message">
           Tu sesión expiró. Por favor inicia sesión nuevamente.
@@ -84,14 +87,30 @@ const Login = () => {
 
       {registered && (
         <div className="success-message">
-          ¡Registro exitoso! Ahora puedes iniciar sesión.
+          ¡Registro exitoso! Revisa tu email para verificar tu cuenta.
+        </div>
+      )}
+
+      {verified && (
+        <div className="success-message-verified">
+          <div className="verified-checkmark">
+            <div className="check-icon-small">
+              <span className="icon-line-small line-tip-small"></span>
+              <span className="icon-line-small line-long-small"></span>
+              <div className="icon-circle-small"></div>
+            </div>
+          </div>
+          <div className="verified-content">
+            <p className="verified-title">Email verificado correctamente</p>
+            <p className="verified-subtitle">
+              Ya podés iniciar sesión con tu cuenta
+            </p>
+          </div>
         </div>
       )}
 
       {logout && (
-        <div className="info-message">
-          Sesión cerrada correctamente.
-        </div>
+        <div className="info-message">Sesión cerrada correctamente.</div>
       )}
 
       {authError && (
@@ -111,7 +130,7 @@ const Login = () => {
             onChange={handleChange}
             onBlur={handleBlur}
             disabled={isSubmitting || authLoading}
-            className={errors.email && touched.email ? 'input-error' : ''}
+            className={errors.email && touched.email ? "input-error" : ""}
             placeholder="tu@email.com"
             autoComplete="email"
           />
@@ -130,7 +149,7 @@ const Login = () => {
             onChange={handleChange}
             onBlur={handleBlur}
             disabled={isSubmitting || authLoading}
-            className={errors.password && touched.password ? 'input-error' : ''}
+            className={errors.password && touched.password ? "input-error" : ""}
             placeholder="Mínimo 6 caracteres"
             autoComplete="current-password"
           />
@@ -139,8 +158,8 @@ const Login = () => {
           )}
         </div>
 
-        <button 
-          type="submit" 
+        <button
+          type="submit"
           disabled={isSubmitting || authLoading}
           className="submit-btn"
         >
@@ -150,7 +169,7 @@ const Login = () => {
               Iniciando sesión...
             </>
           ) : (
-            'Iniciar Sesión'
+            "Iniciar Sesión"
           )}
         </button>
       </form>
@@ -161,11 +180,9 @@ const Login = () => {
         </Link>
       </div>
 
-    
-
       <div className="switch-mode">
         <p>
-          ¿No tienes cuenta?{' '}
+          ¿No tienes cuenta?{" "}
           <Link to="/register" className="switch-link">
             Regístrate aquí
           </Link>

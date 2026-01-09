@@ -16,7 +16,7 @@ const authService = {
       const response = await api.post('/auth/login', credentials);
       return response.data;
     } catch (error) {
-      throw error.response?.data || error;
+      throw error.response?.data.error || error;
     }
   },
 
@@ -25,7 +25,7 @@ const authService = {
       const response = await api.post('/auth/logout');
       return response.data;
     } catch (error) {
-      throw error.response?.data || error;
+      throw error.response?.data.error || error;
     }
   },
 
@@ -34,7 +34,7 @@ const authService = {
       const response = await api.post('/auth/refresh-token');
       return response.data;
     } catch (error) {
-      throw error.response?.data || error;
+      throw error.response?.data.error || error;
     }
   },
 
@@ -43,7 +43,7 @@ const authService = {
       const response = await api.post('/user/forgot-password', { email });
       return response.data;
     } catch (error) {
-      throw error.response?.data || error;
+      throw error.response?.data.error || error;
     }
   },
 
@@ -54,7 +54,7 @@ const authService = {
       });
       return response.data;
     } catch (error) {
-      throw error.response?.data || error;
+      throw error.response?.data.error || error;
     }
   },
 
@@ -63,7 +63,7 @@ const authService = {
       const response = await api.get(`/auth/verify-email/${token}`);
       return response.data;
     } catch (error) {
-      throw error.response?.data || error;
+      throw error.response?.data.error || error;
     }
   },
 
@@ -72,7 +72,7 @@ const authService = {
       const response = await api.post('/auth/resend-verification', { email });
       return response.data;
     } catch (error) {
-      throw error.response?.data || error;
+      throw error.response?.data.error || error;
     }
   },
 
@@ -81,7 +81,7 @@ const authService = {
       const response = await api.get('/auth/me');
       return response.data;
     } catch (error) {
-      throw error.response?.data || error;
+      throw error.response?.data.error || error;
     }
   },
 
@@ -90,7 +90,7 @@ const authService = {
       const response = await api.get('/auth/check');
       return response.data;
     } catch (error) {
-      throw error.response?.data || error;
+      throw error.response?.data.error || error;
     }
   },
 };

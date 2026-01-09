@@ -68,7 +68,7 @@ const useAuth = () => {
       setIsAuthenticated(true);
       return data;
     } catch (err) {
-      setError(err.message || 'Error al iniciar sesión');
+      setError(err || 'Error al iniciar sesión');
       throw err;
     } finally {
       setLoading(false);
@@ -83,7 +83,7 @@ const useAuth = () => {
       setIsAuthenticated(false);
       setError(null);
     } catch (err) {
-      setError(err.message || 'Error al cerrar sesión');
+      setError(err || 'Error al cerrar sesión');
       setUser(null);
       setIsAuthenticated(false);
     } finally {
@@ -98,7 +98,7 @@ const useAuth = () => {
       const data = await authService.forgotPassword(email);
       return data;
     } catch (err) {
-      setError(err.message || 'Error al solicitar recuperación');
+      setError(err || 'Error al solicitar recuperación');
       throw err;
     } finally {
       setLoading(false);
@@ -112,7 +112,7 @@ const useAuth = () => {
       const data = await authService.resetPassword(token, newPassword);
       return data;
     } catch (err) {
-      setError(err.message || 'Error al resetear contraseña');
+      setError(err || 'Error al resetear contraseña');
       throw err;
     } finally {
       setLoading(false);
@@ -126,7 +126,7 @@ const useAuth = () => {
       const data = await authService.verifyEmail(token);
       return data;
     } catch (err) {
-      setError(err.message || 'Error al verificar email');
+      setError(err || 'Error al verificar email');
       throw err;
     } finally {
       setLoading(false);
@@ -140,7 +140,7 @@ const useAuth = () => {
       const data = await authService.resendVerification(email);
       return data;
     } catch (err) {
-      setError(err.message || 'Error al reenviar verificación');
+      setError(err || 'Error al reenviar verificación');
       throw err;
     } finally {
       setLoading(false);

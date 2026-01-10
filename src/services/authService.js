@@ -40,7 +40,7 @@ const authService = {
 
   forgotPassword: async (email) => {
     try {
-      const response = await api.post('/user/forgot-password', { email });
+      const response = await api.post('/users/request-reset', { email });
       return response.data;
     } catch (error) {
       throw error.response?.data.error || error;
@@ -49,7 +49,7 @@ const authService = {
 
   resetPassword: async (token, newPassword) => {
     try {
-      const response = await api.post(`/user/reset-password/${token}`, {
+      const response = await api.post(`/users/reset-password/${token}`, {
         newPassword
       });
       return response.data;

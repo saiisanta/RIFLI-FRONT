@@ -8,10 +8,9 @@ import './auth.scss';
 const ResetPassword = () => {
   const { token } = useParams();
   const navigate = useNavigate();
-  const { clearError } = useAuthContext();
+  const { resetPassword, clearError } = useAuthContext();
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
 
   const validationRules = {
     newPassword: {
@@ -41,8 +40,7 @@ const ResetPassword = () => {
     isSubmitting,
     handleChange,
     handleBlur,
-    handleSubmit,
-    setFieldError
+    handleSubmit
   } = useForm(
     { newPassword: '', confirmPassword: '' },
     validationRules
@@ -50,31 +48,12 @@ const ResetPassword = () => {
 
   const onSubmit = async (formData) => {
     try {
-      setLoading(true);
       setError('');
-
-      const response = await fetch(
-        `http://localhost:4001/api/users/reset-password/${token}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ newPassword: formData.newPassword })
-        }
-      );
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setSuccess(true);
-        setTimeout(() => navigate('/login'), 3000);
-      } else {
-        setError(data.error || data.message || 'Error al restablecer contraseña');
-      }
+      await resetPassword(token, formData.newPassword);
+      setSuccess(true);
+      setTimeout(() => navigate('/login'), 3000);
     } catch (err) {
-      console.error('Error:', err);
-      setError('Error de conexión. Inténtalo nuevamente.');
-    } finally {
-      setLoading(false);
+      setError(err.error || err.message || 'Error al restablecer contraseña');
     }
   };
 
@@ -132,7 +111,7 @@ const ResetPassword = () => {
             value={values.newPassword}
             onChange={handleChange}
             onBlur={handleBlur}
-            disabled={isSubmitting || loading}
+            disabled={isSubmitting}
             className={errors.newPassword && touched.newPassword ? 'input-error' : ''}
             placeholder="Mínimo 8 caracteres"
             autoComplete="new-password"
@@ -151,7 +130,7 @@ const ResetPassword = () => {
             value={values.confirmPassword}
             onChange={handleChange}
             onBlur={handleBlur}
-            disabled={isSubmitting || loading}
+            disabled={isSubmitting}
             className={
               errors.confirmPassword && touched.confirmPassword ? 'input-error' : ''
             }
@@ -175,10 +154,10 @@ const ResetPassword = () => {
 
         <button
           type="submit"
-          disabled={isSubmitting || loading}
+          disabled={isSubmitting}
           className="submit-btn"
         >
-          {isSubmitting || loading ? (
+          {isSubmitting ? (
             <>
               <span className="spinner"></span>
               Restableciendo...

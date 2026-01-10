@@ -9,12 +9,16 @@ const Register = () => {
   const navigate = useNavigate();
   const {
     register,
+    resendVerification,
     loading: authLoading,
     error: authError,
     clearError,
   } = useAuthContext();
   const [registrationSuccess, setRegistrationSuccess] = useState(false);
   const [userEmail, setUserEmail] = useState("");
+  const [resendLoading, setResendLoading] = useState(false);
+  const [resendSuccess, setResendSuccess] = useState(false);
+  const [resendError, setResendError] = useState("");
 
   const validationRules = {
     name: {
@@ -80,6 +84,32 @@ const Register = () => {
     }
   };
 
+  const handleResendVerification = async () => {
+    try {
+      setResendLoading(true);
+      setResendError("");
+      setResendSuccess(false);
+
+      await resendVerification(userEmail);
+      
+      setResendSuccess(true);
+      
+      // Ocultar mensaje de éxito después de 5 segundos
+      setTimeout(() => {
+        setResendSuccess(false);
+      }, 5000);
+    } catch (err) {
+      console.error("Error al reenviar verificación:", err);
+      setResendError(
+        err.error || 
+        err.message || 
+        "Error al reenviar el email. Inténtalo nuevamente."
+      );
+    } finally {
+      setResendLoading(false);
+    }
+  };
+
   React.useEffect(() => {
     return () => clearError();
   }, [clearError]);
@@ -88,7 +118,7 @@ const Register = () => {
     return (
       <AuthPageLayout>
         <div className="auth-header">
-          <h2>¡Registro Exitoso! 🎉</h2>
+          <h2>Registro Exitoso</h2>
           <p className="auth-subtitle">Verificá tu email para continuar</p>
         </div>
 
@@ -107,10 +137,23 @@ const Register = () => {
             </p>
             <p className="verified-subtitle">
               Te enviamos un email de verificación a:
-              <p className="email-highlight">{userEmail}</p>
+              <span className="email-highlight">{userEmail}</span>
             </p>
           </div>
         </div>
+
+        {/* Mensajes de reenvío */}
+        {resendSuccess && (
+          <div className="success-message">
+            Email reenviado correctamente. Revisá tu bandeja de entrada.
+          </div>
+        )}
+
+        {resendError && (
+          <div className="error-message" role="alert">
+            {resendError}
+          </div>
+        )}
 
         <div className="info-messages">
           <ol className="info-ol">
@@ -140,9 +183,17 @@ const Register = () => {
             ¿No recibiste el email?{" "}
             <button
               className="switch-link-button"
-              onClick={() => setRegistrationSuccess(false)}
+              onClick={handleResendVerification}
+              disabled={resendLoading}
             >
-              Volver a intentar
+              {resendLoading ? (
+                <>
+                  <span className="spinner-inline"></span>
+                  Reenviando...
+                </>
+              ) : (
+                "Reenviar email"
+              )}
             </button>
           </p>
         </div>

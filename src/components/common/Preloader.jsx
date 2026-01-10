@@ -25,7 +25,7 @@ const Preloader = () => {
   return (
     <div className={`preloader-overlay ${fadeOut ? 'fade-out' : ''}`}>
       <div className="loader-container">
-        <div className="spinner"></div>
+        <div className="preloader-spinner"></div>
       </div>
     </div>
   );

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useProductsSimple } from "../../hooks/useProductsSimple";
 import ShopHeader from "./components/ShopHeader/ShopHeader";
 import CartPage from "./components/CartPage/CartPage";
+import { FiRefreshCw } from "react-icons/fi";
 import "./shop.scss";
 
 const Shop = () => {
@@ -17,15 +18,15 @@ const Shop = () => {
   const [cart, setCart] = useState([]);
   const [showCart, setShowCart] = useState(false);
 
-  const { products, loading, error } = useProductsSimple();
+  const { products, loading, error, reload } = useProductsSimple();
 
   const filtered = products.filter((prod) => {
     let matches = true;
 
     if (filters.categoria && prod.categoria !== filters.categoria) matches = false;
     if (filters.marca && prod.marca !== filters.marca) matches = false;
-    if (filters.min && prod.price < parseFloat(filters.min)) matches = false;
-    if (filters.max && prod.price > parseFloat(filters.max)) matches = false;
+      if (filters.min && prod.price < parseFloat(filters.min)) matches = false;
+      if (filters.max && prod.price > parseFloat(filters.max)) matches = false;
 
     if (searchTerm.trim()) {
       const normalize = (str) =>
@@ -92,7 +93,7 @@ const Shop = () => {
     return (
       <div className="shop-error">
         <p>⚠ Error: {error}</p>
-        <button onClick={() => window.location.reload()}>Reintentar</button>
+        <button onClick={reload}>Reintentar</button>
       </div>
     );
 
@@ -100,6 +101,7 @@ const Shop = () => {
     return (
       <div className="shop-empty">
         <p>No hay productos disponibles.</p>
+        <button onClick={reload}>Recargar</button>
       </div>
     );
 
@@ -202,13 +204,23 @@ const Shop = () => {
               {filtered.length} producto{filtered.length !== 1 ? "s" : ""}{" "}
               encontrado{filtered.length !== 1 ? "s" : ""}
             </div>
-            <input
-              className="shop-search"
-              type="text"
-              placeholder="Buscar productos..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
+            <div className="shop-controls-right">
+              <input
+                className="shop-search"
+                type="text"
+                placeholder="Buscar productos..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+              <button 
+                className="btn-reload" 
+                onClick={reload}
+                disabled={loading}
+                title="Recargar productos"
+              >
+                <FiRefreshCw className={loading ? "spinning" : ""} />
+              </button>
+            </div>
           </div>
 
           <div className="products-grid">

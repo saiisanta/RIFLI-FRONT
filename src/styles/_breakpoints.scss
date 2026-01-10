@@ -1,8 +1,10 @@
 @use "sass:map";
 
 $breakpoints: (
+  "mobile-md": 425px,
   "mobile-lg": 600px,
   "mobile-l": 700px,
+  "tablet-md":    880px,
   "tablet":    880px,
   "tablet-l":    900px,
   "burger": 991px,

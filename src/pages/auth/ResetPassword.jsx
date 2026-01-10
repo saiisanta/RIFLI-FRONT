@@ -159,7 +159,7 @@ const ResetPassword = () => {
         >
           {isSubmitting ? (
             <>
-              <span className="spinner"></span>
+              <span className="login-spinner"></span>
               Restableciendo...
             </>
           ) : (

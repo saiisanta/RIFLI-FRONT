@@ -307,7 +307,7 @@ const Register = () => {
         >
           {isSubmitting || authLoading ? (
             <>
-              <span className="spinner"></span>
+              <span className="login-spinner"></span>
               Registrando...
             </>
           ) : (

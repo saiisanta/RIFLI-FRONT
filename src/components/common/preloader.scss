@@ -37,9 +37,9 @@
   gap: 20px;
 }
 
-.spinner {
-  width: var(--preloader-spinner-size);
-  height: var(--preloader-spinner-size);
+.preloader-spinner {
+  width: var(--preloader-spinner-size) !important;
+  height: var(--preloader-spinner-size) !important;
   border: 4px solid var(--preloader-accent-soft);
   border-left-color: var(--preloader-accent);
   border-radius: 50%;

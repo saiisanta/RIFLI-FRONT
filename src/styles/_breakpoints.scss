@@ -12,6 +12,8 @@ $breakpoints: (
   "desktop-lg": 1400px,
   "desktop-l": 1440px,
   "desktop": 1600px,
+  "desktop-standart": 1920px,
+
 );
 
 @mixin respond-down($size) {

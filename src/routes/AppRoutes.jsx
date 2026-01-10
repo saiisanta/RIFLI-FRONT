@@ -4,7 +4,7 @@ import App from "../App";
 import Shop from "../pages/shop/Shop";
 import Quotes from "../pages/quotes/Quotes";
 import AdminPanel from "../components/admin/AdminPanel";
-//import Profile from '../components/modules/user/Profile';
+import Profile from "../pages/profile/Profile";
 import Dashboard from "../pages/dashboard/Dashboard";
 import { PrivateRoute } from "./PrivateRoute";
 import NavBar from "../components/common/Nav";
@@ -35,6 +35,15 @@ export default function AppRoutes() {
           element={
             <PrivateRoute>
               <Dashboard />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/profile"
+          element={
+            <PrivateRoute>
+              <Profile/>
             </PrivateRoute>
           }
         />

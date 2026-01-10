@@ -1,8 +1,8 @@
 import React, { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { Shield, Lightning, Fire } from "react-bootstrap-icons";
-import { AuthContext } from "../../../context/AuthContext";
-import "./servicesShowcase.scss";
+import { AuthContext } from "../../../../context/AuthContext";
+import "./ServicesShowcase.scss";
 
 const ServicesShowcase = () => {
   const navigate = useNavigate();

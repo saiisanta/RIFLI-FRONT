@@ -1,6 +1,6 @@
-import Hero from './hero/Hero';
-import Slider from './slider/Slider';
-import ServicesShowcase from './servicesShowcase/ServicesShowcase';
+import Hero from './components/hero/Hero';
+import Slider from './components/slider/Slider';
+import ServicesShowcase from './components/servicesShowcase/ServicesShowcase';
 
 export default function Home() {
   return (

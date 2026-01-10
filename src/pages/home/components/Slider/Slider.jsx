@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button, Container } from "react-bootstrap";
-import { AuthContext } from "../../../context/AuthContext";
+import { AuthContext } from "../../../../context/AuthContext";
 import "./Slider.scss";
 
 const logos = [

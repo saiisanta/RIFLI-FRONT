@@ -6,9 +6,9 @@ import {
   FaFileInvoiceDollar, FaCogs 
 } from "react-icons/fa";
 import { AuthContext } from "../../context/AuthContext";
-import DashboardHeader from "./dashboardHeader/DashboardHeader";
-import DashboardCard from "./dashboardCard/DashboardCard";
-import "./dashboard.scss";
+import DashboardHeader from "./components/dashboardHeader/DashboardHeader";
+import DashboardCard from "./components/dashboardCard/DashboardCard";
+import "./Dashboard.scss";
 
 const Dashboard = () => {
   const { user, loading, logout } = useContext(AuthContext);
@@ -32,12 +32,11 @@ const Dashboard = () => {
     navigate("/");
   };
 
-  // Configuración de las tarjetas del dashboard
   const dashboardCards = [
     { 
       title: "Mi Perfil", 
       icon: FaUserCircle, 
-      path: "/perfil", 
+      path: "/profile", 
       type: "profile" 
     },
     { 
@@ -60,7 +59,6 @@ const Dashboard = () => {
     }
   ];
 
-  // Agregar tarjeta de Admin si el usuario es admin
   if (user.role === 'admin') {
     dashboardCards.push({ 
       title: "Admin", 
@@ -74,11 +72,9 @@ const Dashboard = () => {
     <div className="dashboard-wrapper">
       <div className="polygon-bg"></div>
       
-      {/* Header con botones de navegación */}
       <DashboardHeader onLogout={handleLogout} />
       
       <Container className="dashboard-content">
-        {/* Welcome Section */}
         <header className="dashboard-welcome">
           <div className="accent-line"></div>
           <p className="welcome-label">Terminal de Control</p>
@@ -87,7 +83,6 @@ const Dashboard = () => {
           </h1>
         </header>
 
-        {/* Grid de tarjetas */}
         <Row className="dashboard-grid">
           {dashboardCards.map((card, index) => (
             <DashboardCard

@@ -1,0 +1,94 @@
+@use "../../../../styles/breakpoints" as *;
+
+.shop-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  background: rgba(10, 10, 10, 0.8);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--shop-border);
+
+  @include respond-down("mobile-lg") {
+    padding: 1rem 1.5rem;
+  }
+}
+
+.shop-header-back-btn,
+.shop-header-cart-btn {
+  background: var(--shop-card);
+  border: 1px solid var(--shop-border);
+  color: var(--shop-text);
+  padding: 0.875rem 1.5rem;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  svg {
+    transition: transform 0.3s ease;
+  }
+
+  @include respond-down("mobile-lg") {
+    padding: 0.75rem 1rem;
+    font-size: 0.8rem;
+  }
+}
+
+.shop-header-back-btn {
+  &:hover {
+    border-color: var(--shop-accent);
+    background: rgba(255, 202, 44, 0.05);
+    transform: translateX(-4px);
+
+    svg {
+      transform: translateX(-3px);
+    }
+  }
+
+  @include respond-down("mobile-lg") {
+    span {
+      display: none;
+    }
+  }
+}
+
+.shop-header-cart-btn {
+  position: relative;
+
+  &:hover {
+    border-color: var(--shop-accent);
+    background: rgba(255, 202, 44, 0.05);
+  }
+
+  @include respond-down("mobile-lg") {
+    .shop-header-cart-text {
+      display: none;
+    }
+  }
+}
+
+.shop-header-cart-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: var(--shop-accent);
+  color: #000;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+}

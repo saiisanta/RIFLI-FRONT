@@ -1,12 +1,10 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { FaArrowLeft, FaShoppingCart } from "react-icons/fa";
 import { useProductsSimple } from "../../hooks/useProductsSimple";
-import CartPage from "./CartPage";
+import ShopHeader from "./components/ShopHeader/ShopHeader";
+import CartPage from "./components/CartPage/CartPage";
 import "./shop.scss";
 
 const Shop = () => {
-  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [filters, setFilters] = useState({
     categoria: "",
@@ -102,7 +100,6 @@ const Shop = () => {
     return (
       <div className="shop-empty">
         <p>No hay productos disponibles.</p>
-        <button onClick={() => navigate("/dashboard")}>Volver al Dashboard</button>
       </div>
     );
 
@@ -114,26 +111,7 @@ const Shop = () => {
         <div className="decoration-circle circle-3"></div>
       </div>
 
-      <div className="shop-top-bar">
-        <button
-          className="shop-back-btn"
-          onClick={() => navigate("/dashboard")}
-          aria-label="Volver al dashboard"
-        >
-          <FaArrowLeft />
-          <span>Dashboard</span>
-        </button>
-
-        <button
-          className="shop-cart-btn"
-          onClick={() => setShowCart(true)}
-          aria-label="Ver carrito"
-        >
-          <FaShoppingCart />
-          {cartItemCount > 0 && <span className="cart-badge">{cartItemCount}</span>}
-          <span className="cart-text">Carrito</span>
-        </button>
-      </div>
+      <ShopHeader cartItemCount={cartItemCount} onCartClick={() => setShowCart(true)} />
 
       <div className="shop-wrapper">
         <aside className="shop-filters">

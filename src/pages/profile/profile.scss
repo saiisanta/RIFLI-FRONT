@@ -142,6 +142,31 @@
   }
 }
 
+.profile-page-wrapper {
+  position: relative;
+  min-height: 100vh;
+  background: var(--profile-bg);
+  padding-top: 5.5rem;
+
+  @include respond-down("mobile-lg") {
+    padding-top: 4.5rem;
+  }
+}
+
+.profile-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+
+  @include respond-down("tablet") {
+    padding: 1.5rem;
+  }
+
+  @include respond-down("mobile-lg") {
+    padding: 1rem;
+  }
+}
+
 @include reduced-motion {
   *,
   *::before,

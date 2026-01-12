@@ -1,13 +1,6 @@
 @use "../../../../styles/breakpoints" as *;
 
-:root {
-  --dashboard-nav-card: #1a1a1a;
-  --dashboard-nav-border: rgba(255, 255, 255, 0.08);
-  --dashboard-nav-text: #ffffff;
-  --dashboard-accent: #ffca2c;
-}
-
-.dashboard-header-bar {
+.profile-navbar {
   position: fixed;
   top: 0;
   left: 0;
@@ -17,17 +10,20 @@
   justify-content: space-between;
   align-items: center;
   padding: 1.5rem 2rem;
+  background: rgba(10, 10, 10, 0.8);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--profile-border);
 
   @include respond-down("mobile-lg") {
     padding: 1rem 1.5rem;
   }
 }
 
-.dashboard-btn-back,
-.dashboard-btn-logout {
-  background: var(--dashboard-nav-card);
-  border: 1px solid var(--dashboard-nav-border);
-  color: var(--dashboard-nav-text);
+.profile-navbar-back-btn,
+.profile-navbar-logout-btn {
+  background: var(--profile-card);
+  border: 1px solid var(--profile-border);
+  color: var(--profile-text);
   padding: 0.875rem 1.5rem;
   border-radius: 12px;
   font-size: 0.875rem;
@@ -45,16 +41,12 @@
   @include respond-down("mobile-lg") {
     padding: 0.75rem 1rem;
     font-size: 0.8rem;
-
-    span {
-      display: none;
-    }
   }
 }
 
-.dashboard-btn-back {
+.profile-navbar-back-btn {
   &:hover {
-    border-color: var(--dashboard-accent);
+    border-color: var(--profile-accent);
     background: rgba(255, 202, 44, 0.05);
     transform: translateX(-4px);
 
@@ -62,9 +54,15 @@
       transform: translateX(-3px);
     }
   }
+
+  @include respond-down("mobile-lg") {
+    span {
+      display: none;
+    }
+  }
 }
 
-.dashboard-btn-logout {
+.profile-navbar-logout-btn {
   &:hover {
     border-color: #ef4444;
     background: rgba(239, 68, 68, 0.05);
@@ -72,6 +70,12 @@
 
     svg {
       transform: scale(1.1);
+    }
+  }
+
+  @include respond-down("mobile-lg") {
+    span {
+      display: none;
     }
   }
 }

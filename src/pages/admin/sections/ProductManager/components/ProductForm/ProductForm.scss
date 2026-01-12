@@ -1,0 +1,262 @@
+@use "../../../../../../styles/breakpoints" as *;
+
+.product-form-section {
+  background: var(--admin-surface);
+  border: 1px solid var(--admin-border);
+  border-radius: 20px;
+  margin-bottom: 2rem;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  @include respond-down("mobile-lg") {
+    border-radius: 16px;
+  }
+
+  &.collapsed {
+    .product-form-content {
+      max-height: 0;
+      padding: 0 2rem;
+      opacity: 0;
+    }
+  }
+
+  &.expanded {
+    .product-form-content {
+      max-height: 2000px;
+      padding: 0 2rem 2rem;
+      opacity: 1;
+    }
+  }
+}
+
+.product-form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2rem;
+  border-bottom: 1px solid var(--admin-border);
+
+  @include respond-down("mobile-lg") {
+    padding: 1.5rem;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--admin-text);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+
+    @include respond-down("mobile-lg") {
+      font-size: 1.25rem;
+    }
+
+    svg {
+      color: var(--admin-accent);
+    }
+  }
+}
+
+.product-form-header-buttons {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.product-form-btn-cancel {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: var(--admin-danger);
+  padding: 0.6rem 1.2rem;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: var(--admin-danger);
+    color: #fff;
+  }
+
+  @include respond-down("mobile-lg") {
+    padding: 0.5rem 0.75rem;
+
+    span {
+      display: none;
+    }
+  }
+}
+
+.product-form-btn-toggle {
+  background: rgba(255, 202, 44, 0.1);
+  border: 1px solid var(--admin-border);
+  color: var(--admin-accent);
+  padding: 0.6rem;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: var(--admin-accent);
+    color: #000;
+  }
+}
+
+.product-form-content {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+.product-form-alert {
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  margin-bottom: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 500;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: var(--admin-danger);
+
+  button {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0.25rem;
+    color: inherit;
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+}
+
+.product-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding-top: 2rem;
+}
+
+.product-form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+
+  @include respond-down("tablet") {
+    grid-template-columns: 1fr;
+  }
+}
+
+.product-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  &.product-form-full-width {
+    grid-column: 1 / -1;
+  }
+
+  label {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--admin-text-muted);
+  }
+
+  input,
+  textarea {
+    padding: 0.875rem 1rem;
+    background: var(--admin-card);
+    border: 1px solid var(--admin-border);
+    border-radius: 10px;
+    color: var(--admin-text);
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    font-family: inherit;
+
+    &:focus {
+      outline: none;
+      border-color: var(--admin-accent);
+      box-shadow: 0 0 0 3px rgba(255, 202, 44, 0.1);
+    }
+
+    &::placeholder {
+      color: var(--admin-text-muted);
+    }
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 100px;
+  }
+}
+
+.product-form-file-wrapper {
+  input[type="file"] {
+    display: none;
+  }
+
+  .product-form-file-label {
+    padding: 0.875rem 1rem;
+    background: var(--admin-card);
+    border: 1px dashed var(--admin-border);
+    border-radius: 10px;
+    color: var(--admin-text-muted);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: block;
+    text-align: center;
+
+    &:hover {
+      border-color: var(--admin-accent);
+      color: var(--admin-accent);
+    }
+  }
+}
+
+.product-form-btn-primary {
+  background: linear-gradient(135deg, var(--admin-accent) 0%, var(--admin-accent-hover) 100%);
+  border: none;
+  color: #000;
+  padding: 1rem 2rem;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(255, 202, 44, 0.3);
+  align-self: flex-start;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 202, 44, 0.4);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  @include respond-down("tablet") {
+    width: 100%;
+  }
+}

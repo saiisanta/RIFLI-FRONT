@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useProfile from '../../hooks/useProfile';
+import ProfileNavbar from './components/ProfileNavbar/ProfileNavbar';
 import ProfileHeader from './components/ProfileHeader/ProfileHeader';
 import ProfileInfo from './components/ProfileInfo/ProfileInfo';
 import ProfileEditModal from './components/ProfileEditModal/ProfileEditModal';
@@ -23,6 +24,11 @@ const Profile = () => {
 
     return () => clearError();
   }, [fetchProfile, clearError]);
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    navigate('/login');
+  };
 
   const handleUpdateProfile = async (userData) => {
     try {
@@ -53,10 +59,7 @@ const Profile = () => {
 
   const handleAvatarChange = async (file) => {
     try {
-      // Descomentar en implementacion
-      // await updateAvatar(file);
       console.log('Avatar actualizado:', file);
-      
       await fetchProfile();
     } catch (err) {
       console.error('Error al actualizar avatar:', err);
@@ -94,6 +97,8 @@ const Profile = () => {
 
   return (
     <div className="profile-page-wrapper">
+      <ProfileNavbar onLogout={handleLogout} />
+      
       <div className="profile-container">
         <ProfileHeader
           profile={profile}

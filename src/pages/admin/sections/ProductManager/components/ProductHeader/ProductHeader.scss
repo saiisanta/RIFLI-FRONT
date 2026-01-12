@@ -1,0 +1,115 @@
+@use "../../../../../../styles/breakpoints" as *;
+
+.product-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 3rem;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+
+  @include respond-down("tablet") {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+.product-header-left {
+  h1 {
+    font-size: 2.5rem;
+    font-weight: 900;
+    color: var(--admin-text);
+    margin-bottom: 0.5rem;
+
+    @include respond-down("tablet") {
+      font-size: 2rem;
+    }
+
+    @include respond-down("mobile-lg") {
+      font-size: 1.75rem;
+    }
+  }
+
+  .product-header-subtitle {
+    color: var(--admin-text-muted);
+    font-size: 0.95rem;
+  }
+}
+
+.product-header-actions {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+
+  @include respond-down("tablet") {
+    width: 100%;
+    flex-direction: column;
+  }
+}
+
+.product-header-search-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  svg {
+    position: absolute;
+    left: 1rem;
+    color: var(--admin-text-muted);
+    pointer-events: none;
+  }
+
+  input {
+    padding: 0.75rem 1rem 0.75rem 3rem;
+    background: var(--admin-surface);
+    border: 1px solid var(--admin-border);
+    border-radius: 12px;
+    color: var(--admin-text);
+    font-size: 0.9rem;
+    width: 300px;
+    transition: all 0.3s ease;
+
+    @include respond-down("tablet") {
+      width: 100%;
+    }
+
+    &:focus {
+      outline: none;
+      border-color: var(--admin-accent);
+      box-shadow: 0 0 0 3px rgba(255, 202, 44, 0.1);
+    }
+
+    &::placeholder {
+      color: var(--admin-text-muted);
+    }
+  }
+}
+
+.product-header-view-toggle {
+  display: flex;
+  background: var(--admin-surface);
+  border: 1px solid var(--admin-border);
+  border-radius: 12px;
+  padding: 0.25rem;
+
+  button {
+    background: transparent;
+    border: none;
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    color: var(--admin-text-muted);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+
+    &:hover {
+      color: var(--admin-accent);
+    }
+
+    &.active {
+      background: var(--admin-accent);
+      color: #000;
+    }
+  }
+}

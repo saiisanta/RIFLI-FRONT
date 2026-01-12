@@ -20,8 +20,14 @@
     radial-gradient(ellipse at top, rgba(255, 202, 44, 0.08) 0%, transparent 60%),
     radial-gradient(ellipse at bottom right, rgba(255, 202, 44, 0.04) 0%, transparent 50%);
   color: var(--d-text);
+  padding-top: 8rem;
   padding-bottom: 4rem;
   overflow-x: hidden;
+
+  @include respond-down("mobile-lg") {
+    padding-top: 5rem;
+    padding-bottom: 3rem;
+  }
 }
 
 .dashboard-content {
@@ -111,10 +117,6 @@
 }
 
 @include respond-down("mobile-lg") {
-  .dashboard-wrapper {
-    padding-bottom: 3rem;
-  }
-
   .dashboard-content {
     padding: 0 1.25rem;
   }

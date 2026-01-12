@@ -18,10 +18,16 @@ const useProducts = () => {
       setLoading(true);
       setError(null);
       const data = await productService.getProducts(params);
-      setProducts(data.products || data.data || []);
-      if (data.pagination) {
-        setPagination(data.pagination);
+      
+      if (Array.isArray(data)) {
+        setProducts(data);
+      } else {
+        setProducts(data.products || data.data || []);
+        if (data.pagination) {
+          setPagination(data.pagination);
+        }
       }
+      
       return data;
     } catch (err) {
       setError(err.message || 'Error al cargar productos');

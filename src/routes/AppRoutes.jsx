@@ -3,7 +3,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import App from "../App";
 import Shop from "../pages/shop/Shop";
 import Quotes from "../pages/quotes/Quotes";
-import AdminPanel from "../components/admin/AdminPanel";
+import AdminPanel from "../pages/admin/AdminPanel";
 import Profile from "../pages/profile/Profile";
 import Dashboard from "../pages/dashboard/Dashboard";
 import { PrivateRoute } from "./PrivateRoute";
@@ -43,20 +43,20 @@ export default function AppRoutes() {
           path="/profile"
           element={
             <PrivateRoute>
-              <Profile/>
+              <Profile />
             </PrivateRoute>
           }
         />
 
         <Route
-          path="/admin"
+          path="/admin/*"
           element={
-            <PrivateRoute adminOnly>
+            <PrivateRoute>
               <AdminPanel />
             </PrivateRoute>
           }
         />
-
+        
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </>

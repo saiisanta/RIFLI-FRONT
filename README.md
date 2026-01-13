@@ -1,73 +1,79 @@
-<div align="center">
+# RIFLI Frontend
 
-# 🔥 RIFLI Frontend
-
-### Plataforma E-Commerce y Gestión de Presupuestos Profesionales
+## Plataforma E-Commerce y Gestión de Presupuestos Profesionales
 
 [![React](https://img.shields.io/badge/React-18.2+-61DAFB?style=for-the-badge&logo=react&logoColor=white)](https://reactjs.org/)
-[![Vite](https://img.shields.io/badge/Vite-5.0+-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
-[![Axios](https://img.shields.io/badge/Axios-1.6+-5A29E4?style=for-the-badge&logo=axios&logoColor=white)](https://axios-http.com/)
+[![Vite](https://img.shields.io/badge/Vite-6.0+-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
+[![Vitest](https://img.shields.io/badge/Vitest-2.1+-729B1B?style=for-the-badge&logo=vitest&logoColor=white)](https://vitest.dev/)
+[![Axios](https://img.shields.io/badge/Axios-1.8+-5A29E4?style=for-the-badge&logo=axios&logoColor=white)](https://axios-http.com/)
 [![SCSS](https://img.shields.io/badge/SCSS-CC6699?style=for-the-badge&logo=sass&logoColor=white)](https://sass-lang.com/)
 
 **Sistema moderno de comercio electrónico especializado en servicios profesionales de electricidad, gas y seguridad**
 
-[Documentación](#-documentación) •
-[Características](#-características-principales) •
-[Instalación](#-inicio-rápido) •
-[Arquitectura](#-arquitectura)
-
-</div>
-
----
-
-## 📋 Tabla de Contenidos
-
-- [🎯 Características Principales](#-características-principales)
-- [🏗️ Arquitectura](#-arquitectura)
-- [🔐 Autenticación y Seguridad](#-autenticación-y-seguridad)
-- [🚀 Inicio Rápido](#-inicio-rápido)
-- [📁 Estructura del Proyecto](#-estructura-del-proyecto)
-- [🔧 Tecnologías](#-tecnologías)
-- [🎨 UI/UX](#-uiux)
-- [📚 Documentación](#-documentación)
-- [🧪 Testing](#-testing)
-- [🏗️ Build y Deploy](#-build-y-deploy)
-- [🤝 Contribución](#-contribución)
+[Documentación](#documentación) •
+[Características](#características-principales) •
+[Instalación](#inicio-rápido) •
+[Arquitectura](#arquitectura) •
+[Testing](#testing)
 
 ---
 
-## 🎯 Características Principales
+## Tabla de Contenidos
 
-### 🛡️ Sistema de Autenticación Robusto
-- **Autenticación basada en cookies HttpOnly** (protección XSS)
+- [Características Principales](#características-principales)
+- [Arquitectura](#arquitectura)
+- [Autenticación y Seguridad](#autenticación-y-seguridad)
+- [Inicio Rápido](#inicio-rápido)
+- [Estructura del Proyecto](#estructura-del-proyecto)
+- [Tecnologías](#tecnologías)
+- [Testing](#testing)
+- [UI/UX](#uiux)
+- [Documentación](#documentación)
+- [Build y Deploy](#build-y-deploy)
+- [Contribución](#contribución)
+
+---
+
+## Características Principales
+
+### Sistema de Autenticación Robusto
+- Autenticación basada en cookies HttpOnly (protección XSS)
 - Login/Register/Password Recovery con validación en tiempo real
 - Modal de login para acceso rápido sin interrumpir navegación
 - Páginas dedicadas de autenticación con diseño moderno
 - Refresh token automático
 - Rutas protegidas con control de roles (customer/admin)
 
-### 🛒 E-Commerce Completo
+### E-Commerce Completo
 - Catálogo de productos con filtros avanzados
 - Carrito de compras persistente
 - Sistema de órdenes con seguimiento
 - Integración con pasarelas de pago (MercadoPago/Stripe)
 - Gestión de direcciones de envío
 
-### 💼 Sistema de Presupuestos
+### Sistema de Presupuestos
 - Solicitud de presupuestos para servicios profesionales
 - Formularios dinámicos según tipo de servicio
 - Sistema de mensajería entre cliente y proveedor
 - Estados de presupuesto (pendiente, en revisión, aceptado, rechazado)
 - Notificaciones en tiempo real
 
-### 📊 Dashboard Adaptativo
+### Dashboard Adaptativo
 - Dashboard personalizado según rol de usuario
 - Vista de cliente: estadísticas personales, órdenes recientes, presupuestos
 - Vista de admin: métricas del negocio, gestión completa
 - Diseño modular con composición de componentes
 - Glassmorphism UI con animaciones suaves
 
-### 🎨 Experiencia de Usuario Premium
+### Panel de Administración
+- Gestión completa de productos (CRUD)
+- Administración de usuarios y roles
+- Sistema de cotizaciones y servicios
+- Panel de analíticas y estadísticas
+- Vista modular con sidebar navegable
+- Diseño responsive y profesional
+
+### Experiencia de Usuario Premium
 - Diseño responsive mobile-first
 - Animaciones suaves con respeto a `prefers-reduced-motion`
 - Tipografía fluida con `clamp()`
@@ -77,9 +83,9 @@
 
 ---
 
-## 🏗️ Arquitectura
+## Arquitectura
 
-### Patrón de Diseño: **Feature-Based Architecture**
+### Patrón de Diseño: Feature-Based Architecture
 ```
 ┌─────────────────────────────────────────────────────────┐
 │                      PRESENTATION                        │
@@ -98,18 +104,18 @@
 
 ### Principios Aplicados
 
-- ✅ **Separation of Concerns**: Cada capa tiene una responsabilidad única
-- ✅ **Single Responsibility Principle**: Componentes pequeños y enfocados
-- ✅ **DRY (Don't Repeat Yourself)**: Lógica reutilizable en hooks y utils
-- ✅ **Composition over Inheritance**: Páginas compuestas de componentes
-- ✅ **Container/Presentational Pattern**: Separación de lógica y UI
-- ✅ **Custom Hooks Pattern**: Encapsulación de lógica reutilizable
+- **Separation of Concerns**: Cada capa tiene una responsabilidad única
+- **Single Responsibility Principle**: Componentes pequeños y enfocados
+- **DRY (Don't Repeat Yourself)**: Lógica reutilizable en hooks y utils
+- **Composition over Inheritance**: Páginas compuestas de componentes
+- **Container/Presentational Pattern**: Separación de lógica y UI
+- **Custom Hooks Pattern**: Encapsulación de lógica reutilizable
 
 ---
 
-## 🔐 Autenticación y Seguridad
+## Autenticación y Seguridad
 
-### 🍪 Cookies HttpOnly
+### Cookies HttpOnly
 
 El sistema utiliza **cookies HttpOnly** para máxima seguridad:
 
@@ -121,7 +127,7 @@ import cors from 'cors';
 
 app.use(cors({
   origin: process.env.FRONTEND_URL,
-  credentials: true // ← CRÍTICO
+  credentials: true // CRÍTICO
 }));
 
 app.use(cookieParser());
@@ -166,7 +172,7 @@ import axios from 'axios';
 
 const api = axios.create({
   baseURL: process.env.VITE_API_URL,
-  withCredentials: true // ← Envía cookies automáticamente
+  withCredentials: true // Envía cookies automáticamente
 });
 
 // Interceptor para auto-refresh
@@ -193,30 +199,9 @@ api.interceptors.response.use(
 | **Session Hijacking** | Short-lived tokens | Refresh token cada 15 min |
 | **Token exposure** | No localStorage | Cookies exclusivamente |
 
-### Flujo de Autenticación
-```mermaid
-sequenceDiagram
-    participant U as Usuario
-    participant F as Frontend
-    participant B as Backend
-    
-    U->>F: Ingresar credenciales
-    F->>B: POST /auth/login
-    B->>B: Validar credenciales
-    B->>B: Generar JWT
-    B->>F: Set-Cookie (HttpOnly)
-    F->>F: Guardar user en Context
-    F->>U: Redirigir a dashboard
-    
-    Note over F,B: Peticiones subsecuentes
-    F->>B: GET /api/products (Cookie automática)
-    B->>B: Validar cookie
-    B->>F: Datos + Refresh cookie
-```
-
 ---
 
-## 🚀 Inicio Rápido
+## Inicio Rápido
 
 ### Prerrequisitos
 
@@ -248,163 +233,133 @@ npm run dev
 # .env.example
 
 # API Backend
-VITE_API_URL=http://localhost:5000/api/v1
-
-# Pasarelas de Pago
-VITE_MERCADOPAGO_PUBLIC_KEY=TEST-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-VITE_STRIPE_PUBLIC_KEY=pk_test_xxxxxxxxxxxxxxxxxxxx
-
-# Almacenamiento de Archivos
-VITE_CLOUDINARY_CLOUD_NAME=tu_cloud_name
-VITE_CLOUDINARY_UPLOAD_PRESET=tu_preset
+VITE_API_URL=http://localhost:4001/api
 
 # Configuración de App
 VITE_APP_NAME=RIFLI
 VITE_APP_URL=http://localhost:5173
 
 # Producción
-# VITE_API_URL=https://api.tudominio.com/api/v1
+# VITE_API_URL=https://api.tudominio.com/api
 ```
 
 ---
 
-## 📁 Estructura del Proyecto
+## Estructura del Proyecto
 ```
 frontend/
 ├── public/                          # Archivos estáticos
-│   ├── favicon.ico
 │   └── logo.png
 │
 ├── src/
 │   ├── assets/                      # Recursos multimedia
-│   │   ├── images/                  # Imágenes
-│   │   │   ├── hero/
-│   │   │   ├── products/
-│   │   │   └── services/
-│   │   └── icons/                   # Iconos/SVGs
-│   │       └── Logo.jsx
+│   │   └── images/
 │   │
 │   ├── components/                  # Componentes reutilizables
-│   │   ├── common/                  # Componentes base
-│   │   │   ├── Button.jsx           # Botón reutilizable
-│   │   │   ├── Input.jsx            # Input con validación
-│   │   │   ├── Card.jsx             # Card genérica
-│   │   │   ├── Modal.jsx            # Modal base
-│   │   │   ├── Spinner.jsx          # Loading spinner
-│   │   │   ├── Header.jsx           # Header principal
-│   │   │   ├── Footer.jsx           # Footer principal
-│   │   │   ├── Navbar.jsx           # Barra de navegación
-│   │   │   └── Alert.jsx            # Alertas/notificaciones
-│   │   │
-│   │   └── auth/                    # Componentes de auth
-│   │       ├── AuthModal.jsx        # Modal login/register
-│   │       └── authModal.scss
+│   │   └── PrivateRoute/           # HOC rutas protegidas
+│   │       ├── PrivateRoute.jsx
+│   │       └── __tests__/
 │   │
 │   ├── context/                     # React Context (estado global)
-│   │   ├── AuthContext.jsx          # Autenticación
-│   │   ├── CartContext.jsx          # Carrito
-│   │   └── NotificationContext.jsx  # Notificaciones
+│   │   ├── AuthContext.jsx         # Autenticación
+│   │   └── __tests__/
+│   │       └── AuthContext.test.jsx
 │   │
 │   ├── hooks/                       # Custom Hooks
-│   │   ├── useAuth.js               # Hook de autenticación
-│   │   ├── useCart.js               # Hook de carrito
-│   │   ├── useProducts.js           # Hook de productos
-│   │   ├── useOrders.js             # Hook de órdenes
-│   │   ├── useQuotes.js             # Hook de presupuestos
-│   │   ├── useServices.js           # Hook de servicios
-│   │   ├── useNotifications.js      # Hook de notificaciones
-│   │   ├── useUsers.js              # Hook de usuarios (admin)
-│   │   ├── useAdminStats.js         # Hook de estadísticas admin
-│   │   ├── useForm.js               # Hook de formularios
-│   │   ├── useDebounce.js           # Hook de debounce
-│   │   └── useLocalStorage.js       # Hook de localStorage
+│   │   ├── useAuth.js              # Hook de autenticación
+│   │   ├── useProducts.js          # Hook de productos
+│   │   ├── useProductsSimple.js    # Hook simplificado productos
+│   │   ├── useProfile.js           # Hook de perfil
+│   │   └── __tests__/              # Tests de hooks
+│   │       ├── useAuth.test.js
+│   │       ├── useProducts.test.js
+│   │       ├── useProductsSimple.test.js
+│   │       └── useProfile.test.js
 │   │
 │   ├── pages/                       # Páginas principales
-│   │   ├── home/                    # Landing page
-│   │   │   ├── Home.jsx             # Componente principal
-│   │   │   ├── hero/
-│   │   │   │   ├── Hero.jsx
-│   │   │   │   └── Hero.scss
-│   │   │   ├── slider/
-│   │   │   │   ├── Slider.jsx       # Slider de marcas
-│   │   │   │   └── Slider.scss
-│   │   │   └── servicesShowcase/
-│   │   │       ├── ServicesShowcase.jsx
-│   │   │       └── ServicesShowcase.scss
+│   │   ├── home/                   # Landing page
+│   │   │   ├── Home.jsx
+│   │   │   └── components/
 │   │   │
-│   │   ├── dashboard/               # Dashboard usuario
-│   │   │   ├── Dashboard.jsx        # Componente principal
-│   │   │   ├── dashboard.scss
-│   │   │   ├── dashboardCard/
-│   │   │   │   ├── DashboardCard.jsx
-│   │   │   │   └── DashboardCard.scss
-│   │   │   └── dashboardHeader/
-│   │   │       ├── DashboardHeader.jsx
-│   │   │       └── DashboardHeader.scss
+│   │   ├── dashboard/              # Dashboard usuario
+│   │   │   ├── Dashboard.jsx
+│   │   │   ├── Dashboard.scss
+│   │   │   └── components/
+│   │   │       ├── DashboardCard/
+│   │   │       └── DashboardHeader/
 │   │   │
-│   │   ├── auth/                    # Páginas de autenticación
+│   │   ├── auth/                   # Páginas de autenticación
 │   │   │   ├── Login.jsx
 │   │   │   ├── Register.jsx
-│   │   │   ├── ForgotPassword.jsx
-│   │   │   ├── auth.scss
-│   │   │   └── components/
-│   │   │       └── AuthPageLayout.jsx
+│   │   │   └── auth.scss
 │   │   │
-│   │   ├── shop/                    # Tienda
+│   │   ├── shop/                   # Tienda
 │   │   │   ├── Shop.jsx
-│   │   │   ├── ProductDetail.jsx
-│   │   │   ├── Cart.jsx
-│   │   │   └── Checkout.jsx
+│   │   │   ├── Shop.scss
+│   │   │   └── components/
+│   │   │       ├── ShopHeader/
+│   │   │       └── CartPage/
 │   │   │
-│   │   ├── services/                # Servicios
-│   │   │   ├── Services.jsx
-│   │   │   └── ServiceDetail.jsx
-│   │   │
-│   │   ├── user/                    # Perfil usuario
+│   │   ├── profile/                # Perfil usuario
 │   │   │   ├── Profile.jsx
-│   │   │   ├── Orders.jsx
-│   │   │   ├── Quotes.jsx
-│   │   │   └── Addresses.jsx
+│   │   │   ├── Profile.scss
+│   │   │   └── components/
+│   │   │       ├── ProfileNavbar/
+│   │   │       ├── ProfileHeader/
+│   │   │       ├── ProfileInfo/
+│   │   │       ├── ProfileEditModal/
+│   │   │       ├── ChangePasswordModal/
+│   │   │       └── DeleteAccountModal/
 │   │   │
-│   │   └── admin/                   # Panel admin
+│   │   └── admin/                  # Panel admin
 │   │       ├── AdminPanel.jsx
-│   │       ├── ProductManager.jsx
-│   │       ├── OrderManager.jsx
-│   │       ├── QuoteManager.jsx
-│   │       ├── UserManager.jsx
-│   │       └── Analytics.jsx
-│   │
-│   ├── routes/                      # Configuración de rutas
-│   │   ├── AppRoutes.jsx            # Rutas principales
-│   │   └── PrivateRoute.jsx         # HOC para rutas protegidas
+│   │       ├── AdminPanel.scss
+│   │       ├── components/
+│   │       │   ├── AdminSidebar/
+│   │       │   └── Pagination/
+│   │       └── sections/
+│   │           ├── ProductManager/
+│   │           ├── UserManager/
+│   │           ├── ServiceManager/
+│   │           ├── OrderManager/
+│   │           ├── QuoteManager/
+│   │           └── Stats/
 │   │
 │   ├── services/                    # Capa de API (Axios)
-│   │   ├── api.js                   # Configuración base Axios
-│   │   ├── authService.js           # Endpoints de auth
-│   │   ├── userService.js           # Endpoints de usuarios
-│   │   ├── productService.js        # Endpoints de productos
-│   │   ├── cartService.js           # Endpoints de carrito
-│   │   ├── orderService.js          # Endpoints de órdenes
-│   │   ├── serviceService.js        # Endpoints de servicios
-│   │   ├── quoteService.js          # Endpoints de presupuestos
-│   │   ├── notificationService.js   # Endpoints de notificaciones
-│   │   ├── fileService.js           # Endpoints de archivos
-│   │   └── adminService.js          # Endpoints de admin
+│   │   ├── api.js                  # Configuración base Axios
+│   │   ├── authService.js          # Endpoints de auth
+│   │   ├── userService.js          # Endpoints de usuarios
+│   │   ├── productService.js       # Endpoints de productos
+│   │   └── __tests__/              # Tests de services
+│   │       ├── authService.test.js
+│   │       ├── productService.test.js
+│   │       └── userService.test.js
 │   │
 │   ├── styles/                      # Estilos globales
-│   │   ├── global.css               # Estilos base
-│   │   ├── variables.css            # Variables CSS
-│   │   ├── reset.css                # CSS Reset
-│   │   ├── utilities.css            # Clases utilitarias
-│   │   └── breakpoints.scss         # Breakpoints responsive
+│   │   ├── global.css              # Estilos base
+│   │   ├── variables.scss          # Variables SCSS
+│   │   └── breakpoints.scss        # Breakpoints responsive
+│   │
+│   ├── test/                        # Configuración de testing
+│   │   ├── setup.js                # Setup de Vitest
+│   │   ├── mocks/                  # Mocks globales
+│   │   │   ├── handlers.js         # MSW handlers
+│   │   │   ├── server.js           # MSW server
+│   │   │   └── data/               # Mock data
+│   │   │       ├── products.js
+│   │   │       ├── users.js
+│   │   │       └── auth.js
+│   │   └── utils/                  # Utilidades de testing
+│   │       ├── test-utils.jsx      # Custom render
+│   │       └── helpers.js          # Helpers
 │   │
 │   ├── utils/                       # Utilidades
-│   │   ├── constants.js             # Constantes de la app
-│   │   ├── formatters.js            # Formateo de datos
-│   │   ├── helpers.js               # Funciones auxiliares
-│   │   ├── validation.js            # Validaciones
-│   │   ├── localStorage.js          # Helpers de localStorage
-│   │   └── cookies.js               # Helpers de cookies
+│   │   ├── constants.js            # Constantes de la app
+│   │   ├── formatters.js           # Formateo de datos
+│   │   ├── validators.js           # Validaciones
+│   │   └── __tests__/              # Tests de utils
+│   │       ├── formatters.test.js
+│   │       └── validators.test.js
 │   │
 │   ├── App.jsx                      # Componente raíz
 │   ├── App.scss                     # Estilos del App
@@ -415,23 +370,23 @@ frontend/
 ├── .gitignore                       # Archivos ignorados
 ├── .eslintrc.cjs                    # Configuración ESLint
 ├── package.json                     # Dependencias
-├── vite.config.js                   # Configuración Vite
+├── vite.config.js                   # Configuración Vite + Vitest
 ├── README.md                        # Este archivo
 └── index.html                       # HTML base
 ```
 
 ---
 
-## 🔧 Tecnologías
+## Tecnologías
 
 ### Core
 
 | Tecnología | Versión | Propósito |
 |------------|---------|-----------|
-| **React** | 18.2+ | UI Library |
-| **React Router DOM** | 6.20+ | Routing |
-| **Axios** | 1.6+ | HTTP Client |
-| **Vite** | 5.0+ | Build Tool |
+| **React** | 19.0+ | UI Library |
+| **React Router DOM** | 7.5+ | Routing |
+| **Axios** | 1.8+ | HTTP Client |
+| **Vite** | 6.2+ | Build Tool |
 
 ### Styling
 
@@ -440,26 +395,181 @@ frontend/
 | **SCSS** | Preprocesador CSS |
 | **CSS Modules** | CSS con scope local |
 | **CSS Variables** | Theming dinámico |
+| **Bootstrap** | Framework CSS |
+
+### Testing
+
+| Tecnología | Versión | Propósito |
+|------------|---------|-----------|
+| **Vitest** | 2.1+ | Test Runner |
+| **@testing-library/react** | 16.1+ | Testing de componentes |
+| **@testing-library/jest-dom** | 6.6+ | Matchers DOM |
+| **@testing-library/user-event** | 14.5+ | Interacciones de usuario |
+| **happy-dom** | 25.0+ | Entorno DOM ligero |
 
 ### Utils
 
 | Librería | Propósito |
 |----------|-----------|
 | **React Icons** | Iconos |
-| **date-fns** | Manejo de fechas |
-| **React Hook Form** | Formularios (opcional) |
+| **React Bootstrap Icons** | Iconos adicionales |
+| **Concurrently** | Ejecutar scripts en paralelo |
 
 ### Development
 
 | Herramienta | Propósito |
 |-------------|-----------|
 | **ESLint** | Linting |
-| **Prettier** | Formateo |
-| **Vitest** | Testing (preparado) |
+| **Vite DevTools** | Debugging |
 
 ---
 
-## 🎨 UI/UX
+## Testing
+
+### Infraestructura de Testing
+
+El proyecto cuenta con una infraestructura completa de testing usando **Vitest** y **Testing Library**.
+
+#### Configuración
+```javascript
+// vite.config.js
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+
+export default defineConfig({
+  plugins: [react()],
+  test: {
+    globals: true,
+    environment: 'happy-dom',
+    setupFiles: './src/test/setup.js',
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'html', 'json-summary'],
+      include: ['src/**/*.{js,jsx}'],
+      exclude: [
+        'node_modules/',
+        'src/test/',
+        '**/*.test.{js,jsx}',
+        '**/__tests__/**',
+        'src/main.jsx'
+      ],
+    },
+  },
+});
+```
+
+### Comandos de Testing
+```bash
+# Ejecutar todos los tests
+npm run test
+
+# Modo watch (re-ejecuta al guardar cambios)
+npm run test -- --watch
+
+# Ver UI interactiva de Vitest
+npm run test:ui
+
+# Generar reporte de cobertura
+npm run test:coverage
+
+# Ejecutar tests en CI (sin watch)
+npm run test:run
+```
+
+### Cobertura Actual
+
+| Categoría | Tests | Estado |
+|-----------|-------|--------|
+| **Hooks** | 36 tests | Pasando |
+| **Services** | 13 tests | Pasando |
+| **Context** | 2 tests | Pasando |
+| **Utils** | 2 tests | Placeholder |
+| **Total** | **40+ tests** | **Pasando** |
+
+#### Tests Implementados
+
+**Hooks:**
+- `useProducts`: 8 tests (fetchProducts, createProduct, updateProduct, deleteProduct, error handling)
+- `useAuth`: 5 tests (login, register, logout, error handling)
+- `useProfile`: 7 tests (fetchProfile, updateProfile, changePassword, deleteProfile)
+- `useProductsSimple`: 3 tests (fetch, reload, error handling)
+
+**Services:**
+- `productService`: 8 tests (CRUD operations, error handling)
+- `authService`: 5 tests (login, register, logout, getCurrentUser)
+- `userService`: 4 tests (getMyProfile, updateMyProfile, changePassword, deleteMyProfile)
+
+**Context:**
+- `AuthContext`: 2 tests (provider rendering, error handling)
+
+### Estructura de Testing
+```
+src/
+├── test/
+│   ├── setup.js              # Configuración global de Vitest
+│   ├── mocks/
+│   │   ├── handlers.js       # Handlers de MSW (preparado)
+│   │   ├── server.js         # Server de MSW (preparado)
+│   │   └── data/             # Mock data reutilizable
+│   │       ├── products.js   # Productos mock
+│   │       ├── users.js      # Usuarios mock
+│   │       └── auth.js       # Auth mock
+│   └── utils/
+│       ├── test-utils.jsx    # Custom render con providers
+│       └── helpers.js        # Funciones helper para tests
+│
+├── hooks/__tests__/          # Tests de custom hooks
+├── services/__tests__/       # Tests de services
+├── context/__tests__/        # Tests de context
+└── utils/__tests__/          # Tests de utilidades
+```
+
+### Ejemplo de Test
+```javascript
+// src/hooks/__tests__/useProducts.test.js
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { renderHook, waitFor } from '@testing-library/react';
+import useProducts from '../useProducts';
+import * as productService from '../../services/productService';
+
+vi.mock('../../services/productService');
+
+describe('useProducts', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('fetchProducts carga productos correctamente', async () => {
+    const mockProducts = [
+      { id: 1, name: 'Producto 1', price: 100 },
+      { id: 2, name: 'Producto 2', price: 200 }
+    ];
+    
+    productService.default.getProducts = vi.fn().mockResolvedValue(mockProducts);
+    
+    const { result } = renderHook(() => useProducts());
+    
+    await result.current.fetchProducts();
+    
+    await waitFor(() => {
+      expect(result.current.products).toEqual(mockProducts);
+      expect(result.current.loading).toBe(false);
+    });
+  });
+});
+```
+
+### Mejoras Futuras
+
+- Implementar test factories para mock data centralizado
+- Agregar integration tests para flujos críticos (login, CRUD admin)
+- Implementar component tests para componentes clave
+- Configurar CI/CD con ejecución automática de tests
+- Aumentar cobertura en casos edge y escenarios de error
+
+---
+
+## UI/UX
 
 ### Sistema de Diseño
 
@@ -559,7 +669,7 @@ $breakpoints: (
 
 ---
 
-## 📚 Documentación
+## Documentación
 
 ### Convenciones de Código
 
@@ -570,7 +680,8 @@ Hooks:          camelCase       useAuth.js, useProducts.js
 Services:       camelCase       authService.js, productService.js
 Utils:          camelCase       formatters.js, helpers.js
 Pages:          PascalCase      Login.jsx, Dashboard.jsx
-Styles:         match JS file   Button.scss, Dashboard.css
+Styles:         match JS file   Button.scss, Dashboard.scss
+Tests:          match source    useAuth.test.js, Button.test.jsx
 ```
 
 #### Estructura de Imports
@@ -603,148 +714,9 @@ import { ROUTES, ORDER_STATUS } from '../utils/constants';
 import './Component.scss';
 ```
 
-#### Comentarios JSDoc
-```javascript
-/**
- * Hook personalizado para gestionar productos
- * @param {Object} filters - Filtros de búsqueda
- * @param {string} filters.category - Categoría
- * @param {number} filters.minPrice - Precio mínimo
- * @param {number} filters.maxPrice - Precio máximo
- * @returns {Object} Estado de productos
- * @returns {Array} products - Lista de productos
- * @returns {boolean} loading - Estado de carga
- * @returns {string|null} error - Mensaje de error
- * @returns {Function} refetch - Función para recargar
- */
-export const useProducts = (filters = {}) => {
-  // ...
-};
-```
-
-### Ejemplos de Uso
-
-#### Custom Hook
-```javascript
-// Uso de useProducts
-import { useProducts } from '../hooks/useProducts';
-
-function Shop() {
-  const { products, loading, error, refetch } = useProducts({
-    category: 'electricidad',
-    minPrice: 0,
-    maxPrice: 5000
-  });
-
-  if (loading) return <Spinner />;
-  if (error) return <Alert type="error">{error}</Alert>;
-
-  return (
-    <div>
-      {products.map(product => (
-        <ProductCard key={product.id} product={product} />
-      ))}
-    </div>
-  );
-}
-```
-
-#### Service
-```javascript
-// Uso de productService
-import { productService } from '../services/productService';
-
-async function loadProducts() {
-  try {
-    const products = await productService.getAll({
-      page: 1,
-      limit: 20,
-      category: 'gas'
-    });
-    console.log(products);
-  } catch (error) {
-    console.error('Error:', error);
-  }
-}
-```
-
-#### Context
-```javascript
-// Uso de AuthContext
-import { useAuthContext } from '../context/AuthContext';
-
-function Header() {
-  const { user, logout, openLoginModal } = useAuthContext();
-
-  return (
-    <header>
-      {user ? (
-        <>
-          <span>Hola, {user.name}</span>
-          <button onClick={logout}>Salir</button>
-        </>
-      ) : (
-        <button onClick={() => openLoginModal()}>Iniciar Sesión</button>
-      )}
-    </header>
-  );
-}
-```
-
 ---
 
-## 🧪 Testing
-
-### Configuración (Preparado)
-```javascript
-// vite.config.js
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
-
-export default defineConfig({
-  plugins: [react()],
-  test: {
-    globals: true,
-    environment: 'jsdom',
-    setupFiles: './src/tests/setup.js',
-  },
-});
-```
-
-### Comandos
-```bash
-npm run test          # Ejecutar tests
-npm run test:watch    # Watch mode
-npm run test:ui       # UI de Vitest
-npm run test:coverage # Reporte de cobertura
-```
-
-### Ejemplo de Test
-```javascript
-// src/hooks/__tests__/useAuth.test.js
-import { renderHook, act } from '@testing-library/react-hooks';
-import { useAuth } from '../useAuth';
-
-describe('useAuth', () => {
-  it('should login successfully', async () => {
-    const { result } = renderHook(() => useAuth());
-
-    await act(async () => {
-      await result.current.login({
-        email: 'test@test.com',
-        password: 'password123'
-      });
-    });
-
-    expect(result.current.user).toBeDefined();
-    expect(result.current.error).toBeNull();
-  });
-});
-```
-
----
-
-## 🏗️ Build y Deploy
+## Build y Deploy
 
 ### Build de Producción
 ```bash
@@ -753,18 +725,15 @@ npm run build
 
 # Preview del build
 npm run preview
-
-# Analizar bundle size
-npm run build -- --mode analyze
 ```
 
 ### Variables de Entorno por Ambiente
 ```bash
 # .env.development
-VITE_API_URL=http://localhost:5000/api/v1
+VITE_API_URL=http://localhost:4001/api
 
 # .env.production
-VITE_API_URL=https://api.tudominio.com/api/v1
+VITE_API_URL=https://api.tudominio.com/api
 ```
 
 ### Deploy
@@ -781,26 +750,9 @@ npm run build
 netlify deploy --prod --dir=dist
 ```
 
-#### Docker
-```dockerfile
-# Dockerfile
-FROM node:18-alpine AS build
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci
-COPY . .
-RUN npm run build
-
-FROM nginx:alpine
-COPY --from=build /app/dist /usr/share/nginx/html
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
-```
-
 ---
 
-## 🤝 Contribución
+## Contribución
 
 ### Workflow de Git
 ```bash
@@ -830,18 +782,19 @@ chore:    Tareas de mantenimiento
 
 ### Code Review Checklist
 
-- [ ] El código sigue las convenciones del proyecto
-- [ ] No hay console.logs en producción
-- [ ] Los componentes son reutilizables
-- [ ] Las funciones tienen una sola responsabilidad
-- [ ] Hay manejo de errores apropiado
-- [ ] El código es responsive
-- [ ] Se probó en diferentes navegadores
-- [ ] La documentación está actualizada
+- El código sigue las convenciones del proyecto
+- No hay console.logs en producción
+- Los componentes son reutilizables
+- Las funciones tienen una sola responsabilidad
+- Hay manejo de errores apropiado
+- El código es responsive
+- Se probó en diferentes navegadores
+- La documentación está actualizada
+- Los tests pasan correctamente
 
 ---
 
-## 📝 Licencia
+## Licencia
 
 **Privado** - RIFLI © 2026
 
@@ -849,15 +802,14 @@ Todos los derechos reservados. Este proyecto es propiedad de RIFLI y su uso est�
 
 ---
 
-## 👥 Equipo
+## Equipo
 
-- **Frontend Lead**: [Tu Nombre]
-- **Backend**: [Nombre Backend Dev]
-- **UI/UX**: [Nombre Designer]
+- **Frontend Lead**: Simón Santarelli
+- **Backend**: Alan Carrizo
 
 ---
 
-## 📞 Contacto
+## Contacto
 
 - **Email**: contacto@rifli.com
 - **Website**: https://www.rifli.com
@@ -865,10 +817,4 @@ Todos los derechos reservados. Este proyecto es propiedad de RIFLI y su uso est�
 
 ---
 
-<div align="center">
-
-### ⭐ Si te gustó este proyecto, dale una estrella
-
-**Hecho con ❤️ por el equipo de RIFLI**
-
-</div>
+**Desarrollado por el equipo de RIFLI - 2026**

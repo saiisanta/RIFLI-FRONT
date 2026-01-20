@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuthContext } from "../../context/AuthContext";
 import useForm from "../../hooks/useForm";
@@ -14,6 +14,7 @@ const Register = () => {
     error: authError,
     clearError,
   } = useAuthContext();
+
   const [registrationSuccess, setRegistrationSuccess] = useState(false);
   const [userEmail, setUserEmail] = useState("");
   const [resendLoading, setResendLoading] = useState(false);
@@ -21,11 +22,18 @@ const Register = () => {
   const [resendError, setResendError] = useState("");
 
   const validationRules = {
-    name: {
+    first_name: {
       required: { message: "El nombre es requerido" },
       minLength: {
         value: 2,
         message: "El nombre debe tener al menos 2 caracteres",
+      },
+    },
+    last_name: {
+      required: { message: "El apellido es requerido" },
+      minLength: {
+        value: 2,
+        message: "El apellido debe tener al menos 2 caracteres",
       },
     },
     email: {
@@ -60,18 +68,23 @@ const Register = () => {
     handleSubmit,
     reset,
   } = useForm(
-    { name: "", email: "", password: "", confirmPassword: "" },
+    {
+      first_name: "",
+      last_name: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+    },
     validationRules
   );
 
   const onSubmit = async (formData) => {
-    if (formData.password !== formData.confirmPassword) {
-      return;
-    }
+    if (formData.password !== formData.confirmPassword) return;
 
     try {
-      const response = await register({
-        name: formData.name,
+      await register({
+        first_name: formData.first_name,
+        last_name: formData.last_name,
         email: formData.email,
         password: formData.password,
       });
@@ -91,28 +104,29 @@ const Register = () => {
       setResendSuccess(false);
 
       await resendVerification(userEmail);
-      
+
       setResendSuccess(true);
-      
-      // Ocultar mensaje de éxito después de 5 segundos
+
       setTimeout(() => {
         setResendSuccess(false);
       }, 5000);
     } catch (err) {
       console.error("Error al reenviar verificación:", err);
       setResendError(
-        err.error || 
-        err.message || 
-        "Error al reenviar el email. Inténtalo nuevamente."
+        err.error ||
+          err.message ||
+          "Error al reenviar el email. Inténtalo nuevamente."
       );
     } finally {
       setResendLoading(false);
     }
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     return () => clearError();
   }, [clearError]);
+
+  /* ================= SUCCESS SCREEN ================= */
 
   if (registrationSuccess) {
     return (
@@ -142,7 +156,6 @@ const Register = () => {
           </div>
         </div>
 
-        {/* Mensajes de reenvío */}
         {resendSuccess && (
           <div className="success-message">
             Email reenviado correctamente. Revisá tu bandeja de entrada.
@@ -201,6 +214,8 @@ const Register = () => {
     );
   }
 
+  /* ================= FORM ================= */
+
   return (
     <AuthPageLayout>
       <div className="auth-header">
@@ -216,21 +231,44 @@ const Register = () => {
 
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
         <div className="form-group">
-          <label htmlFor="name">Nombre Completo</label>
+          <label htmlFor="first_name">Nombre</label>
           <input
             type="text"
-            id="name"
-            name="name"
-            value={values.name}
+            id="first_name"
+            name="first_name"
+            value={values.first_name}
             onChange={handleChange}
             onBlur={handleBlur}
             disabled={isSubmitting || authLoading}
-            className={errors.name && touched.name ? "input-error" : ""}
-            placeholder="Tu nombre completo"
-            autoComplete="name"
+            className={
+              errors.first_name && touched.first_name ? "input-error" : ""
+            }
+            placeholder="Tu nombre"
+            autoComplete="given-name"
           />
-          {errors.name && touched.name && (
-            <span className="field-error">{errors.name}</span>
+          {errors.first_name && touched.first_name && (
+            <span className="field-error">{errors.first_name}</span>
+          )}
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="last_name">Apellido</label>
+          <input
+            type="text"
+            id="last_name"
+            name="last_name"
+            value={values.last_name}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            disabled={isSubmitting || authLoading}
+            className={
+              errors.last_name && touched.last_name ? "input-error" : ""
+            }
+            placeholder="Tu apellido"
+            autoComplete="family-name"
+          />
+          {errors.last_name && touched.last_name && (
+            <span className="field-error">{errors.last_name}</span>
           )}
         </div>
 
@@ -263,7 +301,9 @@ const Register = () => {
             onChange={handleChange}
             onBlur={handleBlur}
             disabled={isSubmitting || authLoading}
-            className={errors.password && touched.password ? "input-error" : ""}
+            className={
+              errors.password && touched.password ? "input-error" : ""
+            }
             placeholder="Mínimo 6 caracteres"
             autoComplete="new-password"
           />

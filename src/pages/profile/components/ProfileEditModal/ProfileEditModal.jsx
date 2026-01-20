@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { FiX, FiSave } from 'react-icons/fi';
+import { FiX, FiSave, FiPlus, FiMapPin } from 'react-icons/fi';
 import useForm from '../../../../hooks/useForm';
 import './ProfileEditModal.scss';
 
-const ProfileEditModal = ({ profile, onClose, onSave, loading, error }) => {
+const ProfileEditModal = ({ profile, onClose, onSave, onOpenAddressManager, loading, error }) => {
+  const [selectedAddress, setSelectedAddress] = useState(null);
+
   const validationRules = {
-    name: {
-      required: { message: 'El nombre de usuario es requerido' },
-      minLength: { value: 3, message: 'Mínimo 3 caracteres' }
-    },
     email: {
       required: { message: 'El email es requerido' },
       pattern: {
@@ -16,16 +14,24 @@ const ProfileEditModal = ({ profile, onClose, onSave, loading, error }) => {
         message: 'Email inválido'
       }
     },
-    firstName: {
+    first_name: {
+      required: { message: 'El nombre es requerido' },
       minLength: { value: 2, message: 'Mínimo 2 caracteres' }
     },
-    lastName: {
+    last_name: {
+      required: { message: 'El apellido es requerido' },
       minLength: { value: 2, message: 'Mínimo 2 caracteres' }
     },
     phone: {
       pattern: {
-        value: /^[0-9\s\-\+\(\)]*$/,
+        value: /^\+?[0-9\s\-()]+$/,
         message: 'Formato de teléfono inválido'
+      }
+    },
+    document_number: {
+      pattern: {
+        value: /^[0-9]{7,8}$/,
+        message: 'Debe tener 7 u 8 dígitos'
       }
     }
   };
@@ -41,14 +47,12 @@ const ProfileEditModal = ({ profile, onClose, onSave, loading, error }) => {
     setFieldValues
   } = useForm(
     {
-      name: '',
+      first_name: '',
+      last_name: '',
       email: '',
-      firstName: '',
-      lastName: '',
       phone: '',
-      street: '',
-      city: '',
-      zip: ''
+      document_type: 'DNI',
+      document_number: ''
     },
     validationRules
   );
@@ -56,31 +60,31 @@ const ProfileEditModal = ({ profile, onClose, onSave, loading, error }) => {
   useEffect(() => {
     if (profile) {
       setFieldValues({
-        name: profile.name || '',
+        first_name: profile.first_name || '',
+        last_name: profile.last_name || '',
         email: profile.email || '',
-        firstName: profile.firstName || '',
-        lastName: profile.lastName || '',
         phone: profile.phone || '',
-        street: profile.address?.street || '',
-        city: profile.address?.city || '',
-        zip: profile.address?.zip || ''
+        document_type: profile.document_type || 'DNI',
+        document_number: profile.document_number || ''
       });
+
+      if (profile.Addresses && profile.Addresses.length > 0) {
+        const defaultAddr = profile.Addresses.find(addr => addr.is_default) || profile.Addresses[0];
+        setSelectedAddress(defaultAddr);
+      }
     }
   }, [profile, setFieldValues]);
 
   const onSubmit = async (formData) => {
-    const { street, city, zip, ...userData } = formData;
-    
-    const updatedData = {
-      ...userData,
-      address: {
-        street: street || '',
-        city: city || '',
-        zip: zip || ''
-      }
-    };
+    await onSave(formData);
+  };
 
-    await onSave(updatedData);
+  const handleOpenAddressManagerClick = () => {
+    if (onOpenAddressManager) {
+      onOpenAddressManager();
+    } else {
+      console.warn('onOpenAddressManager no está definido');
+    }
   };
 
   return (
@@ -101,27 +105,47 @@ const ProfileEditModal = ({ profile, onClose, onSave, loading, error }) => {
 
         <form onSubmit={handleSubmit(onSubmit)} className="profile-modal-form">
           <div className="profile-modal-section">
-            <h3 className="profile-modal-section-title">Información de Cuenta</h3>
+            <h3 className="profile-modal-section-title">Información Personal</h3>
             
             <div className="profile-form-row">
               <div className="profile-form-group">
-                <label htmlFor="name">Nombre de Usuario *</label>
+                <label htmlFor="first_name">Nombre *</label>
                 <input
                   type="text"
-                  id="name"
-                  name="name"
-                  value={values.name}
+                  id="first_name"
+                  name="first_name"
+                  value={values.first_name}
                   onChange={handleChange}
                   onBlur={handleBlur}
                   disabled={isSubmitting || loading}
-                  className={errors.name && touched.name ? 'input-error' : ''}
-                  placeholder="tu_usuario"
+                  className={errors.first_name && touched.first_name ? 'input-error' : ''}
+                  placeholder="Juan"
                 />
-                {errors.name && touched.name && (
-                  <span className="profile-field-error">{errors.name}</span>
+                {errors.first_name && touched.first_name && (
+                  <span className="profile-field-error">{errors.first_name}</span>
                 )}
               </div>
 
+              <div className="profile-form-group">
+                <label htmlFor="last_name">Apellido *</label>
+                <input
+                  type="text"
+                  id="last_name"
+                  name="last_name"
+                  value={values.last_name}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  disabled={isSubmitting || loading}
+                  className={errors.last_name && touched.last_name ? 'input-error' : ''}
+                  placeholder="Pérez"
+                />
+                {errors.last_name && touched.last_name && (
+                  <span className="profile-field-error">{errors.last_name}</span>
+                )}
+              </div>
+            </div>
+
+            <div className="profile-form-row">
               <div className="profile-form-group">
                 <label htmlFor="email">Email *</label>
                 <input
@@ -139,117 +163,111 @@ const ProfileEditModal = ({ profile, onClose, onSave, loading, error }) => {
                   <span className="profile-field-error">{errors.email}</span>
                 )}
               </div>
+
+              <div className="profile-form-group">
+                <label htmlFor="phone">Teléfono</label>
+                <input
+                  type="tel"
+                  id="phone"
+                  name="phone"
+                  value={values.phone}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  disabled={isSubmitting || loading}
+                  className={errors.phone && touched.phone ? 'input-error' : ''}
+                  placeholder="+54 9 11 1234-5678"
+                />
+                {errors.phone && touched.phone && (
+                  <span className="profile-field-error">{errors.phone}</span>
+                )}
+              </div>
             </div>
           </div>
 
           <div className="profile-modal-section">
-            <h3 className="profile-modal-section-title">Información Personal</h3>
+            <h3 className="profile-modal-section-title">Documentación</h3>
             
             <div className="profile-form-row">
               <div className="profile-form-group">
-                <label htmlFor="firstName">Nombre</label>
-                <input
-                  type="text"
-                  id="firstName"
-                  name="firstName"
-                  value={values.firstName}
+                <label htmlFor="document_type">Tipo de Documento</label>
+                <select
+                  id="document_type"
+                  name="document_type"
+                  value={values.document_type}
                   onChange={handleChange}
                   onBlur={handleBlur}
                   disabled={isSubmitting || loading}
-                  className={errors.firstName && touched.firstName ? 'input-error' : ''}
-                  placeholder="Juan"
-                />
-                {errors.firstName && touched.firstName && (
-                  <span className="profile-field-error">{errors.firstName}</span>
-                )}
+                >
+                  <option value="DNI">DNI</option>
+                  <option value="CUIL">CUIL</option>
+                  <option value="CUIT">CUIT</option>
+                </select>
               </div>
 
               <div className="profile-form-group">
-                <label htmlFor="lastName">Apellido</label>
+                <label htmlFor="document_number">Número de Documento</label>
                 <input
                   type="text"
-                  id="lastName"
-                  name="lastName"
-                  value={values.lastName}
+                  id="document_number"
+                  name="document_number"
+                  value={values.document_number}
                   onChange={handleChange}
                   onBlur={handleBlur}
                   disabled={isSubmitting || loading}
-                  className={errors.lastName && touched.lastName ? 'input-error' : ''}
-                  placeholder="Pérez"
+                  className={errors.document_number && touched.document_number ? 'input-error' : ''}
+                  placeholder="12345678"
+                  maxLength="8"
                 />
-                {errors.lastName && touched.lastName && (
-                  <span className="profile-field-error">{errors.lastName}</span>
+                {errors.document_number && touched.document_number && (
+                  <span className="profile-field-error">{errors.document_number}</span>
                 )}
               </div>
-            </div>
-
-            <div className="profile-form-group">
-              <label htmlFor="phone">Teléfono</label>
-              <input
-                type="tel"
-                id="phone"
-                name="phone"
-                value={values.phone}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                disabled={isSubmitting || loading}
-                className={errors.phone && touched.phone ? 'input-error' : ''}
-                placeholder="+54 9 11 1234-5678"
-              />
-              {errors.phone && touched.phone && (
-                <span className="profile-field-error">{errors.phone}</span>
-              )}
             </div>
           </div>
 
           <div className="profile-modal-section">
-            <h3 className="profile-modal-section-title">Dirección</h3>
-            
-            <div className="profile-form-group">
-              <label htmlFor="street">Calle</label>
-              <input
-                type="text"
-                id="street"
-                name="street"
-                value={values.street}
-                onChange={handleChange}
-                onBlur={handleBlur}
+            <div className="profile-section-header-with-action">
+              <h3 className="profile-modal-section-title">
+                <FiMapPin />
+                Dirección Principal
+              </h3>
+              <button
+                type="button"
+                className="profile-modal-btn-small btn-secondary"
+                onClick={handleOpenAddressManagerClick}
                 disabled={isSubmitting || loading}
-                placeholder="Av. Corrientes 1234"
-              />
+              >
+                <FiPlus />
+                Gestionar Direcciones
+              </button>
             </div>
 
-            <div className="profile-form-row">
-              <div className="profile-form-group">
-                <label htmlFor="city">Ciudad</label>
-                <input
-                  type="text"
-                  id="city"
-                  name="city"
-                  value={values.city}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  disabled={isSubmitting || loading}
-                  placeholder="Buenos Aires"
-                />
+            {selectedAddress ? (
+              <div className="profile-address-preview">
+                <div className="address-preview-header">
+                  <span className="address-alias">{selectedAddress.alias}</span>
+                  {selectedAddress.is_default && (
+                    <span className="address-default-badge">Principal</span>
+                  )}
+                </div>
+                <p className="address-preview-text">
+                  {selectedAddress.street} {selectedAddress.number}
+                  {selectedAddress.floor && `, Piso ${selectedAddress.floor}`}
+                  {selectedAddress.apartment && `, Depto ${selectedAddress.apartment}`}
+                </p>
+                <p className="address-preview-location">
+                  {selectedAddress.city}, {selectedAddress.province} - CP {selectedAddress.postal_code}
+                </p>
               </div>
-
-              <div className="profile-form-group">
-                <label htmlFor="zip">Código Postal</label>
-                <input
-                  type="text"
-                  id="zip"
-                  name="zip"
-                  value={values.zip}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  disabled={isSubmitting || loading}
-                  placeholder="1000"
-                />
+            ) : (
+              <div className="profile-address-empty">
+                <p>No tienes direcciones guardadas</p>
+                <small>Haz clic en "Gestionar Direcciones" para agregar una</small>
               </div>
-            </div>
+            )}
           </div>
 
+          {/* ACCIONES */}
           <div className="profile-modal-actions">
             <button
               type="button"

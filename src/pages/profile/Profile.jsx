@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import useProfile from '../../hooks/useProfile';
+import useProfile from '../../hooks/useProfile.jsx';
+import addressService from '../../services/addressService';
 import ProfileNavbar from './components/ProfileNavbar/ProfileNavbar';
 import ProfileHeader from './components/ProfileHeader/ProfileHeader';
 import ProfileInfo from './components/ProfileInfo/ProfileInfo';
 import ProfileEditModal from './components/ProfileEditModal/ProfileEditModal';
 import ChangePasswordModal from './components/ChangePasswordModal/ChangePasswordModal';
 import DeleteAccountModal from './components/DeleteAccountModal/DeleteAccountModal';
+import AddressManagerModal from './components/AddressManagerModal/AddressManagerModal';
 import './Profile.scss';
 
 const Profile = () => {
@@ -16,6 +18,7 @@ const Profile = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showAddressModal, setShowAddressModal] = useState(false);
 
   useEffect(() => {
     fetchProfile().catch(err => {
@@ -63,6 +66,51 @@ const Profile = () => {
       await fetchProfile();
     } catch (err) {
       console.error('Error al actualizar avatar:', err);
+      throw err;
+    }
+  };
+
+  const handleOpenAddressManager = () => {
+    setShowEditModal(false);
+    setShowAddressModal(true);
+  };
+
+  const handleAddressSave = async (addressData, action) => {
+    try {
+      switch(action) {
+        case 'create':
+          await addressService.createAddress(addressData);
+          console.log('Dirección creada correctamente');
+          break;
+          
+        case 'update':
+          await addressService.updateAddress(addressData.id, addressData);
+          console.log('Dirección actualizada correctamente');
+          break;
+          
+        case 'delete':
+          await addressService.deleteAddress(addressData.id);
+          console.log('Dirección eliminada correctamente');
+          break;
+          
+        case 'set-default':
+          await addressService.setDefaultAddress(addressData.id);
+          console.log('Dirección establecida como principal');
+          break;
+          
+        default:
+          console.warn('Acción no reconocida:', action);
+      }
+      
+      // Recargar perfil para obtener direcciones actualizadas
+      // Esto actualiza profile.Addresses automáticamente
+      await fetchProfile();
+      
+      // TODO: Agregar notificación de éxito
+      // toast.success('Dirección guardada correctamente');
+      
+    } catch (err) {
+      console.error('Error al gestionar dirección:', err);
       throw err;
     }
   };
@@ -118,6 +166,7 @@ const Profile = () => {
           profile={profile}
           onClose={() => setShowEditModal(false)}
           onSave={handleUpdateProfile}
+          onOpenAddressManager={handleOpenAddressManager}
           loading={loading}
           error={error}
         />
@@ -136,6 +185,16 @@ const Profile = () => {
         <DeleteAccountModal
           onClose={() => setShowDeleteModal(false)}
           onConfirm={handleDeleteAccount}
+          loading={loading}
+          error={error}
+        />
+      )}
+
+      {showAddressModal && (
+        <AddressManagerModal
+          addresses={profile?.Addresses || []}
+          onClose={() => setShowAddressModal(false)}
+          onSave={handleAddressSave}
           loading={loading}
           error={error}
         />

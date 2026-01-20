@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useProductsSimple } from "../../hooks/useProductsSimple";
 import ShopHeader from "./components/ShopHeader/ShopHeader";
 import CartPage from "./components/CartPage/CartPage";
@@ -8,46 +8,80 @@ import "./shop.scss";
 const Shop = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filters, setFilters] = useState({
-    categoria: "",
-    marca: "",
-    priceOrder: "",
-    min: "",
-    max: "",
+    category: "",
+    minPrice: "",
+    maxPrice: "",
+    sort: "",
   });
   const [modalProduct, setModalProduct] = useState(null);
   const [cart, setCart] = useState([]);
   const [showCart, setShowCart] = useState(false);
+  const [categories, setCategories] = useState([]);
+  const [brands, setBrands] = useState([]);
 
   const { products, loading, error, reload } = useProductsSimple();
+
+  useEffect(() => {
+    if (products.length > 0) {
+      const uniqueCategories = products.reduce((acc, prod) => {
+        const category = prod.Category || prod.category;
+        if (category && !acc.find(cat => cat.id === category.id)) {
+          acc.push(category);
+        }
+        return acc;
+      }, []);
+      setCategories(uniqueCategories);
+
+      // Extraer marcas únicas (soporta Brand o brand)
+      const uniqueBrands = products.reduce((acc, prod) => {
+        const brand = prod.Brand || prod.brand;
+        if (brand && !acc.find(b => b.id === brand.id)) {
+          acc.push(brand);
+        }
+        return acc;
+      }, []);
+      setBrands(uniqueBrands);
+    }
+  }, [products]);
 
   const filtered = products.filter((prod) => {
     let matches = true;
 
-    if (filters.categoria && prod.categoria !== filters.categoria) matches = false;
-    if (filters.marca && prod.marca !== filters.marca) matches = false;
-      if (filters.min && prod.price < parseFloat(filters.min)) matches = false;
-      if (filters.max && prod.price > parseFloat(filters.max)) matches = false;
+    const category = prod.Category || prod.category;
+    if (filters.category && category?.id !== parseInt(filters.category)) {
+      matches = false;
+    }
+
+    if (filters.minPrice && prod.price < parseFloat(filters.minPrice)) {
+      matches = false;
+    }
+    if (filters.maxPrice && prod.price > parseFloat(filters.maxPrice)) {
+      matches = false;
+    }
 
     if (searchTerm.trim()) {
       const normalize = (str) =>
         str?.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
       const term = normalize(searchTerm);
+      const brand = prod.Brand || prod.brand;
       matches =
         matches &&
         (normalize(prod.name).includes(term) ||
-          normalize(prod.categoria).includes(term) ||
-          normalize(prod.marca).includes(term));
+          normalize(category?.name).includes(term) ||
+          normalize(brand?.name).includes(term) ||
+          normalize(prod.short_description).includes(term));
     }
 
     return matches;
   }).sort((a, b) => {
-    if (filters.priceOrder === "asc") return a.price - b.price;
-    if (filters.priceOrder === "desc") return b.price - a.price;
+    if (filters.sort === "asc") return a.price - b.price;
+    if (filters.sort === "desc") return b.price - a.price;
+    if (filters.sort === "name") return a.name.localeCompare(b.name);
     return 0;
   });
 
   const handleClearFilters = () => {
-    setFilters({ categoria: "", marca: "", priceOrder: "", min: "", max: "" });
+    setFilters({ category: "", minPrice: "", maxPrice: "", sort: "" });
     setSearchTerm("");
   };
 
@@ -93,7 +127,7 @@ const Shop = () => {
     return (
       <div className="shop-error">
         <p>⚠ Error: {error}</p>
-        <button onClick={reload}>Reintentar</button>
+        <button onClick={() => reload()}>Reintentar</button>
       </div>
     );
 
@@ -101,7 +135,7 @@ const Shop = () => {
     return (
       <div className="shop-empty">
         <p>No hay productos disponibles.</p>
-        <button onClick={reload}>Recargar</button>
+        <button onClick={() => reload()}>Recargar</button>
       </div>
     );
 
@@ -123,55 +157,33 @@ const Shop = () => {
             <label htmlFor="f-categoria">Categoría</label>
             <select
               id="f-categoria"
-              value={filters.categoria}
+              value={filters.category}
               onChange={(e) =>
-                setFilters({ ...filters, categoria: e.target.value })
+                setFilters({ ...filters, category: e.target.value })
               }
             >
               <option value="">Todas</option>
-              <option value="Cámaras">Cámaras</option>
-              <option value="Cables">Cables</option>
-              <option value="Herramientas">Herramientas</option>
-              <option value="Durlock">Durlock</option>
-              <option value="DVR">DVR</option>
+              {categories.map((cat) => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.name}
+                </option>
+              ))}
             </select>
           </div>
 
           <div className="filter-group">
-            <label htmlFor="f-marca">Marca</label>
+            <label htmlFor="f-sort">Ordenar por</label>
             <select
-              id="f-marca"
-              value={filters.marca}
-              onChange={(e) => setFilters({ ...filters, marca: e.target.value })}
-            >
-              <option value="">Todas</option>
-              <option value="Hikvision">Hikvision</option>
-              <option value="DSC">DSC</option>
-              <option value="Imou">Imou</option>
-              <option value="Dahua">Dahua</option>
-              <option value="Garnet">Garnet</option>
-              <option value="Bosch">Bosch</option>
-              <option value="TP-Link">TP-Link</option>
-              <option value="Durlock">Durlock</option>
-              <option value="Stanley">Stanley</option>
-              <option value="Belkin">Belkin</option>
-              <option value="Black+Decker">Black+Decker</option>
-              <option value="Generic">Generic</option>
-            </select>
-          </div>
-
-          <div className="filter-group">
-            <label htmlFor="f-priceOrder">Orden de precio</label>
-            <select
-              id="f-priceOrder"
-              value={filters.priceOrder}
+              id="f-sort"
+              value={filters.sort}
               onChange={(e) =>
-                setFilters({ ...filters, priceOrder: e.target.value })
+                setFilters({ ...filters, sort: e.target.value })
               }
             >
               <option value="">---</option>
-              <option value="asc">Menor a mayor</option>
-              <option value="desc">Mayor a menor</option>
+              <option value="asc">Precio: Menor a mayor</option>
+              <option value="desc">Precio: Mayor a menor</option>
+              <option value="name">Nombre: A-Z</option>
             </select>
           </div>
 
@@ -181,14 +193,14 @@ const Shop = () => {
               <input
                 type="number"
                 placeholder="Mín"
-                value={filters.min}
-                onChange={(e) => setFilters({ ...filters, min: e.target.value })}
+                value={filters.minPrice}
+                onChange={(e) => setFilters({ ...filters, minPrice: e.target.value })}
               />
               <input
                 type="number"
                 placeholder="Máx"
-                value={filters.max}
-                onChange={(e) => setFilters({ ...filters, max: e.target.value })}
+                value={filters.maxPrice}
+                onChange={(e) => setFilters({ ...filters, maxPrice: e.target.value })}
               />
             </div>
           </div>
@@ -214,7 +226,7 @@ const Shop = () => {
               />
               <button 
                 className="btn-reload" 
-                onClick={reload}
+                onClick={() => reload()}
                 disabled={loading}
                 title="Recargar productos"
               >
@@ -224,39 +236,73 @@ const Shop = () => {
           </div>
 
           <div className="products-grid">
-            {filtered.map((prod) => (
-              <div key={prod.id} className="product-card">
-                <img
-                  src={`http://localhost:4001${prod.imageUrl}`}
-                  alt={`Foto de ${prod.name}`}
-                  loading="lazy"
-                  className="product-image"
-                  onError={(e) => {
-                    if (!e.currentTarget.dataset.fallback) {
-                      e.currentTarget.src = "/api/images/placeholder.png";
-                      e.currentTarget.dataset.fallback = "true";
-                    }
-                  }}
-                />
-                <div className="product-info">
-                  <h3 className="product-title">{prod.name}</h3>
-                  <p className="product-category">{prod.categoria}</p>
-                  <p className="product-brand">{prod.marca}</p>
-                  <p className="product-price">${prod.price}</p>
+            {filtered.map((prod) => {
+              const hasDiscount = prod.discount_percentage > 0;
+              const discountedPrice = hasDiscount 
+                ? (prod.price * (1 - prod.discount_percentage / 100)).toFixed(2)
+                : prod.price;
+              
+              const category = prod.Category || prod.category;
+              const brand = prod.Brand || prod.brand;
+
+              return (
+                <div key={prod.id} className="product-card">
+                  {hasDiscount && (
+                    <div className="product-discount-badge">
+                      -{prod.discount_percentage}%
+                    </div>
+                  )}
+                  <img
+                    src={prod.main_image ? `http://localhost:4001${prod.main_image}` : "/api/images/placeholder.png"}
+                    alt={`Foto de ${prod.name}`}
+                    loading="lazy"
+                    className="product-image"
+                    onError={(e) => {
+                      if (!e.currentTarget.dataset.fallback) {
+                        e.currentTarget.src = "/api/images/placeholder.png";
+                        e.currentTarget.dataset.fallback = "true";
+                      }
+                    }}
+                  />
+                  <div className="product-info">
+                    <h3 className="product-title">{prod.name}</h3>
+                    <p className="product-category">{category?.name || "Sin categoría"}</p>
+                    <p className="product-brand">{brand?.name || "Sin marca"}</p>
+                    <div className="product-price-container">
+                      {hasDiscount ? (
+                        <>
+                          <p className="product-price-original">${prod.price}</p>
+                          <p className="product-price">${discountedPrice}</p>
+                        </>
+                      ) : (
+                        <p className="product-price">${prod.price}</p>
+                      )}
+                    </div>
+                    {prod.stock <= 0 && (
+                      <p className="product-out-of-stock">Sin stock</p>
+                    )}
+                    {prod.stock > 0 && prod.stock <= prod.min_stock && (
+                      <p className="product-low-stock">¡Últimas unidades!</p>
+                    )}
+                  </div>
+                  <div className="product-actions">
+                    <button
+                      className="btn-secondary"
+                      onClick={() => setModalProduct(prod)}
+                    >
+                      Detalles
+                    </button>
+                    <button 
+                      className="btn-primary" 
+                      onClick={() => addToCart(prod)}
+                      disabled={prod.stock <= 0}
+                    >
+                      {prod.stock > 0 ? "Agregar" : "Sin stock"}
+                    </button>
+                  </div>
                 </div>
-                <div className="product-actions">
-                  <button
-                    className="btn-secondary"
-                    onClick={() => setModalProduct(prod)}
-                  >
-                    Detalles
-                  </button>
-                  <button className="btn-primary" onClick={() => addToCart(prod)}>
-                    Agregar
-                  </button>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>
@@ -272,30 +318,68 @@ const Shop = () => {
             </button>
             <div className="modal-body">
               <img
-                src={`http://localhost:4001${modalProduct.imageUrl}`}
+                src={modalProduct.main_image ? `http://localhost:4001${modalProduct.main_image}` : "/api/images/placeholder.png"}
                 alt={modalProduct.name}
                 className="modal-image"
               />
               <div className="modal-info">
                 <h2>{modalProduct.name}</h2>
                 <p>
+                  <strong>SKU:</strong> {modalProduct.sku || "N/A"}
+                </p>
+                <p>
                   <strong>Precio:</strong> ${modalProduct.price}
+                  {modalProduct.discount_percentage > 0 && (
+                    <span className="modal-discount">
+                      {" "}(-{modalProduct.discount_percentage}% = $
+                      {(modalProduct.price * (1 - modalProduct.discount_percentage / 100)).toFixed(2)})
+                    </span>
+                  )}
                 </p>
                 <p>
-                  <strong>Marca:</strong> {modalProduct.marca}
+                  <strong>Marca:</strong> {(modalProduct.Brand || modalProduct.brand)?.name || "Sin marca"}
                 </p>
                 <p>
-                  <strong>Categoría:</strong> {modalProduct.categoria}
+                  <strong>Categoría:</strong> {(modalProduct.Category || modalProduct.category)?.name || "Sin categoría"}
                 </p>
                 <p>
                   <strong>Stock:</strong>{" "}
                   {modalProduct.stock > 0 ? (
-                    modalProduct.stock
+                    <span className={modalProduct.stock <= modalProduct.min_stock ? "low-stock" : ""}>
+                      {modalProduct.stock} unidades
+                    </span>
                   ) : (
                     <span className="out-of-stock">Sin stock</span>
                   )}
                 </p>
-                <p className="modal-description">{modalProduct.description}</p>
+                
+                {modalProduct.short_description && (
+                  <p className="modal-short-description">
+                    {modalProduct.short_description}
+                  </p>
+                )}
+
+                {modalProduct.long_description && (
+                  <p className="modal-description">{modalProduct.long_description}</p>
+                )}
+
+                {modalProduct.specifications && Array.isArray(modalProduct.specifications) && (
+                  <div className="modal-specifications">
+                    <h3>Especificaciones</h3>
+                    {modalProduct.specifications.map((spec, idx) => (
+                      <div key={idx} className="spec-group">
+                        <h4>{spec.group}</h4>
+                        <ul>
+                          {spec.attributes?.map((attr, attrIdx) => (
+                            <li key={attrIdx}>
+                              <strong>{attr.key}:</strong> {attr.value}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </div>

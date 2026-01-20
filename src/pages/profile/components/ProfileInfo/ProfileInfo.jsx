@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { FiMail, FiPhone, FiMapPin, FiLock, FiAlertTriangle, FiCamera, FiTrash2 } from 'react-icons/fi';
+import { FiMail, FiPhone, FiMapPin, FiLock, FiAlertTriangle, FiCamera, FiTrash2, FiFileText } from 'react-icons/fi';
 import './ProfileInfo.scss';
 
 const ProfileInfo = ({ profile, onChangePassword, onDeleteAccount, onAvatarChange }) => {
@@ -35,10 +35,6 @@ const ProfileInfo = ({ profile, onChangePassword, onDeleteAccount, onAvatarChang
 
     try {
       setUploadingAvatar(true);
-      
-      // Descomentar en implementacion
-      // await onAvatarChange(file);
-      
       console.log('Avatar seleccionado:', file.name);
       await new Promise(resolve => setTimeout(resolve, 1000));
       
@@ -58,9 +54,6 @@ const ProfileInfo = ({ profile, onChangePassword, onDeleteAccount, onAvatarChang
       setUploadingAvatar(true);
       setAvatarPreview(null);
       
-      // Descomentar en implementacion
-      // await onAvatarChange(null);
-      
       console.log('Avatar eliminado');
       
     } catch (error) {
@@ -69,6 +62,27 @@ const ProfileInfo = ({ profile, onChangePassword, onDeleteAccount, onAvatarChang
       setUploadingAvatar(false);
     }
   };
+
+  const formatDocumentType = (type) => {
+    const types = {
+      'DNI': 'DNI',
+      'CUIL': 'CUIL',
+      'CUIT': 'CUIT'
+    };
+    return types[type] || type;
+  };
+
+  const formatDocumentNumber = (number) => {
+    if (!number) return 'No especificado';
+    return number.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  };
+
+  const getDefaultAddress = () => {
+    if (!profile?.Addresses || profile.Addresses.length === 0) return null;
+    return profile.Addresses.find(addr => addr.is_default) || profile.Addresses[0];
+  };
+
+  const defaultAddress = getDefaultAddress();
 
   return (
     <div className="profile-info-grid">
@@ -83,9 +97,9 @@ const ProfileInfo = ({ profile, onChangePassword, onDeleteAccount, onAvatarChang
         <div className="profile-info-content">
           <div className="profile-avatar-upload-section">
             <div className="profile-avatar-preview">
-              {avatarPreview || profile?.avatar ? (
+              {avatarPreview || profile?.avatar_url ? (
                 <img 
-                  src={avatarPreview || profile.avatar} 
+                  src={avatarPreview || profile.avatar_url} 
                   alt="Avatar preview" 
                   className="avatar-preview-img"
                 />
@@ -113,10 +127,10 @@ const ProfileInfo = ({ profile, onChangePassword, onDeleteAccount, onAvatarChang
                 disabled={uploadingAvatar}
               >
                 <FiCamera />
-                <span>{profile?.avatar || avatarPreview ? 'Cambiar Foto' : 'Subir Foto'}</span>
+                <span>{profile?.avatar_url || avatarPreview ? 'Cambiar Foto' : 'Subir Foto'}</span>
               </button>
 
-              {(profile?.avatar || avatarPreview) && (
+              {(profile?.avatar_url || avatarPreview) && (
                 <button 
                   onClick={handleRemoveAvatar} 
                   className="avatar-btn btn-remove"
@@ -151,22 +165,17 @@ const ProfileInfo = ({ profile, onChangePassword, onDeleteAccount, onAvatarChang
         <div className="profile-info-content">
           <div className="profile-info-row">
             <div className="profile-info-item">
-              <span className="profile-info-label">Nombre de Usuario</span>
-              <span className="profile-info-value">{profile?.name || 'No especificado'}</span>
+              <span className="profile-info-label">Nombre</span>
+              <span className="profile-info-value">{profile?.first_name || 'No especificado'}</span>
             </div>
 
             <div className="profile-info-item">
-              <span className="profile-info-label">Nombre</span>
-              <span className="profile-info-value">{profile?.firstName || 'No especificado'}</span>
+              <span className="profile-info-label">Apellido</span>
+              <span className="profile-info-value">{profile?.last_name || 'No especificado'}</span>
             </div>
           </div>
 
           <div className="profile-info-row">
-            <div className="profile-info-item">
-              <span className="profile-info-label">Apellido</span>
-              <span className="profile-info-value">{profile?.lastName || 'No especificado'}</span>
-            </div>
-
             <div className="profile-info-item">
               <div className="profile-info-icon-label">
                 <FiMail />
@@ -174,9 +183,7 @@ const ProfileInfo = ({ profile, onChangePassword, onDeleteAccount, onAvatarChang
               </div>
               <span className="profile-info-value">{profile?.email}</span>
             </div>
-          </div>
 
-          <div className="profile-info-row">
             <div className="profile-info-item">
               <div className="profile-info-icon-label">
                 <FiPhone />
@@ -191,30 +198,93 @@ const ProfileInfo = ({ profile, onChangePassword, onDeleteAccount, onAvatarChang
       <div className="profile-info-card">
         <div className="profile-info-header">
           <div className="profile-info-icon-label">
-            <FiMapPin />
-            <h2>Dirección</h2>
+            <FiFileText />
+            <h2>Documentación</h2>
           </div>
         </div>
 
         <div className="profile-info-content">
-          {profile?.address ? (
+          <div className="profile-info-row">
+            <div className="profile-info-item">
+              <span className="profile-info-label">Tipo de Documento</span>
+              <span className="profile-info-value">
+                {formatDocumentType(profile?.document_type)}
+              </span>
+            </div>
+
+            <div className="profile-info-item">
+              <span className="profile-info-label">Número de Documento</span>
+              <span className="profile-info-value">
+                {formatDocumentNumber(profile?.document_number)}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="profile-info-card">
+        <div className="profile-info-header">
+          <div className="profile-info-icon-label">
+            <FiMapPin />
+            <h2>Dirección Principal</h2>
+          </div>
+        </div>
+
+        <div className="profile-info-content">
+          {defaultAddress ? (
             <>
               <div className="profile-info-item">
-                <span className="profile-info-label">Calle</span>
-                <span className="profile-info-value">{profile.address.street || 'No especificado'}</span>
+                <span className="profile-info-label">Alias</span>
+                <span className="profile-info-value profile-address-alias">
+                  {defaultAddress.alias}
+                </span>
+              </div>
+
+              <div className="profile-info-item">
+                <span className="profile-info-label">Dirección</span>
+                <span className="profile-info-value">
+                  {defaultAddress.street} {defaultAddress.number}
+                  {defaultAddress.floor && `, Piso ${defaultAddress.floor}`}
+                  {defaultAddress.apartment && `, Depto ${defaultAddress.apartment}`}
+                </span>
               </div>
 
               <div className="profile-info-row">
                 <div className="profile-info-item">
                   <span className="profile-info-label">Ciudad</span>
-                  <span className="profile-info-value">{profile.address.city || 'No especificado'}</span>
+                  <span className="profile-info-value">{defaultAddress.city}</span>
                 </div>
 
                 <div className="profile-info-item">
-                  <span className="profile-info-label">Código Postal</span>
-                  <span className="profile-info-value">{profile.address.zip || 'No especificado'}</span>
+                  <span className="profile-info-label">Provincia</span>
+                  <span className="profile-info-value">{defaultAddress.province}</span>
                 </div>
               </div>
+
+              <div className="profile-info-row">
+                <div className="profile-info-item">
+                  <span className="profile-info-label">Código Postal</span>
+                  <span className="profile-info-value">{defaultAddress.postal_code}</span>
+                </div>
+
+                <div className="profile-info-item">
+                  <span className="profile-info-label">País</span>
+                  <span className="profile-info-value">{defaultAddress.country}</span>
+                </div>
+              </div>
+
+              {defaultAddress.additional_info && (
+                <div className="profile-info-item">
+                  <span className="profile-info-label">Información Adicional</span>
+                  <span className="profile-info-value">{defaultAddress.additional_info}</span>
+                </div>
+              )}
+
+              {profile?.Addresses && profile.Addresses.length > 1 && (
+                <div className="profile-address-count">
+                  <span>+{profile.Addresses.length - 1} dirección(es) adicional(es)</span>
+                </div>
+              )}
             </>
           ) : (
             <p className="profile-info-empty">No has agregado una dirección</p>

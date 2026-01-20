@@ -46,49 +46,83 @@ const CartPage = ({ cart, cartTotal, onClose, onRemove, onChangeQuantity }) => {
             ) : (
               <>
                 <div className="cart-items">
-                  {cart.map((item) => (
-                    <div key={item.id} className="cart-item">
-                      <img
-                        src={`http://localhost:4001${item.imageUrl}`}
-                        alt={item.name}
-                        className="cart-item-image"
-                        onError={(e) => {
-                          if (!e.currentTarget.dataset.fallback) {
-                            e.currentTarget.src = "/api/images/placeholder.png";
-                            e.currentTarget.dataset.fallback = "true";
-                          }
-                        }}
-                      />
-                      <div className="cart-item-info">
-                        <h4>{item.name}</h4>
-                        <p className="cart-item-brand">{item.marca}</p>
-                        <p className="cart-item-price">${item.price}</p>
-                      </div>
-                      <div className="cart-item-controls">
-                        <div className="quantity-controls">
-                          <button onClick={() => onChangeQuantity(item.id, -1)}>
-                            -
-                          </button>
-                          <span>{item.quantity}</span>
-                          <button onClick={() => onChangeQuantity(item.id, 1)}>
-                            +
+                  {cart.map((item) => {
+                    const hasDiscount = item.discount_percentage > 0;
+                    const finalPrice = hasDiscount 
+                      ? (item.price * (1 - item.discount_percentage / 100)).toFixed(2)
+                      : item.price;
+                    
+                    const brand = item.Brand || item.brand;
+                    const category = item.Category || item.category;
+
+                    return (
+                      <div key={item.id} className="cart-item">
+                        <img
+                          src={item.main_image ? `http://localhost:4001${item.main_image}` : "/api/images/placeholder.png"}
+                          alt={item.name}
+                          className="cart-item-image"
+                          onError={(e) => {
+                            if (!e.currentTarget.dataset.fallback) {
+                              e.currentTarget.src = "/api/images/placeholder.png";
+                              e.currentTarget.dataset.fallback = "true";
+                            }
+                          }}
+                        />
+                        <div className="cart-item-info">
+                          <h4>{item.name}</h4>
+                          <p className="cart-item-brand">{brand?.name || "Sin marca"}</p>
+                          <p className="cart-item-category">{category?.name || "Sin categoría"}</p>
+                          <div className="cart-item-price-container">
+                            {hasDiscount ? (
+                              <>
+                                <p className="cart-item-price-original">${item.price}</p>
+                                <p className="cart-item-price">${finalPrice}</p>
+                                <span className="cart-item-discount">-{item.discount_percentage}%</span>
+                              </>
+                            ) : (
+                              <p className="cart-item-price">${item.price}</p>
+                            )}
+                          </div>
+                          {item.stock > 0 && item.stock <= item.min_stock && (
+                            <p className="cart-item-low-stock">¡Solo quedan {item.stock} unidades!</p>
+                          )}
+                        </div>
+                        <div className="cart-item-controls">
+                          <div className="quantity-controls">
+                            <button 
+                              onClick={() => onChangeQuantity(item.id, -1)}
+                              aria-label="Disminuir cantidad"
+                            >
+                              -
+                            </button>
+                            <span>{item.quantity}</span>
+                            <button 
+                              onClick={() => onChangeQuantity(item.id, 1)}
+                              disabled={item.quantity >= item.stock}
+                              aria-label="Aumentar cantidad"
+                            >
+                              +
+                            </button>
+                          </div>
+                          <p className="cart-item-subtotal">
+                            Subtotal: ${(finalPrice * item.quantity).toFixed(2)}
+                          </p>
+                          <button
+                            className="btn-remove"
+                            onClick={() => onRemove(item.id)}
+                          >
+                            Eliminar
                           </button>
                         </div>
-                        <button
-                          className="btn-remove"
-                          onClick={() => onRemove(item.id)}
-                        >
-                          Eliminar
-                        </button>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
 
                 <div className="cart-summary">
                   <div className="cart-total">
                     <span>Total:</span>
-                    <span className="total-amount">${cartTotal}</span>
+                    <span className="total-amount">${cartTotal.toFixed(2)}</span>
                   </div>
                   <button className="btn-checkout" onClick={handleCheckout}>
                     Proceder al pago

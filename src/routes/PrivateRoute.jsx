@@ -7,7 +7,7 @@ export function PrivateRoute({ children, adminOnly = false }) {
 
   if (loading) return null;
   if (!user) return <Navigate to="/" />;
-  if (adminOnly && user.role !== 'admin') return <Navigate to="/" />;
+  if (adminOnly && user.role !== 'ADMIN') return <Navigate to="/" />;
 
   return children;
 }

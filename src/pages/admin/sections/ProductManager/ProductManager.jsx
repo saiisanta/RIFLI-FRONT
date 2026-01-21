@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import useProducts from "../../../../hooks/useProducts";
+import useCategories from "../../../../hooks/useCategories";
+import useBrands from "../../../../hooks/useBrands";
 import ProductHeader from "./components/ProductHeader/ProductHeader";
 import ProductForm from "./components/ProductForm/ProductForm";
 import ProductsTable from "./components/ProductsTable/ProductsTable";
@@ -16,17 +18,25 @@ const ProductManager = () => {
     createProduct,
     updateProduct,
     deleteProduct,
-    clearError
+    clearError,
   } = useProducts();
+
+  const { categories, fetchCategories } = useCategories();
+  const { brands, fetchBrands } = useBrands();
 
   const [form, setForm] = useState({
     name: "",
-    description: "",
+    short_description: "",
+    long_description: "",
     price: "",
-    categoria: "",
-    marca: "",
+    category_id: "",
+    brand_id: "",
     stock: "",
-    image: null,
+    min_stock: "5",
+    discount_percentage: "0",
+    sku: "",
+    specifications: "",
+    main_image: null,
   });
   const [editId, setEditId] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -37,13 +47,21 @@ const ProductManager = () => {
 
   useEffect(() => {
     fetchProducts();
-  }, [fetchProducts]);
+    fetchCategories();
+    fetchBrands();
+  }, [fetchProducts, fetchCategories, fetchBrands]);
 
-  const productosFiltrados = products.filter(p =>
-    p.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    p.marca?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    p.categoria?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const productosFiltrados = products.filter((p) => {
+    const category = p.Category || p.category;
+    const brand = p.Brand || p.brand;
+
+    return (
+      p.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      brand?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      category?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      p.sku?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  });
 
   useEffect(() => {
     setCurrentPage(1);
@@ -52,12 +70,17 @@ const ProductManager = () => {
   const resetForm = () => {
     setForm({
       name: "",
-      description: "",
+      short_description: "",
+      long_description: "",
       price: "",
-      categoria: "",
-      marca: "",
+      category_id: "",
+      brand_id: "",
       stock: "",
-      image: null,
+      min_stock: "5",
+      discount_percentage: "0",
+      sku: "",
+      specifications: "",
+      main_image: null,
     });
     setEditId(null);
     clearError();
@@ -71,11 +94,41 @@ const ProductManager = () => {
     }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (customEvent) => {
+    customEvent.preventDefault();
+
     const formData = new FormData();
-    for (const key in form) {
-      if (form[key] !== null) formData.append(key, form[key]);
+
+    formData.append("name", form.name);
+    formData.append("price", form.price);
+    formData.append("category_id", form.category_id);
+    formData.append("brand_id", form.brand_id);
+    formData.append("stock", form.stock);
+    formData.append("min_stock", form.min_stock || "5");
+    formData.append("discount_percentage", form.discount_percentage || "0");
+
+    if (form.sku) formData.append("sku", form.sku);
+    if (form.short_description)
+      formData.append("short_description", form.short_description);
+    if (form.long_description)
+      formData.append("long_description", form.long_description);
+
+    if (customEvent.specifications) {
+      formData.append("specifications", customEvent.specifications);
+    }
+
+    if (customEvent.images && customEvent.images.length > 0) {
+      customEvent.images.forEach((image) => {
+        formData.append("images", image);
+      });
+    }
+
+    console.log("=== FRONTEND DEBUG ===");
+    console.log("customEvent.images:", customEvent.images);
+    console.log("customEvent.images.length:", customEvent.images?.length);
+    console.log("FormData entries:");
+    for (let pair of formData.entries()) {
+      console.log(pair[0], pair[1]);
     }
 
     try {
@@ -91,10 +144,26 @@ const ProductManager = () => {
   };
 
   const handleEdit = (p) => {
+    const category = p.Category || p.category;
+    const brand = p.Brand || p.brand;
+
     setEditId(p.id);
-    setForm({ ...p, image: null });
+    setForm({
+      name: p.name || "",
+      short_description: p.short_description || "",
+      long_description: p.long_description || "",
+      price: p.price || "",
+      category_id: category?.id || p.category_id || "",
+      brand_id: brand?.id || p.brand_id || "",
+      stock: p.stock || "",
+      min_stock: p.min_stock || "5",
+      discount_percentage: p.discount_percentage || "0",
+      sku: p.sku || "",
+      specifications: p.specifications ? JSON.stringify(p.specifications) : "",
+      main_image: null,
+    });
     setFormOpen(true);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleDelete = async (id) => {
@@ -108,7 +177,10 @@ const ProductManager = () => {
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = productosFiltrados.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = productosFiltrados.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  );
   const totalPages = Math.ceil(productosFiltrados.length / itemsPerPage);
 
   if (loading && products.length === 0) {
@@ -136,6 +208,8 @@ const ProductManager = () => {
         formOpen={formOpen}
         errorMsg={error}
         loading={loading}
+        categories={categories}
+        brands={brands}
         onFormChange={handleChange}
         onSubmit={handleSubmit}
         onCancel={resetForm}

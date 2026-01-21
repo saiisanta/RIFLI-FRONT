@@ -51,12 +51,12 @@ export default function AppRoutes() {
         <Route
           path="/admin/*"
           element={
-            <PrivateRoute>
+            <PrivateRoute adminOnly={true}>
               <AdminPanel />
             </PrivateRoute>
           }
         />
-        
+
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </>

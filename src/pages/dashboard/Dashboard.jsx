@@ -59,7 +59,7 @@ const Dashboard = () => {
     }
   ];
 
-  if (user.role === 'admin') {
+  if (user.role === 'ADMIN') {
     dashboardCards.push({ 
       title: "Admin", 
       icon: FaCogs, 

@@ -4,14 +4,13 @@ const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:4001/api',
   timeout: 10000,
   withCredentials: true,
-  headers: {
-    'Content-Type': 'application/json',
-  },
 });
 
-// Interceptor para requests
 api.interceptors.request.use(
   (config) => {
+    if (!(config.data instanceof FormData)) {
+      config.headers['Content-Type'] = 'application/json';
+    }
     return config;
   },
   (error) => {

@@ -9,11 +9,11 @@ import "bootstrap/dist/js/bootstrap.js"
 import './App.scss';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
+   <React.StrictMode>
     <AuthProvider>
       <BrowserRouter>
         <AppRoutes />
       </BrowserRouter>
     </AuthProvider>
-  </React.StrictMode>
+   </React.StrictMode>
 );

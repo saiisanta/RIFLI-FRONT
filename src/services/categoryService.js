@@ -45,6 +45,15 @@ const categoryService = {
       throw error.response?.data || error;
     }
   },
+
+  getCategoryProducts: async (categoryId, params = {}) => {
+    try {
+      const response = await api.get(`/categories/${categoryId}/products`, { params });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
 };
 
 export default categoryService;

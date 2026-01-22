@@ -9,7 +9,9 @@ import {
   Tools,
   Receipt,
   ChatDots,
-  BarChartLine
+  BarChartLine,
+  Grid3x3,
+  Award
 } from 'react-bootstrap-icons';
 import './AdminSidebar.scss';
 
@@ -19,6 +21,8 @@ const AdminSidebar = ({ sidebarOpen, setSidebarOpen }) => {
 
   const menuItems = [
     { path: '/admin/products', label: 'Productos', icon: Box },
+    { path: '/admin/categories', label: 'Categorías', icon: Grid3x3 },
+    { path: '/admin/brands', label: 'Marcas', icon: Award },
     { path: '/admin/users', label: 'Usuarios', icon: People },
     { path: '/admin/services', label: 'Servicios', icon: Tools },
     { path: '/admin/orders', label: 'Pedidos', icon: Receipt },

@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import AdminSidebar from './components/AdminSidebar/AdminSidebar';
 import ProductManager from './sections/ProductManager/ProductManager';
+import CategoryManager from './sections/CategoryManager/CategoryManager';
+import BrandManager from './sections/BrandManager/BrandManager';
 import UserManager from './sections/UserManager/UserManager';
 import ServiceManager from './sections/ServiceManager/ServiceManager';
 import OrderManager from './sections/OrderManager/OrderManager';
@@ -30,6 +32,8 @@ const AdminPanel = () => {
         <Routes>
           <Route path="/" element={<Navigate to="products" replace />} />
           <Route path="products" element={<ProductManager />} />
+          <Route path="categories" element={<CategoryManager />} />
+          <Route path="brands" element={<BrandManager />} />
           <Route path="users" element={<UserManager />} />
           <Route path="services" element={<ServiceManager />} />
           <Route path="orders" element={<OrderManager />} />

@@ -64,6 +64,8 @@ const NavBar = () => {
     pathname === "/dashboard" ||
     pathname === "/admin" ||
     pathname === "/admin/products" ||
+    pathname === "/admin/categories" ||
+    pathname === "/admin/brands" ||
     pathname === "/admin/users" ||
     pathname === "/admin/services" ||
     pathname === "/admin/orders" ||

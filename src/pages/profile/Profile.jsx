@@ -13,7 +13,17 @@ import './Profile.scss';
 
 const Profile = () => {
   const navigate = useNavigate();
-  const { profile, loading, error, fetchProfile, updateProfile, changePassword, deleteProfile, clearError } = useProfile();
+  const { 
+    profile, 
+    loading, 
+    error, 
+    fetchProfile, 
+    updateProfile, 
+    changePassword, 
+    deleteProfile,
+    updateAvatar,
+    clearError 
+  } = useProfile();
   
   const [showEditModal, setShowEditModal] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
@@ -62,8 +72,8 @@ const Profile = () => {
 
   const handleAvatarChange = async (file) => {
     try {
-      console.log('Avatar actualizado:', file);
-      await fetchProfile();
+      await updateAvatar(file);
+      console.log('Avatar actualizado correctamente');
     } catch (err) {
       console.error('Error al actualizar avatar:', err);
       throw err;
@@ -102,12 +112,7 @@ const Profile = () => {
           console.warn('Acción no reconocida:', action);
       }
       
-      // Recargar perfil para obtener direcciones actualizadas
-      // Esto actualiza profile.Addresses automáticamente
       await fetchProfile();
-      
-      // TODO: Agregar notificación de éxito
-      // toast.success('Dirección guardada correctamente');
       
     } catch (err) {
       console.error('Error al gestionar dirección:', err);

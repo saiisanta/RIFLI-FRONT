@@ -69,6 +69,25 @@ const useProfile = () => {
     }
   }, []);
 
+  const updateAvatar = useCallback(async (file) => {
+    try {
+      setLoading(true);
+      setError(null);
+      const formData = new FormData();
+      formData.append('avatar', file);
+      const data = await userService.updateAvatar(profile?.id, formData);
+      setProfile(data.user || data);
+      
+      return data;
+    } catch (err) {
+      const errorMessage = err.error || err.message || 'Error al actualizar avatar';
+      setError(errorMessage);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, [profile?.id]);
+
   const clearError = useCallback(() => {
     setError(null);
   }, []);
@@ -81,6 +100,7 @@ const useProfile = () => {
     updateProfile,
     changePassword,
     deleteProfile,
+    updateAvatar,
     clearError,
   };
 };

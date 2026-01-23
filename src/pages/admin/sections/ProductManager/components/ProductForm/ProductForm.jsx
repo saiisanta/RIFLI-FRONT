@@ -5,6 +5,7 @@ import './ProductForm.scss';
 const ProductForm = ({
   form,
   editId,
+  currentProduct,
   formOpen,
   errorMsg,
   loading,
@@ -20,6 +21,20 @@ const ProductForm = ({
   
   const [images, setImages] = useState([]);
   const [imagePreviews, setImagePreviews] = useState([]);
+  
+  const [existingImages, setExistingImages] = useState([]);
+  const [imagesToRemove, setImagesToRemove] = useState([]);
+  
+  useEffect(() => {
+    if (editId && currentProduct?.images) {
+      setExistingImages(currentProduct.images);
+      setImagesToRemove([]);
+    } else {
+      setExistingImages([]);
+      setImagesToRemove([]);
+    }
+  }, [editId, currentProduct]);
+
   useEffect(() => {
     if (form.specifications) {
       try {
@@ -76,6 +91,14 @@ const ProductForm = ({
     setImagePreviews(newPreviews);
   };
 
+  const handleToggleRemoveExistingImage = (imagePath) => {
+    if (imagesToRemove.includes(imagePath)) {
+      setImagesToRemove(imagesToRemove.filter(img => img !== imagePath));
+    } else {
+      setImagesToRemove([...imagesToRemove, imagePath]);
+    }
+  };
+
   useEffect(() => {
     return () => {
       imagePreviews.forEach(preview => URL.revokeObjectURL(preview));
@@ -86,6 +109,8 @@ const ProductForm = ({
     if (!editId && form.name === '') {
       setImages([]);
       setImagePreviews([]);
+      setExistingImages([]);
+      setImagesToRemove([]);
       imagePreviews.forEach(preview => URL.revokeObjectURL(preview));
     }
   }, [editId, form.name]);
@@ -100,7 +125,8 @@ const ProductForm = ({
     const customEvent = {
       preventDefault: () => {},
       specifications: specsArray.length > 0 ? JSON.stringify(specsArray) : '',
-      images: images
+      images: images,
+      remove_images: imagesToRemove
     };
     
     onSubmit(customEvent);
@@ -188,7 +214,6 @@ const ProductForm = ({
             />
           </div>
 
-          {/* Categorización */}
           <div className="product-form-section-title">
             <h3>Categorización</h3>
           </div>
@@ -334,26 +359,71 @@ const ProductForm = ({
 
           <div className="product-form-section-title">
             <h3>Imágenes del Producto</h3>
-            <small>La primera imagen será la imagen principal</small>
+            <small>
+              {editId 
+                ? "Puedes agregar nuevas imágenes o eliminar las existentes" 
+                : "La primera imagen será la imagen principal"}
+            </small>
           </div>
 
           <div className="images-container">
+            {editId && existingImages.length > 0 && (
+              <div className="existing-images-section">
+                <h4 className="existing-images-title">Imágenes actuales</h4>
+                <div className="image-previews">
+                  {existingImages.map((img, index) => {
+                    const isMarkedForRemoval = imagesToRemove.includes(img);
+                    return (
+                      <div 
+                        key={`existing-${index}`} 
+                        className={`image-preview-item ${isMarkedForRemoval ? 'marked-for-removal' : ''}`}
+                      >
+                        {index === 0 && !isMarkedForRemoval && (
+                          <span className="main-image-badge">Principal</span>
+                        )}
+                        {isMarkedForRemoval && (
+                          <span className="removal-badge">Se eliminará</span>
+                        )}
+                        <img 
+                          src={`http://localhost:4001${img}`} 
+                          alt={`Imagen ${index + 1}`} 
+                        />
+                        <button
+                          type="button"
+                          className={`btn-remove-image ${isMarkedForRemoval ? 'undo' : ''}`}
+                          onClick={() => handleToggleRemoveExistingImage(img)}
+                          title={isMarkedForRemoval ? "Cancelar eliminación" : "Marcar para eliminar"}
+                        >
+                          {isMarkedForRemoval ? <Plus size={18} /> : <X size={18} />}
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
             {imagePreviews.length > 0 && (
-              <div className="image-previews">
-                {imagePreviews.map((preview, index) => (
-                  <div key={index} className="image-preview-item">
-                    {index === 0 && <span className="main-image-badge">Principal</span>}
-                    <img src={preview} alt={`Preview ${index + 1}`} />
-                    <button
-                      type="button"
-                      className="btn-remove-image"
-                      onClick={() => handleRemoveImage(index)}
-                      title="Eliminar imagen"
-                    >
-                      <X size={18} />
-                    </button>
-                  </div>
-                ))}
+              <div className="new-images-section">
+                <h4 className="new-images-title">Nuevas imágenes a agregar</h4>
+                <div className="image-previews">
+                  {imagePreviews.map((preview, index) => (
+                    <div key={`new-${index}`} className="image-preview-item">
+                      {index === 0 && existingImages.length === 0 && (
+                        <span className="main-image-badge">Principal</span>
+                      )}
+                      <img src={preview} alt={`Preview ${index + 1}`} />
+                      <button
+                        type="button"
+                        className="btn-remove-image"
+                        onClick={() => handleRemoveImage(index)}
+                        title="Eliminar imagen"
+                      >
+                        <X size={18} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
 

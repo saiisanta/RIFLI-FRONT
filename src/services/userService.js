@@ -131,16 +131,16 @@ const userService = {
   // },
 
   // Actualizar avatar
-  // updateAvatar: async (userId, formData) => {
-  //   try {
-  //     const response = await api.patch(`/users/${userId}/avatar`, formData, {
-  //       headers: { 'Content-Type': 'multipart/form-data' }
-  //     });
-  //     return response.data;
-  //   } catch (error) {
-  //     throw error.response?.data || error;
-  //   }
-  // },
+  updateAvatar: async (userId, formData) => {
+   try {
+      const response = await api.patch(`/users/avatar`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      return response.data;
+    } catch (error) {
+       throw error.response?.data || error;
+     }
+   },
 
   // Historial de actividad
   // getUserActivity: async (userId, params = {}) => {

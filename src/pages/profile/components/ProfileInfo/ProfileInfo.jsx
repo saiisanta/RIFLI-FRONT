@@ -27,6 +27,7 @@ const ProfileInfo = ({ profile, onChangePassword, onDeleteAccount, onAvatarChang
       return;
     }
 
+    // Crear preview local
     const reader = new FileReader();
     reader.onload = (e) => {
       setAvatarPreview(e.target.result);
@@ -35,8 +36,8 @@ const ProfileInfo = ({ profile, onChangePassword, onDeleteAccount, onAvatarChang
 
     try {
       setUploadingAvatar(true);
-      console.log('Avatar seleccionado:', file.name);
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await onAvatarChange(file);
+      setAvatarPreview(null);
       
     } catch (error) {
       console.error('Error al subir avatar:', error);
@@ -44,6 +45,9 @@ const ProfileInfo = ({ profile, onChangePassword, onDeleteAccount, onAvatarChang
       alert('Error al subir la imagen');
     } finally {
       setUploadingAvatar(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     }
   };
 
@@ -53,7 +57,6 @@ const ProfileInfo = ({ profile, onChangePassword, onDeleteAccount, onAvatarChang
     try {
       setUploadingAvatar(true);
       setAvatarPreview(null);
-      
       console.log('Avatar eliminado');
       
     } catch (error) {
@@ -97,13 +100,26 @@ const ProfileInfo = ({ profile, onChangePassword, onDeleteAccount, onAvatarChang
         <div className="profile-info-content">
           <div className="profile-avatar-upload-section">
             <div className="profile-avatar-preview">
-              {avatarPreview || profile?.avatar_url ? (
+              {avatarPreview ? (
                 <img 
-                  src={avatarPreview || profile.avatar_url} 
+                  src={avatarPreview} 
                   alt="Avatar preview" 
                   className="avatar-preview-img"
                 />
-              ) : (
+              ) : profile?.avatar_url ? (
+                <img 
+                  src={`http://localhost:4001${profile.avatar_url}`} 
+                  alt="Avatar" 
+                  className="avatar-preview-img"
+                  onError={(e) => {
+                    console.error('Error cargando avatar:', profile.avatar_url);
+                    e.target.style.display = 'none';
+                    e.target.nextSibling.style.display = 'flex';
+                  }}
+                />
+              ) : null}
+              
+              {!avatarPreview && !profile?.avatar_url && (
                 <div className="avatar-preview-placeholder">
                   <FiCamera />
                 </div>

@@ -39,6 +39,7 @@ const ProductManager = () => {
     main_image: null,
   });
   const [editId, setEditId] = useState(null);
+  const [currentProduct, setCurrentProduct] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [vistaGrid, setVistaGrid] = useState(false);
   const [formOpen, setFormOpen] = useState(true);
@@ -83,6 +84,7 @@ const ProductManager = () => {
       main_image: null,
     });
     setEditId(null);
+    setCurrentProduct(null);
     clearError();
   };
 
@@ -123,13 +125,10 @@ const ProductManager = () => {
       });
     }
 
-    console.log("=== FRONTEND DEBUG ===");
-    console.log("customEvent.images:", customEvent.images);
-    console.log("customEvent.images.length:", customEvent.images?.length);
-    console.log("FormData entries:");
-    for (let pair of formData.entries()) {
-      console.log(pair[0], pair[1]);
+    if (customEvent.remove_images && customEvent.remove_images.length > 0) {
+      formData.append("remove_images", JSON.stringify(customEvent.remove_images));
     }
+
 
     try {
       if (editId) {
@@ -148,6 +147,7 @@ const ProductManager = () => {
     const brand = p.Brand || p.brand;
 
     setEditId(p.id);
+    setCurrentProduct(p);
     setForm({
       name: p.name || "",
       short_description: p.short_description || "",
@@ -205,6 +205,7 @@ const ProductManager = () => {
       <ProductForm
         form={form}
         editId={editId}
+        currentProduct={currentProduct}
         formOpen={formOpen}
         errorMsg={error}
         loading={loading}

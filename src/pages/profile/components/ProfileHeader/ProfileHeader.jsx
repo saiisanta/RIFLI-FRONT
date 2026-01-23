@@ -30,14 +30,21 @@ const ProfileHeader = ({ profile, onEditProfile }) => {
           <div className="profile-avatar">
             {profile?.avatar_url ? (
               <img
-                src={profile.avatar_url}
+                src={`http://localhost:4001${profile.avatar_url}`}
                 alt={`${profile.first_name} ${profile.last_name}`}
+                onError={(e) => {
+                  console.error('Error cargando avatar:', profile.avatar_url);
+                  e.target.style.display = 'none';
+                  e.target.nextSibling.style.display = 'flex';
+                }}
               />
-            ) : (
-              <div className="profile-avatar-placeholder">
-                <FiUser />
-              </div>
-            )}
+            ) : null}
+            <div 
+              className="profile-avatar-placeholder"
+              style={{ display: profile?.avatar_url ? 'none' : 'flex' }}
+            >
+              <FiUser />
+            </div>
           </div>
 
           <div className="profile-avatar-initials">

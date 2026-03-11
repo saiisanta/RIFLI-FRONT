@@ -79,7 +79,7 @@ const Dashboard = () => {
           <div className="accent-line"></div>
           <p className="welcome-label">Terminal de Control</p>
           <h1>
-            Hola, <span>{user.nombre || "Usuario"}</span>
+            Hola, <span>{user.first_name || "Usuario"}</span>
           </h1>
         </header>
 

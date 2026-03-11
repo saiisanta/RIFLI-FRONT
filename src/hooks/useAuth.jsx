@@ -1,31 +1,11 @@
-import { useState, useEffect, useCallback, createContext, useContext } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import authService from '../services/authService';
-
-const AuthContext = createContext(null);
-
-export const useAuthContext = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuthContext debe usarse dentro de un AuthProvider');
-  }
-  return context;
-};
-
-export const AuthProvider = ({ children }) => {
-  const auth = useAuth();
-  return <AuthContext.Provider value={auth}>{children}</AuthContext.Provider>;
-};
 
 const useAuth = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  useEffect(() => {
-   // checkAuthStatus(); TEMPORAL
-   setLoading(false);
-  }, []);
 
   const checkAuthStatus = useCallback(async () => {
     try {
@@ -42,6 +22,10 @@ const useAuth = () => {
       setLoading(false);
     }
   }, []);
+
+  useEffect(() => {
+    checkAuthStatus();
+  }, [checkAuthStatus]);
 
   const register = useCallback(async (userData) => {
     try {

@@ -1,0 +1,168 @@
+@use "../../../../../../styles/breakpoints" as *;
+
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+
+  @include respond-down("laptop") {
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  }
+
+  @include respond-down("tablet") {
+    grid-template-columns: 1fr;
+  }
+}
+
+.services-grid-card {
+  background: var(--admin-card);
+  border: 1px solid var(--admin-border);
+  border-radius: 16px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    border-color: var(--admin-accent);
+  }
+}
+
+.services-grid-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+// ── Type badge ───────────────────────────────────────────────
+
+.services-grid-type-badge {
+  padding: 0.375rem 0.875rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: rgba(255, 202, 44, 0.1);
+  color: var(--admin-accent);
+}
+
+// ── Actions ──────────────────────────────────────────────────
+
+.services-grid-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.services-grid-btn-icon {
+  background: transparent;
+  border: 1px solid var(--admin-border);
+  padding: 0.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &.services-grid-btn-edit {
+    color: var(--admin-accent);
+
+    &:hover {
+      background: rgba(255, 202, 44, 0.1);
+      border-color: var(--admin-accent);
+    }
+  }
+
+  &.services-grid-btn-delete {
+    color: var(--admin-danger);
+
+    &:hover {
+      background: rgba(239, 68, 68, 0.1);
+      border-color: var(--admin-danger);
+    }
+  }
+}
+
+// ── Body ─────────────────────────────────────────────────────
+
+.services-grid-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  flex: 1;
+}
+
+.services-grid-icon-img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  border-radius: 10px;
+  background: var(--admin-surface);
+  border: 1px solid var(--admin-border);
+  padding: 6px;
+  align-self: flex-start;
+}
+
+.services-grid-description {
+  color: var(--admin-text-muted);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.services-grid-empty {
+  opacity: 0.5;
+}
+
+// ── Features list ────────────────────────────────────────────
+
+.services-grid-features {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--admin-text-muted);
+
+    svg {
+      color: var(--admin-success);
+      flex-shrink: 0;
+    }
+  }
+}
+
+.services-grid-features-more {
+  font-size: 0.8rem !important;
+  color: var(--admin-text-muted) !important;
+  opacity: 0.6;
+  padding-left: 1.25rem;
+}
+
+// ── Footer ───────────────────────────────────────────────────
+
+.services-grid-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 1rem;
+  border-top: 1px solid var(--admin-border);
+}
+
+.services-grid-stat {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--admin-success);
+
+  &.empty {
+    color: var(--admin-text-muted);
+    opacity: 0.6;
+  }
+}

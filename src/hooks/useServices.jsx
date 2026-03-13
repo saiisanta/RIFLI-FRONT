@@ -12,7 +12,7 @@ export const useServices = () => {
         setLoading(true);
         setError(null);
         const data = await serviceService.getServices(params);
-        setServices(data.services || data.data || []);
+        setServices(Array.isArray(data) ? data : data.services || data.data || []);
         return data;
       } catch (err) {
         setError(err.message || 'Error al cargar servicios');

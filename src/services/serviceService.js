@@ -1,4 +1,4 @@
-import api from '../api';
+import api from './api';
 
 export const serviceService = {
 
@@ -56,3 +56,5 @@ export const serviceService = {
       }
     },
   };
+
+  export default serviceService;

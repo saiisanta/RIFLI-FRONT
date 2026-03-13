@@ -75,7 +75,9 @@ const NavBar = () => {
     pathname === "/login" ||
     pathname === "/register" ||
     pathname === "/forgot-password" ||
-    pathname === "/profile"
+    pathname === "/profile" ||
+    pathname === "/servicios" ||
+    pathname === "/presupuestos"
   ) {
     return null;
   }

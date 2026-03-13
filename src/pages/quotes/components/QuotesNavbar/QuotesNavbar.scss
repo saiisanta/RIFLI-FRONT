@@ -1,0 +1,81 @@
+@use "../../../../styles/breakpoints" as *;
+
+.quote-navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  background: rgba(10, 10, 10, 0.8);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--profile-border);
+
+  @include respond-down("mobile-lg") {
+    padding: 1rem 1.5rem;
+  }
+}
+
+.quote-navbar-back-btn,
+.quote-navbar-logout-btn {
+  background: var(--profile-card);
+  border: 1px solid var(--profile-border);
+  color: var(--profile-text);
+  padding: 0.875rem 1.5rem;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  svg {
+    transition: transform 0.3s ease;
+  }
+
+  @include respond-down("mobile-lg") {
+    padding: 0.75rem 1rem;
+    font-size: 0.8rem;
+  }
+}
+
+.quote-navbar-back-btn {
+  &:hover {
+    border-color: var(--profile-accent);
+    background: rgba(255, 202, 44, 0.05);
+    transform: translateX(-4px);
+
+    svg {
+      transform: translateX(-3px);
+    }
+  }
+
+  @include respond-down("mobile-lg") {
+    span {
+      display: none;
+    }
+  }
+}
+
+.quote-navbar-logout-btn {
+  &:hover {
+    border-color: #ef4444;
+    background: rgba(239, 68, 68, 0.05);
+    color: #ef4444;
+
+    svg {
+      transform: scale(1.1);
+    }
+  }
+
+  @include respond-down("mobile-lg") {
+    span {
+      display: none;
+    }
+  }
+}

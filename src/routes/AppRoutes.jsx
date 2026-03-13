@@ -2,6 +2,7 @@ import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import App from "../App";
 import Shop from "../pages/shop/Shop";
+import Services from "../pages/services/Services"
 import Quotes from "../pages/quotes/Quotes";
 import AdminPanel from "../pages/admin/AdminPanel";
 import Profile from "../pages/profile/Profile";
@@ -23,8 +24,8 @@ export default function AppRoutes() {
         <Route path="/" element={<App />} />
 
         <Route path="/shop" element={<Shop />} />
-        <Route path="/servicios" element={<Quotes />} />
-
+        <Route path="/servicios" element={<Services />} />
+        <Route path="/presupuestos" element={<Quotes />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />

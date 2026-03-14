@@ -1,39 +1,19 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Shield, Lightning, Fire } from "react-bootstrap-icons";
 import { AuthContext } from "../../../../context/AuthContext";
+import useServices from "../../../../hooks/useServices";
 import "./ServicesShowcase.scss";
+
+const API_URL = "http://localhost:4001";
 
 const ServicesShowcase = () => {
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
+  const { services, loading, fetchServices } = useServices();
 
-  const services = [
-    {
-      id: 1,
-      title: "Seguridad",
-      icon: Shield,
-      image: "/src/assets/img/servicios/seguridadHero.png",
-      description: "Sistemas de seguridad avanzados para tu hogar o negocio",
-      features: ["Alarmas", "Cámaras", "Monitoreo 24/7"]
-    },
-    {
-      id: 2,
-      title: "Electricidad",
-      icon: Lightning,
-      image: "/src/assets/img/servicios/electricidadHero.png",
-      description: "Instalaciones eléctricas profesionales y certificadas",
-      features: ["Instalaciones", "Reparaciones", "Mantenimiento"]
-    },
-    {
-      id: 3,
-      title: "Gasista",
-      icon: Fire,
-      image: "/src/assets/img/servicios/gasistaHero.png",
-      description: "Servicio de gas matriculado y confiable",
-      features: ["Instalaciones", "Certificaciones", "Reparaciones"]
-    }
-  ];
+  useEffect(() => {
+    fetchServices();
+  }, [fetchServices]);
 
   const handleViewMore = () => {
     if (user && user.email) {
@@ -42,6 +22,38 @@ const ServicesShowcase = () => {
       navigate("/login");
     }
   };
+
+  // Skeleton cards mientras carga
+  if (loading) {
+    return (
+      <section id="servicios" className="services-showcase">
+        <div className="showcase-header">
+          <span className="section-label">Nuestros Servicios</span>
+          <h2 className="section-title">
+            Soluciones <span>Profesionales</span>
+          </h2>
+        </div>
+        <div className="services-grid">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="service-card service-card--skeleton">
+              <div className="service-image-wrapper skeleton-image" />
+              <div className="service-content">
+                <div className="skeleton-icon" />
+                <div className="skeleton-title" />
+                <div className="skeleton-text" />
+                <div className="skeleton-text short" />
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="showcase-decoration">
+          <div className="decoration-circle circle-1"></div>
+          <div className="decoration-circle circle-2"></div>
+          <div className="decoration-circle circle-3"></div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section id="servicios" className="services-showcase">
@@ -53,50 +65,75 @@ const ServicesShowcase = () => {
       </div>
 
       <div className="services-grid">
-        {services.map((service, index) => (
-          <div 
-            key={service.id} 
-            className="service-card"
-            style={{ animationDelay: `${index * 0.2}s` }}
-          >
-            <div className="service-image-wrapper">
-              <img 
-                src={service.image} 
-                alt={service.title}
-                className="service-image"
-              />
-              <div className="image-overlay"></div>
-            </div>
+        {services.map((service, index) => {
+          const mainImage = Array.isArray(service.images) && service.images.length > 0
+            ? `${API_URL}${service.images[0]}`
+            : null;
 
-            <div className="service-content">
-              <div className="service-icon-wrapper">
-                <service.icon className="service-icon" size={40} />
+          const features = Array.isArray(service.features) ? service.features : [];
+
+          return (
+            <div
+              key={service.id}
+              className="service-card"
+              style={{ animationDelay: `${index * 0.2}s` }}
+            >
+              <div className="service-image-wrapper">
+                {mainImage ? (
+                  <img
+                    src={mainImage}
+                    alt={service.type}
+                    className="service-image"
+                  />
+                ) : (
+                  <div className="service-image service-image--placeholder" />
+                )}
+                <div className="image-overlay"></div>
               </div>
 
-              <h3 className="service-title">{service.title}</h3>
-              <p className="service-description">{service.description}</p>
+              <div className="service-content">
+                <div className="service-icon-wrapper">
+                  {service.icon ? (
+                    <img
+                      src={`${API_URL}${service.icon}`}
+                      alt={`${service.type} icon`}
+                      className="service-icon service-icon--img"
+                    />
+                  ) : (
+                    <span className="service-icon service-icon--fallback">
+                      ⚡
+                    </span>
+                  )}
+                </div>
 
-              <ul className="service-features">
-                {service.features.map((feature, idx) => (
-                  <li key={idx}>
-                    <span className="feature-dot"></span>
-                    {feature}
-                  </li>
-                ))}
-              </ul>
+                <h3 className="service-title">{service.type}</h3>
+                <p className="service-description">
+                  {service.short_description || ""}
+                </p>
 
-              <button 
-                className="btn-service"
-                onClick={handleViewMore}
-              >
-                Ver más
-                <span className="btn-arrow">→</span>
-              </button>
+                {features.length > 0 && (
+                  <div className="service-features">
+                    {features.slice(0, 3).map((feature, idx) => (
+                      <span key={idx} className="service-feature-chip">
+                        <svg className="chip-check" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M3 8l3.5 3.5L13 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                        {feature}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                <button className="btn-service" onClick={handleViewMore}>
+                  <span>Solicitar presupuesto</span>
+                  <span className="btn-arrow">→</span>
+                </button>
+              </div>
+
+              <div className="card-glow"></div>
             </div>
-
-            <div className="card-glow"></div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       <div className="showcase-decoration">

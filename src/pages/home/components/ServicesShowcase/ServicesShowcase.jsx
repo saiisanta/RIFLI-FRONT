@@ -17,7 +17,7 @@ const ServicesShowcase = () => {
 
   const handleViewMore = () => {
     if (user && user.email) {
-      navigate("/dashboard");
+      navigate("/servicios");
     } else {
       navigate("/login");
     }
@@ -125,7 +125,7 @@ const ServicesShowcase = () => {
                 )}
 
                 <button className="btn-service" onClick={handleViewMore}>
-                  <span>Solicitar presupuesto</span>
+                  <span>Ver servicio</span>
                   <span className="btn-arrow">→</span>
                 </button>
               </div>

@@ -1,0 +1,863 @@
+@use "../../../../styles/breakpoints" as *;
+
+// ── Wizard wrapper ────────────────────────────────────────────
+
+.quote-wizard {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+// ── Step indicator ────────────────────────────────────────────
+
+.qw-steps {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  background: var(--quotes-surface);
+  border: 1px solid var(--quotes-border);
+  border-radius: 20px;
+  padding: 1.5rem 2rem;
+
+  @include respond-down("mobile-lg") {
+    padding: 1.25rem 1rem;
+  }
+}
+
+.qw-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  position: relative;
+
+  .qw-step-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--quotes-border);
+    background: var(--quotes-card);
+    color: var(--quotes-text-muted);
+    transition: all 0.3s ease;
+
+    @include respond-down("mobile-lg") {
+      width: 34px;
+      height: 34px;
+    }
+  }
+
+  .qw-step-label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--quotes-text-muted);
+    white-space: nowrap;
+    transition: color 0.3s ease;
+
+    @include respond-down("mobile-lg") {
+      display: none;
+    }
+  }
+
+  &.active {
+    .qw-step-circle {
+      border-color: var(--quotes-accent);
+      background: rgba(255, 202, 44, 0.1);
+      color: var(--quotes-accent);
+      box-shadow: 0 0 0 4px rgba(255, 202, 44, 0.12);
+    }
+
+    .qw-step-label {
+      color: var(--quotes-accent);
+    }
+  }
+
+  &.done {
+    .qw-step-circle {
+      border-color: var(--quotes-success);
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--quotes-success);
+    }
+
+    .qw-step-label {
+      color: var(--quotes-success);
+    }
+  }
+}
+
+.qw-step-connector {
+  flex: 1;
+  height: 2px;
+  background: var(--quotes-border);
+  min-width: 3rem;
+  margin: 0 0.75rem;
+  margin-bottom: 1.5rem;
+  transition: background 0.3s ease;
+
+  &.done {
+    background: var(--quotes-success);
+  }
+
+  @include respond-down("mobile-lg") {
+    min-width: 1.5rem;
+    margin: 0 0.5rem;
+    margin-bottom: 1.25rem;
+  }
+}
+
+// ── Panel ─────────────────────────────────────────────────────
+
+.qw-panel {
+  background: var(--quotes-surface);
+  border: 1px solid var(--quotes-border);
+  border-radius: 20px;
+  padding: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  animation: qwFadeIn 0.35s ease;
+
+  @include respond-down("mobile-lg") {
+    padding: 1.5rem;
+    border-radius: 16px;
+    gap: 1.5rem;
+  }
+}
+
+@keyframes qwFadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.qw-panel-header {
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--quotes-text);
+    margin: 0 0 0.4rem;
+
+    @include respond-down("mobile-lg") {
+      font-size: 1.25rem;
+    }
+  }
+
+  p {
+    color: var(--quotes-text-muted);
+    font-size: 0.9rem;
+    margin: 0;
+  }
+}
+
+// ── Loading / empty ───────────────────────────────────────────
+
+.qw-inner-loading {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: var(--quotes-text-muted);
+  font-size: 0.9rem;
+  padding: 2rem 0;
+}
+
+.qw-spinner {
+  width: 24px;
+  height: 24px;
+  border: 3px solid rgba(255, 202, 44, 0.2);
+  border-top-color: var(--quotes-accent);
+  border-radius: 50%;
+  animation: qwSpin 0.75s linear infinite;
+  flex-shrink: 0;
+
+  &--sm {
+    width: 16px;
+    height: 16px;
+    border-width: 2px;
+  }
+}
+
+@keyframes qwSpin {
+  to { transform: rotate(360deg); }
+}
+
+.qw-empty {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--quotes-text-muted);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+
+  svg {
+    color: var(--quotes-accent);
+    opacity: 0.6;
+  }
+
+  h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--quotes-text);
+    margin: 0;
+  }
+
+  p {
+    font-size: 0.9rem;
+    margin: 0;
+  }
+}
+
+// ── Service grid (Step 1) ─────────────────────────────────────
+
+.qw-service-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+
+  @include respond-down("mobile-lg") {
+    grid-template-columns: 1fr;
+  }
+}
+
+.qw-service-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.25rem;
+  padding: 1.25rem;
+  background: var(--quotes-card);
+  border: 1px solid var(--quotes-border);
+  border-radius: 14px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.3s ease;
+  position: relative;
+  width: 100%;
+
+  &:hover {
+    border-color: rgba(255, 202, 44, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  }
+
+  &.selected {
+    border-color: var(--quotes-accent);
+    background: rgba(255, 202, 44, 0.04);
+    box-shadow: 0 0 0 1px rgba(255, 202, 44, 0.2);
+
+    .qw-service-check {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+}
+
+.qw-service-icon-wrapper {
+  flex-shrink: 0;
+  width: 52px;
+  height: 52px;
+  background: rgba(255, 202, 44, 0.08);
+  border: 1px solid rgba(255, 202, 44, 0.2);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.qw-service-icon {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+  filter: brightness(0) saturate(100%)
+          invert(82%) sepia(55%) saturate(600%)
+          hue-rotate(2deg) brightness(103%) contrast(101%);
+}
+
+.qw-service-icon-fallback {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.qw-service-info {
+  flex: 1;
+  min-width: 0;
+
+  h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--quotes-text);
+    margin: 0 0 0.3rem;
+  }
+
+  p {
+    font-size: 0.82rem;
+    color: var(--quotes-text-muted);
+    margin: 0 0 0.5rem;
+    line-height: 1.4;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+}
+
+.qw-service-fields-badge {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  background: rgba(59, 130, 246, 0.1);
+  color: #60a5fa;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.qw-service-check {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  background: var(--quotes-accent);
+  color: #000;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: scale(0.6);
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+// ── Address list (Step 2) ─────────────────────────────────────
+
+.qw-address-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+
+.qw-address-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  background: var(--quotes-card);
+  border: 1px solid var(--quotes-border);
+  border-radius: 14px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.3s ease;
+  width: 100%;
+
+  &:hover {
+    border-color: rgba(255, 202, 44, 0.3);
+    transform: translateX(4px);
+  }
+
+  &.selected {
+    border-color: var(--quotes-accent);
+    background: rgba(255, 202, 44, 0.04);
+
+    .qw-service-check {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+}
+
+.qw-address-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.qw-address-alias-row {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  margin-bottom: 0.375rem;
+}
+
+.qw-address-alias {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--quotes-text);
+}
+
+.qw-address-default-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.15rem 0.6rem;
+  background: var(--quotes-accent);
+  color: #000;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.qw-address-street {
+  font-size: 0.9rem;
+  color: var(--quotes-text);
+  margin: 0 0 0.25rem;
+}
+
+.qw-address-location {
+  font-size: 0.82rem;
+  color: var(--quotes-text-muted);
+  margin: 0;
+}
+
+.qw-address-extra {
+  font-size: 0.8rem;
+  color: var(--quotes-text-muted);
+  font-style: italic;
+  margin: 0.25rem 0 0;
+}
+
+// ── Summary bar (Step 3) ──────────────────────────────────────
+
+.qw-summary {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  background: var(--quotes-card);
+  border: 1px solid rgba(255, 202, 44, 0.2);
+  border-radius: 12px;
+  padding: 1rem 1.5rem;
+  flex-wrap: wrap;
+
+  @include respond-down("mobile-lg") {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+}
+
+.qw-summary-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.qw-summary-key {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--quotes-accent);
+  opacity: 0.8;
+}
+
+.qw-summary-val {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--quotes-text);
+}
+
+.qw-summary-sep {
+  width: 1px;
+  height: 36px;
+  background: var(--quotes-border);
+  flex-shrink: 0;
+
+  @include respond-down("mobile-lg") {
+    width: 100%;
+    height: 1px;
+  }
+}
+
+// ── Form block (Step 3) ───────────────────────────────────────
+
+.qw-form-block {
+  background: var(--quotes-card);
+  border: 1px solid var(--quotes-border);
+  border-radius: 14px;
+  padding: 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+
+  @include respond-down("mobile-lg") {
+    padding: 1.25rem;
+  }
+}
+
+.qw-form-block-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border-left: 4px solid var(--quotes-accent);
+  padding-left: 0.875rem;
+
+  span:first-child {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--quotes-text);
+  }
+}
+
+.qw-optional-badge {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--quotes-text-muted);
+  background: rgba(255, 255, 255, 0.06);
+  padding: 0.15rem 0.6rem;
+  border-radius: 6px;
+}
+
+// ── Form fields ───────────────────────────────────────────────
+
+.qw-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  &.has-error {
+    .qw-input,
+    .qw-textarea,
+    .qw-select {
+      border-color: var(--quotes-error);
+
+      &:focus {
+        box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+      }
+    }
+  }
+}
+
+.qw-field-label {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--quotes-text-muted);
+}
+
+.qw-field-required {
+  color: var(--quotes-error);
+}
+
+.qw-field-comment {
+  font-size: 0.8rem;
+  color: var(--quotes-text-muted);
+  opacity: 0.75;
+  margin-top: -0.25rem;
+}
+
+.qw-input,
+.qw-textarea,
+.qw-select {
+  padding: 0.875rem 1rem;
+  background: var(--quotes-bg);
+  border: 1px solid var(--quotes-border);
+  border-radius: 10px;
+  color: var(--quotes-text);
+  font-size: 0.95rem;
+  font-family: inherit;
+  transition: all 0.3s ease;
+
+  &:focus {
+    outline: none;
+    border-color: var(--quotes-accent);
+    box-shadow: 0 0 0 3px rgba(255, 202, 44, 0.1);
+  }
+
+  &::placeholder {
+    color: var(--quotes-text-muted);
+  }
+}
+
+.qw-select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ffca2c' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-color: var(--quotes-bg);
+  padding-right: 2.5rem;
+
+  option {
+    background: var(--quotes-card);
+    color: var(--quotes-text);
+  }
+}
+
+.qw-textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+// Radio
+.qw-radio-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.625rem;
+}
+
+.qw-radio-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1rem;
+  background: var(--quotes-bg);
+  border: 1px solid var(--quotes-border);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: var(--quotes-text-muted);
+  transition: all 0.25s ease;
+
+  input[type='radio'] {
+    display: none;
+  }
+
+  .qw-radio-mark {
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--quotes-border);
+    border-radius: 50%;
+    flex-shrink: 0;
+    transition: all 0.25s ease;
+    position: relative;
+
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 2px;
+      background: var(--quotes-accent);
+      border-radius: 50%;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+  }
+
+  &.selected,
+  &:hover {
+    border-color: rgba(255, 202, 44, 0.4);
+    color: var(--quotes-text);
+  }
+
+  &.selected {
+    background: rgba(255, 202, 44, 0.06);
+
+    .qw-radio-mark {
+      border-color: var(--quotes-accent);
+
+      &::after {
+        opacity: 1;
+      }
+    }
+  }
+}
+
+// Checkbox
+.qw-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  width: fit-content;
+  padding: 0.75rem 1rem;
+  background: var(--quotes-bg);
+  border: 1px solid var(--quotes-border);
+  border-radius: 10px;
+  transition: all 0.25s ease;
+
+  input[type='checkbox'] {
+    display: none;
+  }
+
+  .qw-checkbox-mark {
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--quotes-border);
+    border-radius: 6px;
+    flex-shrink: 0;
+    background: var(--quotes-card);
+    transition: all 0.25s ease;
+    position: relative;
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 5px;
+      width: 6px;
+      height: 10px;
+      border: 2px solid #000;
+      border-top: none;
+      border-left: none;
+      transform: rotate(45deg);
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+  }
+
+  input:checked ~ .qw-checkbox-mark {
+    background: var(--quotes-accent);
+    border-color: var(--quotes-accent);
+
+    &::after {
+      opacity: 1;
+    }
+  }
+
+  span:last-child {
+    font-size: 0.9rem;
+    color: var(--quotes-text);
+  }
+
+  &:hover {
+    border-color: rgba(255, 202, 44, 0.3);
+  }
+}
+
+.qw-field-error {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.8rem;
+  color: var(--quotes-error);
+}
+
+.qw-char-count {
+  font-size: 0.75rem;
+  color: var(--quotes-text-muted);
+  align-self: flex-end;
+}
+
+// ── Error banner ──────────────────────────────────────────────
+
+.qw-error-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 12px;
+  color: var(--quotes-error);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+// ── Actions bar ───────────────────────────────────────────────
+
+.qw-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--quotes-border);
+  flex-wrap: wrap;
+}
+
+.qw-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.75rem;
+  background: linear-gradient(135deg, var(--quotes-accent) 0%, var(--quotes-accent-hover) 100%);
+  color: #000;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 14px rgba(255, 202, 44, 0.25);
+
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 202, 44, 0.4);
+  }
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+}
+
+.qw-btn-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.5rem;
+  background: transparent;
+  color: var(--quotes-text-muted);
+  border: 1px solid var(--quotes-border);
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.2);
+    color: var(--quotes-text);
+    background: rgba(255, 255, 255, 0.04);
+  }
+}
+
+.qw-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.75rem 1.5rem;
+  background: rgba(255, 202, 44, 0.1);
+  color: var(--quotes-accent);
+  border: 1px solid rgba(255, 202, 44, 0.25);
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  margin-top: 0.5rem;
+
+  &:hover {
+    background: var(--quotes-accent);
+    color: #000;
+  }
+}
+
+// ── Success screen ────────────────────────────────────────────
+
+.qw-success {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: var(--quotes-surface);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  animation: qwFadeIn 0.4s ease;
+
+  .qw-success-icon {
+    svg {
+      color: var(--quotes-success);
+      filter: drop-shadow(0 0 16px rgba(16, 185, 129, 0.4));
+    }
+  }
+
+  h3 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--quotes-text);
+    margin: 0;
+  }
+
+  p {
+    color: var(--quotes-text-muted);
+    font-size: 0.95rem;
+    max-width: 480px;
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  .qw-success-hint {
+    font-size: 0.8rem;
+    color: var(--quotes-text-muted);
+    opacity: 0.6;
+  }
+}

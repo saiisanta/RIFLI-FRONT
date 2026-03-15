@@ -12,7 +12,7 @@ export const useQuotes = () => {
         setLoading(true);
         setError(null);
         const data = await quoteService.getQuotes(params);
-        setQuotes(data.quotes || data.data || []);
+        setQuotes(Array.isArray(data) ? data : data.quotes || data.data || []);
         return data;
       } catch (err) {
         setError(err.message || 'Error al cargar cotizaciones');

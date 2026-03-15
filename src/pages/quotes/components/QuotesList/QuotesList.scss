@@ -1,0 +1,510 @@
+@use "../../../../styles/breakpoints" as *;
+
+// ── Loading / error / empty ───────────────────────────────────
+
+.ql-loading {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: var(--quotes-text-muted);
+  padding: 4rem 0;
+  justify-content: center;
+}
+
+.ql-spinner {
+  width: 24px;
+  height: 24px;
+  border: 3px solid rgba(255, 202, 44, 0.2);
+  border-top-color: var(--quotes-accent);
+  border-radius: 50%;
+  animation: qlSpin 0.75s linear infinite;
+}
+
+@keyframes qlSpin {
+  to { transform: rotate(360deg); }
+}
+
+.ql-error,
+.ql-empty {
+  text-align: center;
+  padding: 4rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.ql-error {
+  background: rgba(239, 68, 68, 0.06);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: 16px;
+  color: var(--quotes-error);
+
+  h3 { font-size: 1.1rem; font-weight: 700; margin: 0; color: var(--quotes-error); }
+  p  { font-size: 0.9rem; margin: 0; color: var(--quotes-text-muted); }
+}
+
+.ql-retry-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1.5rem;
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--quotes-error);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 10px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 0.5rem;
+
+  &:hover { background: var(--quotes-error); color: #fff; }
+}
+
+.ql-empty {
+  .ql-empty-icon {
+    width: 80px;
+    height: 80px;
+    background: rgba(255, 202, 44, 0.07);
+    border: 1px solid rgba(255, 202, 44, 0.2);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    svg { color: var(--quotes-accent); opacity: 0.7; }
+  }
+
+  h3 { font-size: 1.2rem; font-weight: 700; color: var(--quotes-text); margin: 0; }
+  p  { font-size: 0.9rem; color: var(--quotes-text-muted); margin: 0; max-width: 400px; line-height: 1.6; }
+}
+
+.ql-empty-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.75rem;
+  background: linear-gradient(135deg, var(--quotes-accent) 0%, var(--quotes-accent-hover) 100%);
+  color: #000;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 0.5rem;
+
+  &:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255, 202, 44, 0.35); }
+}
+
+// ── List wrapper ──────────────────────────────────────────────
+
+.quotes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.ql-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+
+  h2 {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--quotes-text);
+    margin: 0;
+  }
+}
+
+.ql-new-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1.25rem;
+  background: rgba(255, 202, 44, 0.1);
+  color: var(--quotes-accent);
+  border: 1px solid rgba(255, 202, 44, 0.25);
+  border-radius: 10px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: var(--quotes-accent);
+    color: #000;
+  }
+}
+
+.ql-inline-error {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.875rem 1.25rem;
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  border-radius: 10px;
+  color: var(--quotes-error);
+  font-size: 0.875rem;
+
+  button {
+    margin-left: auto;
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    opacity: 0.7;
+    padding: 0.2rem;
+
+    &:hover { opacity: 1; }
+  }
+}
+
+.ql-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+
+// ── Quote card ────────────────────────────────────────────────
+
+.ql-card {
+  background: var(--quotes-surface);
+  border: 1px solid var(--quotes-border);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+
+  &:hover {
+    border-color: rgba(255, 202, 44, 0.2);
+  }
+
+  &.expanded {
+    border-color: rgba(255, 202, 44, 0.3);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  }
+}
+
+.ql-card-header {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 1.25rem 1.5rem;
+  cursor: pointer;
+  user-select: none;
+  flex-wrap: wrap;
+
+  @include respond-down("mobile-lg") {
+    padding: 1rem;
+    gap: 0.875rem;
+  }
+}
+
+.ql-card-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+.ql-quote-number {
+  font-family: monospace;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--quotes-accent);
+  background: rgba(255, 202, 44, 0.1);
+  padding: 0.25rem 0.625rem;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+.ql-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex: 1;
+  flex-wrap: wrap;
+
+  @include respond-down("mobile-lg") {
+    gap: 0.625rem;
+    width: 100%;
+  }
+}
+
+.ql-card-service {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--quotes-text);
+}
+
+.ql-card-date,
+.ql-card-amount {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.82rem;
+  color: var(--quotes-text-muted);
+
+  svg { flex-shrink: 0; }
+}
+
+.ql-card-amount {
+  color: var(--quotes-accent);
+  font-weight: 600;
+}
+
+.ql-expand-btn {
+  flex-shrink: 0;
+  margin-left: auto;
+  background: transparent;
+  border: 1px solid var(--quotes-border);
+  color: var(--quotes-text-muted);
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.25s ease;
+
+  &:hover {
+    border-color: var(--quotes-accent);
+    color: var(--quotes-accent);
+  }
+}
+
+// ── Card body ─────────────────────────────────────────────────
+
+.ql-card-body {
+  border-top: 1px solid var(--quotes-border);
+  padding: 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  animation: qlBodyIn 0.25s ease;
+
+  @include respond-down("mobile-lg") {
+    padding: 1.25rem;
+    gap: 1.25rem;
+  }
+}
+
+@keyframes qlBodyIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.ql-detail-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.ql-detail-section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.75px;
+  color: var(--quotes-accent);
+  opacity: 0.85;
+}
+
+.ql-detail-address {
+  font-size: 0.9rem;
+  color: var(--quotes-text);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.ql-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.625rem;
+
+  @include respond-down("mobile-lg") {
+    grid-template-columns: 1fr;
+  }
+}
+
+.ql-detail-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  background: var(--quotes-card);
+  border: 1px solid var(--quotes-border);
+  border-radius: 8px;
+  padding: 0.625rem 0.875rem;
+}
+
+.ql-detail-key {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--quotes-text-muted);
+  text-transform: capitalize;
+}
+
+.ql-detail-val {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--quotes-text);
+}
+
+.ql-detail-notes {
+  font-size: 0.9rem;
+  color: var(--quotes-text-muted);
+  font-style: italic;
+  margin: 0;
+  line-height: 1.6;
+  padding: 0.875rem 1rem;
+  background: var(--quotes-card);
+  border: 1px solid var(--quotes-border);
+  border-radius: 8px;
+  border-left: 3px solid var(--quotes-accent);
+}
+
+// ── Budget summary ────────────────────────────────────────────
+
+.ql-budget-summary {
+  background: var(--quotes-card);
+  border: 1px solid rgba(255, 202, 44, 0.15);
+  border-radius: 12px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+
+.ql-budget-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: 1px solid var(--quotes-border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.ql-budget-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.7rem 1rem;
+  font-size: 0.88rem;
+  color: var(--quotes-text-muted);
+  border-bottom: 1px solid var(--quotes-border);
+
+  &:last-child { border-bottom: none; }
+
+  &.discount {
+    color: var(--quotes-success);
+  }
+
+  &.total {
+    background: rgba(255, 202, 44, 0.06);
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--quotes-text);
+
+    span:last-child {
+      color: var(--quotes-accent);
+    }
+  }
+
+  &.deposit {
+    background: rgba(16, 185, 129, 0.06);
+    font-weight: 700;
+    color: var(--quotes-success);
+  }
+}
+
+.ql-budget-validity {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  color: var(--quotes-text-muted);
+  margin: 0;
+}
+
+// ── Card actions ──────────────────────────────────────────────
+
+.ql-card-actions {
+  display: flex;
+  gap: 0.75rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--quotes-border);
+  flex-wrap: wrap;
+}
+
+.ql-btn-accept {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.8rem 1.5rem;
+  background: linear-gradient(135deg, var(--quotes-success) 0%, #0ea570 100%);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);
+  }
+
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+}
+
+.ql-btn-reject {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.8rem 1.5rem;
+  background: transparent;
+  color: var(--quotes-error);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover:not(:disabled) {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: var(--quotes-error);
+  }
+
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+}
+
+// ── Status badges ─────────────────────────────────────────────
+
+.ql-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+
+  &.ql-status--yellow  { background: rgba(255, 202, 44, 0.12); color: var(--quotes-accent); }
+  &.ql-status--blue    { background: rgba(59, 130, 246, 0.12); color: #60a5fa; }
+  &.ql-status--green   { background: rgba(16, 185, 129, 0.12); color: var(--quotes-success); }
+  &.ql-status--red     { background: rgba(239, 68, 68, 0.12);  color: var(--quotes-error); }
+  &.ql-status--orange  { background: rgba(249, 115, 22, 0.12); color: #fb923c; }
+  &.ql-status--success { background: rgba(16, 185, 129, 0.18); color: #34d399; }
+  &.ql-status--gray    { background: rgba(107, 114, 128, 0.12); color: #9ca3af; }
+}

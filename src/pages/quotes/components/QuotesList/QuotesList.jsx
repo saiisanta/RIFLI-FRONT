@@ -14,8 +14,9 @@ import {
   FiRefreshCw,
 } from 'react-icons/fi';
 import useQuotes from '../../../../hooks/useQuotes';
-import { quoteService } from '../../../../services/quoteService';
 import './QuotesList.scss';
+
+const API_URL = 'http://localhost:4001';
 
 // ── Status config ─────────────────────────────────────────────
 
@@ -185,6 +186,18 @@ const QuoteCard = ({ quote, onAccept, onReject }) => {
               <div className="ql-detail-section-title">
                 <FiDollarSign size={14} />
                 Resumen del presupuesto
+                {quote.budget_pdf && (
+                  <a
+                    href={`${API_URL}${quote.budget_pdf}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="ql-pdf-btn"
+                    onClick={e => e.stopPropagation()}
+                  >
+                    <FiFileText size={13} />
+                    Ver PDF
+                  </a>
+                )}
               </div>
               <div className="ql-budget-grid">
                 {quote.materials_subtotal && (

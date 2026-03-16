@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useAuthContext } from "../../context/AuthContext";
 import useForm from "../../hooks/useForm";
@@ -8,7 +8,6 @@ import AuthPageLayout from "./components/AuthPageLayout";
 import "./auth.scss";
 
 const Register = () => {
-  const navigate = useNavigate();
   const {
     register,
     resendVerification,
@@ -25,7 +24,6 @@ const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  // Hook para manejar errores de API
   const { 
     generalError, 
     handleApiError, 
@@ -144,7 +142,6 @@ const Register = () => {
     };
   }, [clearError, clearApiError]);
 
-  /* ================= SUCCESS SCREEN ================= */
 
   if (registrationSuccess) {
     return (
@@ -232,7 +229,6 @@ const Register = () => {
     );
   }
 
-  /* ================= FORM ================= */
 
   return (
     <AuthPageLayout>

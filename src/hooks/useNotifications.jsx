@@ -7,9 +7,9 @@ const useNotifications = () => {
   const [error, setError] = useState(null);
   const [unreadCount, setUnreadCount] = useState(0);
 
-  useEffect(() => {
-    fetchUnreadCount();
-  }, []);
+    useEffect(() => {
+      fetchUnreadCount();
+    }, []);
 
   const fetchNotifications = useCallback(async (params = {}) => {
     try {

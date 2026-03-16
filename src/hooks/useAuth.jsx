@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import authService from '../services/authService';
 
 const useAuth = () => {
@@ -6,37 +6,61 @@ const useAuth = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  
+  const isCheckingAuth = useRef(false);
+  const hasCheckedAuth = useRef(false);
 
   const checkAuthStatus = useCallback(async () => {
+    // Evitar múltiples llamadas simultáneas
+    if (isCheckingAuth.current) {
+      return;
+    }
+
     try {
+      isCheckingAuth.current = true;
       setLoading(true);
+      
+      // ✅ Hacer la petición directamente - las cookies se envían automáticamente
       const data = await authService.getCurrentUser();
       setUser(data.user);
       setIsAuthenticated(true);
       setError(null);
     } catch (err) {
+      console.error('Error verificando autenticación:', err);
+      // Si falla (401), significa que no hay sesión válida
       setUser(null);
       setIsAuthenticated(false);
       setError(null);
     } finally {
       setLoading(false);
+      isCheckingAuth.current = false;
+      hasCheckedAuth.current = true;
     }
   }, []);
 
   useEffect(() => {
-    checkAuthStatus();
-  }, [checkAuthStatus]);
+    if (!hasCheckedAuth.current) {
+      checkAuthStatus();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const register = useCallback(async (userData) => {
     try {
       setLoading(true);
       setError(null);
       const data = await authService.register(userData);
-      setUser(data.user);
-      setIsAuthenticated(true);
+      
+      // Si el backend devuelve el usuario después del registro
+      if (data.user) {
+        setUser(data.user);
+        setIsAuthenticated(true);
+      }
+      
       return data;
     } catch (err) {
-      setError(err.message || 'Error al registrar usuario');
+      const errorMsg = err.message || err.error || 'Error al registrar usuario';
+      setError(errorMsg);
       throw err;
     } finally {
       setLoading(false);
@@ -52,7 +76,8 @@ const useAuth = () => {
       setIsAuthenticated(true);
       return data;
     } catch (err) {
-      setError(err || 'Error al iniciar sesión');
+      const errorMsg = err.error || err.message || 'Error al iniciar sesión';
+      setError(errorMsg);
       throw err;
     } finally {
       setLoading(false);
@@ -63,15 +88,14 @@ const useAuth = () => {
     try {
       setLoading(true);
       await authService.logout();
+    } catch (err) {
+      console.error('Error al cerrar sesión:', err);
+    } finally {
       setUser(null);
       setIsAuthenticated(false);
       setError(null);
-    } catch (err) {
-      setError(err || 'Error al cerrar sesión');
-      setUser(null);
-      setIsAuthenticated(false);
-    } finally {
       setLoading(false);
+      hasCheckedAuth.current = false;
     }
   }, []);
 
@@ -82,7 +106,8 @@ const useAuth = () => {
       const data = await authService.forgotPassword(email);
       return data;
     } catch (err) {
-      setError(err || 'Error al solicitar recuperación');
+      const errorMsg = err.error || err.message || 'Error al solicitar recuperación';
+      setError(errorMsg);
       throw err;
     } finally {
       setLoading(false);
@@ -96,7 +121,8 @@ const useAuth = () => {
       const data = await authService.resetPassword(token, newPassword);
       return data;
     } catch (err) {
-      setError(err || 'Error al resetear contraseña');
+      const errorMsg = err.error || err.message || 'Error al resetear contraseña';
+      setError(errorMsg);
       throw err;
     } finally {
       setLoading(false);
@@ -110,7 +136,8 @@ const useAuth = () => {
       const data = await authService.verifyEmail(token);
       return data;
     } catch (err) {
-      setError(err || 'Error al verificar email');
+      const errorMsg = err.error || err.message || 'Error al verificar email';
+      setError(errorMsg);
       throw err;
     } finally {
       setLoading(false);
@@ -124,7 +151,8 @@ const useAuth = () => {
       const data = await authService.resendVerification(email);
       return data;
     } catch (err) {
-      setError(err || 'Error al reenviar verificación');
+      const errorMsg = err.error || err.message || 'Error al reenviar verificación';
+      setError(errorMsg);
       throw err;
     } finally {
       setLoading(false);

@@ -11,33 +11,26 @@ const useAuth = () => {
   const hasCheckedAuth = useRef(false);
 
   const checkAuthStatus = useCallback(async () => {
+    // Evitar múltiples llamadas simultáneas
     if (isCheckingAuth.current) {
-      return;
-    }
-
-    const token = localStorage.getItem('token');
-    if (!token) {
-      setLoading(false);
-      setUser(null);
-      setIsAuthenticated(false);
-      hasCheckedAuth.current = true;
       return;
     }
 
     try {
       isCheckingAuth.current = true;
       setLoading(true);
+      
+      // ✅ Hacer la petición directamente - las cookies se envían automáticamente
       const data = await authService.getCurrentUser();
       setUser(data.user);
       setIsAuthenticated(true);
       setError(null);
     } catch (err) {
       console.error('Error verificando autenticación:', err);
+      // Si falla (401), significa que no hay sesión válida
       setUser(null);
       setIsAuthenticated(false);
       setError(null);
-      localStorage.removeItem('token');
-      localStorage.removeItem('refreshToken');
     } finally {
       setLoading(false);
       isCheckingAuth.current = false;
@@ -49,6 +42,7 @@ const useAuth = () => {
     if (!hasCheckedAuth.current) {
       checkAuthStatus();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const register = useCallback(async (userData) => {
@@ -57,7 +51,8 @@ const useAuth = () => {
       setError(null);
       const data = await authService.register(userData);
       
-      if (data.token) {
+      // Si el backend devuelve el usuario después del registro
+      if (data.user) {
         setUser(data.user);
         setIsAuthenticated(true);
       }

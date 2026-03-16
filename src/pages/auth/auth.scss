@@ -1674,3 +1674,74 @@
     }
   }
 }
+
+.password-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  input {
+    width: 100%;
+    padding-right: 3.5rem;
+  }
+
+  .password-toggle {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    color: var(--auth-text-muted);
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 2;
+    border-radius: 0 12px 12px 0;
+
+    svg {
+      width: 18px;
+      height: 18px;
+      transition: all 0.3s ease;
+
+      @include respond-down("mobile-lg") {
+        width: 16px;
+        height: 16px;
+      }
+    }
+
+    &:hover:not(:disabled) {
+      color: var(--auth-accent);
+      background: rgba(255, 202, 44, 0.05);
+
+      svg {
+        transform: scale(1.1);
+      }
+    }
+
+    &:active:not(:disabled) {
+      transform: scale(0.95);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--auth-accent);
+      outline-offset: -2px;
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.4;
+    }
+
+    @include respond-down("mobile-lg") {
+      width: 2.75rem;
+    }
+  }
+}
+
+.password-input-wrapper input.input-error {
+  padding-right: 3.5rem;
+}

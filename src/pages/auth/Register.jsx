@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useAuthContext } from "../../context/AuthContext";
 import useForm from "../../hooks/useForm";
+import useApiError from "../../hooks/useApiError";
 import AuthPageLayout from "./components/AuthPageLayout";
 import "./auth.scss";
 
@@ -11,7 +13,6 @@ const Register = () => {
     register,
     resendVerification,
     loading: authLoading,
-    error: authError,
     clearError,
   } = useAuthContext();
 
@@ -20,6 +21,17 @@ const Register = () => {
   const [resendLoading, setResendLoading] = useState(false);
   const [resendSuccess, setResendSuccess] = useState(false);
   const [resendError, setResendError] = useState("");
+
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  // Hook para manejar errores de API
+  const { 
+    generalError, 
+    handleApiError, 
+    clearApiError, 
+    getFieldError 
+  } = useApiError(['first_name', 'last_name', 'email', 'password']);
 
   const validationRules = {
     first_name: {
@@ -81,6 +93,8 @@ const Register = () => {
   const onSubmit = async (formData) => {
     if (formData.password !== formData.confirmPassword) return;
 
+    clearApiError();
+
     try {
       await register({
         first_name: formData.first_name,
@@ -94,6 +108,7 @@ const Register = () => {
       reset();
     } catch (err) {
       console.error("Error en registro:", err);
+      handleApiError(err);
     }
   };
 
@@ -123,8 +138,11 @@ const Register = () => {
   };
 
   useEffect(() => {
-    return () => clearError();
-  }, [clearError]);
+    return () => {
+      clearError();
+      clearApiError();
+    };
+  }, [clearError, clearApiError]);
 
   /* ================= SUCCESS SCREEN ================= */
 
@@ -223,9 +241,9 @@ const Register = () => {
         <p className="auth-subtitle">Regístrate para comenzar</p>
       </div>
 
-      {authError && (
+      {generalError && (
         <div className="error-message" role="alert">
-          {authError}
+          {generalError}
         </div>
       )}
 
@@ -241,13 +259,18 @@ const Register = () => {
             onBlur={handleBlur}
             disabled={isSubmitting || authLoading}
             className={
-              errors.first_name && touched.first_name ? "input-error" : ""
+              (errors.first_name && touched.first_name) || getFieldError('first_name')
+                ? "input-error"
+                : ""
             }
             placeholder="Tu nombre"
             autoComplete="given-name"
           />
           {errors.first_name && touched.first_name && (
             <span className="field-error">{errors.first_name}</span>
+          )}
+          {!errors.first_name && getFieldError('first_name') && (
+            <span className="field-error">{getFieldError('first_name')}</span>
           )}
         </div>
 
@@ -262,13 +285,18 @@ const Register = () => {
             onBlur={handleBlur}
             disabled={isSubmitting || authLoading}
             className={
-              errors.last_name && touched.last_name ? "input-error" : ""
+              (errors.last_name && touched.last_name) || getFieldError('last_name')
+                ? "input-error"
+                : ""
             }
             placeholder="Tu apellido"
             autoComplete="family-name"
           />
           {errors.last_name && touched.last_name && (
             <span className="field-error">{errors.last_name}</span>
+          )}
+          {!errors.last_name && getFieldError('last_name') && (
+            <span className="field-error">{getFieldError('last_name')}</span>
           )}
         </div>
 
@@ -282,54 +310,88 @@ const Register = () => {
             onChange={handleChange}
             onBlur={handleBlur}
             disabled={isSubmitting || authLoading}
-            className={errors.email && touched.email ? "input-error" : ""}
+            className={
+              (errors.email && touched.email) || getFieldError('email')
+                ? "input-error"
+                : ""
+            }
             placeholder="tu@email.com"
             autoComplete="email"
           />
           {errors.email && touched.email && (
             <span className="field-error">{errors.email}</span>
           )}
+          {!errors.email && getFieldError('email') && (
+            <span className="field-error">{getFieldError('email')}</span>
+          )}
         </div>
 
         <div className="form-group">
           <label htmlFor="password">Contraseña</label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            value={values.password}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            disabled={isSubmitting || authLoading}
-            className={
-              errors.password && touched.password ? "input-error" : ""
-            }
-            placeholder="Mínimo 6 caracteres"
-            autoComplete="new-password"
-          />
+          <div className="password-input-wrapper">
+            <input
+              type={showPassword ? "text" : "password"}
+              id="password"
+              name="password"
+              value={values.password}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              disabled={isSubmitting || authLoading}
+              className={
+                (errors.password && touched.password) || getFieldError('password')
+                  ? "input-error"
+                  : ""
+              }
+              placeholder="Mínimo 6 caracteres"
+              autoComplete="new-password"
+            />
+            <button
+              type="button"
+              className="password-toggle"
+              onClick={() => setShowPassword(!showPassword)}
+              disabled={isSubmitting || authLoading}
+              aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+            >
+              {showPassword ? <FaEyeSlash /> : <FaEye />}
+            </button>
+          </div>
           {errors.password && touched.password && (
             <span className="field-error">{errors.password}</span>
+          )}
+          {!errors.password && getFieldError('password') && (
+            <span className="field-error">{getFieldError('password')}</span>
           )}
         </div>
 
         <div className="form-group">
           <label htmlFor="confirmPassword">Confirmar Contraseña</label>
-          <input
-            type="password"
-            id="confirmPassword"
-            name="confirmPassword"
-            value={values.confirmPassword}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            disabled={isSubmitting || authLoading}
-            className={
-              errors.confirmPassword && touched.confirmPassword
-                ? "input-error"
-                : ""
-            }
-            placeholder="Repite tu contraseña"
-            autoComplete="new-password"
-          />
+          <div className="password-input-wrapper">
+            <input
+              type={showConfirmPassword ? "text" : "password"}
+              id="confirmPassword"
+              name="confirmPassword"
+              value={values.confirmPassword}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              disabled={isSubmitting || authLoading}
+              className={
+                errors.confirmPassword && touched.confirmPassword
+                  ? "input-error"
+                  : ""
+              }
+              placeholder="Repite tu contraseña"
+              autoComplete="new-password"
+            />
+            <button
+              type="button"
+              className="password-toggle"
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              disabled={isSubmitting || authLoading}
+              aria-label={showConfirmPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+            >
+              {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+            </button>
+          </div>
           {errors.confirmPassword && touched.confirmPassword && (
             <span className="field-error">{errors.confirmPassword}</span>
           )}

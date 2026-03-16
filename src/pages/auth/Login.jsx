@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useAuthContext } from "../../context/AuthContext";
 import useForm from "../../hooks/useForm";
+import useApiError from "../../hooks/useApiError";
 import AuthPageLayout from "./components/AuthPageLayout";
 import "./auth.scss";
 
@@ -11,15 +13,24 @@ const Login = () => {
   const {
     login,
     loading: authLoading,
-    error: authError,
     clearError,
   } = useAuthContext();
+
+  const [showPassword, setShowPassword] = useState(false);
 
   const redirect = searchParams.get("redirect");
   const sessionExpired = searchParams.get("session_expired");
   const registered = searchParams.get("registered");
   const verified = searchParams.get("verified");
   const logout = searchParams.get("logout");
+
+  // Hook para manejar errores de API
+  const { 
+    generalError, 
+    handleApiError, 
+    clearApiError, 
+    getFieldError 
+  } = useApiError(['email', 'password']);
 
   const validationRules = {
     email: {
@@ -50,6 +61,8 @@ const Login = () => {
   } = useForm({ email: "", password: "" }, validationRules);
 
   const onSubmit = async (formData) => {
+    clearApiError();
+    
     try {
       await login({
         email: formData.email,
@@ -65,12 +78,16 @@ const Login = () => {
       }
     } catch (err) {
       console.error("Error en login:", err);
+      handleApiError(err);
     }
   };
 
   React.useEffect(() => {
-    return () => clearError();
-  }, [clearError]);
+    return () => {
+      clearError();
+      clearApiError();
+    };
+  }, [clearError, clearApiError]);
 
   return (
     <AuthPageLayout>
@@ -113,9 +130,9 @@ const Login = () => {
         <div className="info-message">Sesión cerrada correctamente.</div>
       )}
 
-      {authError && (
+      {generalError && (
         <div className="error-message" role="alert">
-          {authError}
+          {generalError}
         </div>
       )}
 
@@ -130,31 +147,56 @@ const Login = () => {
             onChange={handleChange}
             onBlur={handleBlur}
             disabled={isSubmitting || authLoading}
-            className={errors.email && touched.email ? "input-error" : ""}
+            className={
+              (errors.email && touched.email) || getFieldError('email')
+                ? "input-error"
+                : ""
+            }
             placeholder="tu@email.com"
             autoComplete="email"
           />
           {errors.email && touched.email && (
             <span className="field-error">{errors.email}</span>
           )}
+          {!errors.email && getFieldError('email') && (
+            <span className="field-error">{getFieldError('email')}</span>
+          )}
         </div>
 
         <div className="form-group">
           <label htmlFor="password">Contraseña</label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            value={values.password}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            disabled={isSubmitting || authLoading}
-            className={errors.password && touched.password ? "input-error" : ""}
-            placeholder="Mínimo 6 caracteres"
-            autoComplete="current-password"
-          />
+          <div className="password-input-wrapper">
+            <input
+              type={showPassword ? "text" : "password"}
+              id="password"
+              name="password"
+              value={values.password}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              disabled={isSubmitting || authLoading}
+              className={
+                (errors.password && touched.password) || getFieldError('password')
+                  ? "input-error"
+                  : ""
+              }
+              placeholder="Mínimo 6 caracteres"
+              autoComplete="current-password"
+            />
+            <button
+              type="button"
+              className="password-toggle"
+              onClick={() => setShowPassword(!showPassword)}
+              disabled={isSubmitting || authLoading}
+              aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+            >
+              {showPassword ? <FaEyeSlash /> : <FaEye />}
+            </button>
+          </div>
           {errors.password && touched.password && (
             <span className="field-error">{errors.password}</span>
+          )}
+          {!errors.password && getFieldError('password') && (
+            <span className="field-error">{getFieldError('password')}</span>
           )}
         </div>
 

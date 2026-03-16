@@ -75,8 +75,8 @@ const useProfile = () => {
       setError(null);
       const formData = new FormData();
       formData.append('avatar', file);
-      const data = await userService.updateAvatar(profile?.id, formData);
-      setProfile(data.user || data);
+      const data = await userService.updateAvatar(formData);
+      setProfile((prev) => ({ ...prev, avatar_url: data.avatar_url || data.user?.avatar_url }));
       
       return data;
     } catch (err) {
@@ -86,7 +86,25 @@ const useProfile = () => {
     } finally {
       setLoading(false);
     }
-  }, [profile?.id]);
+  }, []);
+
+  const deleteAvatar = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await userService.deleteAvatar();
+      
+      setProfile((prev) => ({ ...prev, avatar_url: null }));
+      
+      return data;
+    } catch (err) {
+      const errorMessage = err.error || err.message || 'Error al eliminar avatar';
+      setError(errorMessage);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   const clearError = useCallback(() => {
     setError(null);
@@ -101,6 +119,7 @@ const useProfile = () => {
     changePassword,
     deleteProfile,
     updateAvatar,
+    deleteAvatar,
     clearError,
   };
 };

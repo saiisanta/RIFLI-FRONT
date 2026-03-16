@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { FiMail, FiPhone, FiMapPin, FiLock, FiAlertTriangle, FiCamera, FiTrash2, FiFileText } from 'react-icons/fi';
 import './ProfileInfo.scss';
 
-const ProfileInfo = ({ profile, onChangePassword, onDeleteAccount, onAvatarChange }) => {
+const ProfileInfo = ({ profile, onChangePassword, onDeleteAccount, onAvatarChange, onAvatarDelete }) => {
   const [avatarPreview, setAvatarPreview] = useState(null);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const fileInputRef = useRef(null);
@@ -37,10 +37,13 @@ const ProfileInfo = ({ profile, onChangePassword, onDeleteAccount, onAvatarChang
     try {
       setUploadingAvatar(true);
       await onAvatarChange(file);
+      
+
       setAvatarPreview(null);
       
     } catch (error) {
       console.error('Error al subir avatar:', error);
+      
       setAvatarPreview(null);
       alert('Error al subir la imagen');
     } finally {
@@ -56,11 +59,16 @@ const ProfileInfo = ({ profile, onChangePassword, onDeleteAccount, onAvatarChang
 
     try {
       setUploadingAvatar(true);
+      
       setAvatarPreview(null);
-      console.log('Avatar eliminado');
+      
+      if (onAvatarDelete) {
+        await onAvatarDelete();
+      }
       
     } catch (error) {
       console.error('Error al eliminar avatar:', error);
+      alert('Error al eliminar la imagen');
     } finally {
       setUploadingAvatar(false);
     }
@@ -87,6 +95,8 @@ const ProfileInfo = ({ profile, onChangePassword, onDeleteAccount, onAvatarChang
 
   const defaultAddress = getDefaultAddress();
 
+  const displayAvatar = avatarPreview || profile?.avatar_url;
+
   return (
     <div className="profile-info-grid">
       <div className="profile-info-card profile-avatar-card">
@@ -100,26 +110,20 @@ const ProfileInfo = ({ profile, onChangePassword, onDeleteAccount, onAvatarChang
         <div className="profile-info-content">
           <div className="profile-avatar-upload-section">
             <div className="profile-avatar-preview">
-              {avatarPreview ? (
+              {displayAvatar ? (
                 <img 
-                  src={avatarPreview} 
-                  alt="Avatar preview" 
-                  className="avatar-preview-img"
-                />
-              ) : profile?.avatar_url ? (
-                <img 
-                  src={`http://localhost:4001${profile.avatar_url}`} 
+                  src={avatarPreview ? avatarPreview : `http://localhost:4001${profile.avatar_url}`}
                   alt="Avatar" 
                   className="avatar-preview-img"
                   onError={(e) => {
                     console.error('Error cargando avatar:', profile.avatar_url);
                     e.target.style.display = 'none';
-                    e.target.nextSibling.style.display = 'flex';
+                    if (e.target.nextSibling) {
+                      e.target.nextSibling.style.display = 'flex';
+                    }
                   }}
                 />
-              ) : null}
-              
-              {!avatarPreview && !profile?.avatar_url && (
+              ) : (
                 <div className="avatar-preview-placeholder">
                   <FiCamera />
                 </div>
@@ -143,10 +147,10 @@ const ProfileInfo = ({ profile, onChangePassword, onDeleteAccount, onAvatarChang
                 disabled={uploadingAvatar}
               >
                 <FiCamera />
-                <span>{profile?.avatar_url || avatarPreview ? 'Cambiar Foto' : 'Subir Foto'}</span>
+                <span>{displayAvatar ? 'Cambiar Foto' : 'Subir Foto'}</span>
               </button>
 
-              {(profile?.avatar_url || avatarPreview) && (
+              {profile?.avatar_url && (
                 <button 
                   onClick={handleRemoveAvatar} 
                   className="avatar-btn btn-remove"

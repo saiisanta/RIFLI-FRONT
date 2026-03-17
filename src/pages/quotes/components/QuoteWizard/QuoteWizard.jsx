@@ -14,7 +14,7 @@ import useQuotes from '../../../../hooks/useQuotes';
 import addressService from '../../../../services/addressService';
 import './QuoteWizard.scss';
 
-const API_URL = 'http://localhost:4001';
+const API_URL = import.meta.env.VITE_API_URL;
 
 const STEPS = [
   { id: 1, label: 'Servicio',  Icon: FiGrid },

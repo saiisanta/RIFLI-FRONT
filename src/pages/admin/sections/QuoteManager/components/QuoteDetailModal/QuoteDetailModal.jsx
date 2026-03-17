@@ -12,7 +12,7 @@ import {
 } from 'react-bootstrap-icons';
 import './QuoteDetailModal.scss';
 
-const API_URL = 'http://localhost:4001';
+const API_URL = import.meta.env.VITE_API_URL;
 
 const STATUS_CONFIG = {
   PENDING:     { label: 'Pendiente',     cls: 'yellow'  },

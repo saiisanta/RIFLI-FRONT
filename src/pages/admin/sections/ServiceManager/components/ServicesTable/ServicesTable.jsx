@@ -2,6 +2,8 @@ import React from 'react';
 import { Pencil, Trash3 } from 'react-bootstrap-icons';
 import './ServicesTable.scss';
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 const ServicesTable = ({ servicios, onEdit, onDelete }) => {
   return (
     <div className="services-table-wrapper">
@@ -26,7 +28,7 @@ const ServicesTable = ({ servicios, onEdit, onDelete }) => {
                 <td>
                   {s.icon ? (
                     <img
-                      src={`http://localhost:4001${s.icon}`}
+                      src={`${API_URL}${s.icon}`}
                       alt="Icono"
                       className="services-table-icon-img"
                     />

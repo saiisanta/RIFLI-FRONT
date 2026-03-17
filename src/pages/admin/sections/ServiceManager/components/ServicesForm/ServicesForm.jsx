@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Plus, X, ChevronDown, ChevronUp, Trash3, Image } from 'react-bootstrap-icons';
 import './ServicesForm.scss';
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 const SERVICE_TYPES = ['ELECTRICITY', 'SECURITY', 'GAS'];
 const FIELD_TYPES = ['text', 'number', 'select', 'radio', 'checkbox', 'textarea'];
 
@@ -323,7 +325,7 @@ const ServicesForm = ({
               <div className="service-icon-preview-wrapper">
                 <div className="service-icon-preview-item">
                   <img
-                    src={`http://localhost:4001${existingIcon}`}
+                    src={`${API_URL}${existingIcon}`}
                     alt="Icono actual"
                   />
                   <button
@@ -463,7 +465,7 @@ const ServicesForm = ({
                           <span className="service-removal-badge">Se eliminará</span>
                         )}
                         <img
-                          src={`http://localhost:4001${img}`}
+                          src={`${API_URL}${img}`}
                           alt={`Imagen ${index + 1}`}
                         />
                         <button

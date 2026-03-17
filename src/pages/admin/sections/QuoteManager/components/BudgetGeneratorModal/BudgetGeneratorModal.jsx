@@ -4,7 +4,7 @@ import { pdf } from '@react-pdf/renderer';
 import BudgetPdfDocument from './BudgetPdfDocument';
 import './BudgetGeneratorModal.scss';
 
-const API_URL = 'http://localhost:4001';
+const API_URL = import.meta.env.VITE_API_URL;
 
 const newMaterial = () => ({
   id: `mat_${Date.now()}`,

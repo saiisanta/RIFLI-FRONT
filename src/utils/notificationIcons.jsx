@@ -1,4 +1,3 @@
-// utils/notificationIcons.jsx
 import React from 'react';
 import {
   ClipboardList,

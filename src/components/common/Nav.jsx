@@ -3,11 +3,31 @@ import { Container, Navbar, Nav } from "react-bootstrap";
 import { PersonCircle, BoxArrowRight } from "react-bootstrap-icons";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
+import NotificationBell from "../NotificationBell/NotificationBell";
 import "./nav.scss";
+
+const HIDDEN_PATHS = [
+  "/dashboard",
+  "/admin",
+  "/admin/products",
+  "/admin/categories",
+  "/admin/brands",
+  "/admin/users",
+  "/admin/services",
+  "/admin/orders",
+  "/admin/quotes",
+  "/admin/stats",
+  "/shop",
+  "/login",
+  "/register",
+  "/forgot-password",
+  "/profile",
+  "/servicios",
+  "/presupuestos",
+];
 
 const NavBar = () => {
   const { user, logout, loading } = useContext(AuthContext);
-
   const isAuthenticated = !!(user && user.email);
 
   const { pathname } = useLocation();
@@ -31,10 +51,7 @@ const NavBar = () => {
   };
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
-    };
-
+    const handleScroll = () => setIsScrolled(window.scrollY > 50);
     const hero = document.querySelector(".hero-section");
 
     if (!hero) {
@@ -60,27 +77,7 @@ const NavBar = () => {
     };
   }, [pathname]);
 
-  if (
-    pathname === "/dashboard" ||
-    pathname === "/admin" ||
-    pathname === "/admin/products" ||
-    pathname === "/admin/categories" ||
-    pathname === "/admin/brands" ||
-    pathname === "/admin/users" ||
-    pathname === "/admin/services" ||
-    pathname === "/admin/orders" ||
-    pathname === "/admin/quotes" ||
-    pathname === "/admin/stats" ||
-    pathname === "/shop" ||
-    pathname === "/login" ||
-    pathname === "/register" ||
-    pathname === "/forgot-password" ||
-    pathname === "/profile" ||
-    pathname === "/servicios" ||
-    pathname === "/presupuestos"
-  ) {
-    return null;
-  }
+  if (HIDDEN_PATHS.includes(pathname)) return null;
 
   return (
     <Navbar
@@ -92,12 +89,7 @@ const NavBar = () => {
       onToggle={(val) => setExpanded(val)}
     >
       <Container fluid className="Nav__container px-4">
-        <Navbar.Brand
-          as={Link}
-          to="/"
-          className="Nav__brand"
-          onClick={closeMenu}
-        >
+        <Navbar.Brand as={Link} to="/" className="Nav__brand" onClick={closeMenu}>
           <div className="Nav__logo-wrapper">
             <img
               src="./src/assets/img/rifli/rifli_white.png"
@@ -108,30 +100,19 @@ const NavBar = () => {
           </div>
         </Navbar.Brand>
 
-        <Navbar.Toggle
-          aria-controls="navbar-content"
-          className="Nav__toggler"
-        />
+        <Navbar.Toggle aria-controls="navbar-content" className="Nav__toggler" />
 
         <Navbar.Collapse id="navbar-content" className="Nav__collapse">
           <div className="Nav__menu-wrapper">
             <Nav className="Nav__nav-list">
-              <Nav.Link
-                href="/#servicios"
-                className="Nav__link"
-                onClick={closeMenu}
-              >
+              <Nav.Link href="/#servicios" className="Nav__link" onClick={closeMenu}>
                 Servicios
               </Nav.Link>
-              <Nav.Link
-                href="/#marcas"
-                className="Nav__link"
-                onClick={closeMenu}
-              >
+              <Nav.Link href="/#marcas" className="Nav__link" onClick={closeMenu}>
                 Marcas
               </Nav.Link>
 
-              {user && user.email && (
+              {isAuthenticated && (
                 <Nav.Link
                   as={Link}
                   to="/dashboard"
@@ -146,20 +127,15 @@ const NavBar = () => {
             <div className="Nav__auth-container">
               {!loading &&
                 (isAuthenticated ? (
-                  <div
-                    className="d-flex align-items-center gap-3"
-                    key="logged-in"
-                  >
+                  <div className="d-flex align-items-center gap-3" key="logged-in">
+                    <NotificationBell />
+
                     <button onClick={handleLogout} className="Nav__auth-btn">
                       <BoxArrowRight size={28} />
                     </button>
                   </div>
                 ) : (
-                  <button
-                    key="guest"
-                    onClick={handleLoginClick}
-                    className="Nav__auth-btn"
-                  >
+                  <button key="guest" onClick={handleLoginClick} className="Nav__auth-btn">
                     <PersonCircle size={30} />
                   </button>
                 ))}

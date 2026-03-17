@@ -1,30 +1,27 @@
-import api from '../api';
+import api from './api';
 
 const notificationService = {
-  getNotifications: async (params = {}) => {
+  getAll: async (params = {}) => {
     try {
-      const { page = 1, limit = 20, unread = false } = params;
-      const response = await api.get('/notifications', {
-        params: { page, limit, unread },
-      });
+      const response = await api.get('/notifications', { params });
       return response.data;
     } catch (error) {
       throw error.response?.data || error;
     }
   },
 
-  getNotificationById: async (notificationId) => {
+  getUnreadCount: async () => {
     try {
-      const response = await api.get(`/notifications/${notificationId}`);
-      return response.data;
+      const response = await api.get('/notifications/unread-count');
+      return response.data; // { count: N }
     } catch (error) {
       throw error.response?.data || error;
     }
   },
 
-  markAsRead: async (notificationId) => {
+  markAsRead: async (id) => {
     try {
-      const response = await api.patch(`/notifications/${notificationId}/read`);
+      const response = await api.patch(`/notifications/${id}/read`);
       return response.data;
     } catch (error) {
       throw error.response?.data || error;
@@ -40,27 +37,9 @@ const notificationService = {
     }
   },
 
-  deleteNotification: async (notificationId) => {
+  delete: async (id) => {
     try {
-      const response = await api.delete(`/notifications/${notificationId}`);
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || error;
-    }
-  },
-
-  deleteAll: async () => {
-    try {
-      const response = await api.delete('/notifications');
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || error;
-    }
-  },
-
-  getUnreadCount: async () => {
-    try {
-      const response = await api.get('/notifications/unread-count');
+      const response = await api.delete(`/notifications/${id}`);
       return response.data;
     } catch (error) {
       throw error.response?.data || error;

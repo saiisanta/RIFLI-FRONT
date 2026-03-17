@@ -130,17 +130,24 @@ const userService = {
   //   }
   // },
 
-  // Actualizar avatar
-  updateAvatar: async (userId, formData) => {
-   try {
-      const response = await api.patch(`/users/avatar`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
-      return response.data;
-    } catch (error) {
-       throw error.response?.data || error;
-     }
-   },
+  updateAvatar: async (formData) => {
+  try {
+    const response = await api.patch('/users/avatar', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+},
+deleteAvatar: async () => {
+  try {
+    const response = await api.delete('/users/avatar');
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+},
 
   // Historial de actividad
   // getUserActivity: async (userId, params = {}) => {

@@ -4,7 +4,7 @@ import { AuthContext } from "../../../../context/AuthContext";
 import useServices from "../../../../hooks/useServices";
 import "./ServicesShowcase.scss";
 
-const API_URL = "http://localhost:4001";
+const API_URL = import.meta.env.VITE_API_URL;
 
 const ServicesShowcase = () => {
   const navigate = useNavigate();

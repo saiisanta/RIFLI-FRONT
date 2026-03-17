@@ -1,7 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaArrowLeft } from 'react-icons/fa';
-import logoUrl from '../../../assets/img/rifli/icono_color.svg';
 
 const AuthPageLayout = ({ children, showBackButton = true }) => {
   const navigate = useNavigate();

@@ -22,6 +22,7 @@ const Profile = () => {
     changePassword, 
     deleteProfile,
     updateAvatar,
+    deleteAvatar,
     clearError 
   } = useProfile();
   
@@ -77,6 +78,14 @@ const Profile = () => {
     } catch (err) {
       console.error('Error al actualizar avatar:', err);
       throw err;
+    }
+  };
+
+    const handleDeleteAvatar = async () => {
+    try {
+      await deleteAvatar();
+    } catch (error) {
+      console.error('Error al eliminar avatar:', error);
     }
   };
 
@@ -163,6 +172,7 @@ const Profile = () => {
           onChangePassword={() => setShowPasswordModal(true)}
           onDeleteAccount={() => setShowDeleteModal(true)}
           onAvatarChange={handleAvatarChange}
+          onAvatarDelete={handleDeleteAvatar}
         />
       </div>
 

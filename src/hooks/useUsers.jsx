@@ -163,6 +163,24 @@ const useUsers = () => {
     }
   }, [user]);
 
+const deleteAvatar = useCallback(async () => {
+  try {
+    setLoading(true);
+    setError(null);
+    const data = await userService.deleteAvatar();
+    
+    // Actualizar el usuario local quitando el avatar
+    setUser((prev) => ({ ...prev, avatar_url: null }));
+    
+    return data;
+  } catch (err) {
+    setError(err.message || err.error || 'Error al eliminar avatar');
+    throw err;
+  } finally {
+    setLoading(false);
+  }
+}, []);
+
   const fetchUserActivity = useCallback(async (userId, params = {}) => {
     try {
       setLoading(true);
@@ -234,6 +252,7 @@ const useUsers = () => {
     fetchUserProfile,
     changePassword,
     updateAvatar,
+    deleteAvatar,
     fetchUserActivity,
     updatePreferences,
     fetchUserStats,

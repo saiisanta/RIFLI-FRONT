@@ -92,7 +92,6 @@ const NavBar = () => {
       
       <Link to="/" className="Nav__logo">
         <img src="./src/assets/img/rifli/rifli_white.png" alt="RIFLI" className="Nav__logo-img" draggable="false" />
-        <div className="Nav__connector" />
       </Link>
       <div className="Nav__pill">
         <nav className="Nav__links">

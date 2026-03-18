@@ -2,6 +2,7 @@
 
 $breakpoints: (
   "mobile-md": 425px,
+  "mobile-sm": 500px,
   "mobile-lg": 600px,
   "mobile-l": 700px,
   "tablet-md":    880px,
@@ -10,11 +11,13 @@ $breakpoints: (
   "burger": 991px,
   "laptop":    1024px,
   "desktop-sm": 1100px,
+  "desktop-md-variation": 1200px,
   "desktop-md": 1350px,
   "desktop-lg": 1400px,
   "desktop-l": 1440px,
   "desktop": 1600px,
   "desktop-m": 1700px,
+  "desktop-standart-variation": 1800px,
   "desktop-standart": 1920px,
 
 );

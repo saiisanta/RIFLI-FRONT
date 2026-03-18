@@ -1,11 +1,11 @@
 @use "../../styles/breakpoints" as *;
 
-$accent:       #ffca2c;
-$accent-glow:  rgba(255, 202, 44, 0.25);
-$accent-soft:  rgba(255, 202, 44, 0.12);
-$glass-bg:     rgba(12, 12, 14, 0.72);
+$accent: #ffca2c;
+$accent-glow: rgba(255, 202, 44, 0.25);
+$accent-soft: rgba(255, 202, 44, 0.12);
+$glass-bg: rgba(12, 12, 14, 0.72);
 $glass-border: rgba(255, 255, 255, 0.08);
-$glass-hover:  rgba(255, 255, 255, 0.06);
+$glass-hover: rgba(255, 255, 255, 0.06);
 
 .Nav {
   position: fixed !important;
@@ -23,16 +23,21 @@ $glass-hover:  rgba(255, 255, 255, 0.06);
   -webkit-user-select: none;
   -webkit-user-drag: none;
 
-  * { pointer-events: all; }
+  * {
+    pointer-events: all;
+  }
 
-  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
-              opacity   0.35s ease;
+  transition:
+    transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.35s ease;
 
   &--hidden {
     transform: translateY(-110%);
     opacity: 0;
     pointer-events: none !important;
-    * { pointer-events: none !important; }
+    * {
+      pointer-events: none !important;
+    }
   }
 
   @include respond-down("mobile-lg") {
@@ -42,90 +47,294 @@ $glass-hover:  rgba(255, 255, 255, 0.06);
 }
 
 .Nav__logo {
+  position: relative;
   display: flex;
   align-items: center;
-  flex-shrink: 0;
-  text-decoration: none;
-  z-index: 1;
+  padding-left: 4%;
+  padding-top: 4%;
+  z-index: 10;
+
+  $var_rg_px: 180px;
+  $var_rg_pr: 10%;
 
   &::before {
-    content: '';
-    position: absolute;
-    top: -65px;
-    left: 5%;
-    transform: translateX(-50%);
-    width: 360px;
-    height: 170px;
-    border-radius: 50%;
-    background: #0a0a0a;
-    z-index: 11;
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 120px;
 
-    @include respond-down("desktop-m"){
-      left: 6%;
-    }
-     @include respond-down("desktop"){
-      left: 7%;
-    }
-     @include respond-down("desktop-lg"){
-      left: 8%;
-    }
-    @include respond-down("desktop-sm"){
-      left: 9%;
+    background:
+      linear-gradient(rgba(10, 10, 10, 0.9), rgba(10, 10, 10, 0.9)) padding-box,
+      linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.2))
+        border-box;
+    border-top: none;
+    $mask-shape:
+      radial-gradient(
+        circle $var_rg_px at $var_rg_pr 0px,
+        black 100%,
+        transparent 100%
+      ),
+      linear-gradient(black 35px, transparent 35px);
+
+    -webkit-mask-image: $mask-shape;
+    mask-image: $mask-shape;
+
+    -webkit-mask-composite: source-over;
+    mask-composite: add;
+
+    z-index: -1;
+    pointer-events: none;
+
+    @include respond-down("desktop-standart-variation") {
+      $var_rg_px: 180px;
+      $var_rg_pr: 10.5%;
+
+      $mask-update:
+        radial-gradient(
+          circle $var_rg_px at $var_rg_pr 0px,
+          black 100%,
+          transparent 100%
+        ),
+        linear-gradient(black 35px, transparent 35px);
+
+      -webkit-mask-image: $mask-update;
+      mask-image: $mask-update;
     }
 
-    @include respond-down("tablet-l"){
-      left: 10%;
-    }
-    @include respond-down("tablet"){
-      left: 12%;
-    }
-    @include respond-down("tablet-md"){
-      left: 14%;
+    @include respond-down("desktop-m") {
+      $var_rg_px: 180px;
+      $var_rg_pr: 11%;
+
+      $mask-update:
+        radial-gradient(
+          circle $var_rg_px at $var_rg_pr 0px,
+          black 100%,
+          transparent 100%
+        ),
+        linear-gradient(black 35px, transparent 35px);
+
+      -webkit-mask-image: $mask-update;
+      mask-image: $mask-update;
     }
 
-     @include respond-down("mobile-l"){
-      left: 16%;
+    @include respond-down("desktop") {
+      $var_rg_px: 180px;
+      $var_rg_pr: 11.5%;
+
+      $mask-update:
+        radial-gradient(
+          circle $var_rg_px at $var_rg_pr 0px,
+          black 100%,
+          transparent 100%
+        ),
+        linear-gradient(black 35px, transparent 35px);
+
+      -webkit-mask-image: $mask-update;
+      mask-image: $mask-update;
     }
+
+    @include respond-down("desktop-l") {
+      $var_rg_px: 180px;
+      $var_rg_pr: 12.5%;
+      height: 115px;
+
+      $mask-update:
+        radial-gradient(
+          circle $var_rg_px at $var_rg_pr 0px,
+          black 100%,
+          transparent 100%
+        ),
+        linear-gradient(black 35px, transparent 35px);
+
+      -webkit-mask-image: $mask-update;
+      mask-image: $mask-update;
+    }
+
+    @include respond-down("desktop-md") {
+      $var_rg_px: 180px;
+      $var_rg_pr: 13%;
+      height: 110px;
+
+      $mask-update:
+        radial-gradient(
+          circle $var_rg_px at $var_rg_pr 0px,
+          black 100%,
+          transparent 100%
+        ),
+        linear-gradient(black 35px, transparent 35px);
+
+      -webkit-mask-image: $mask-update;
+      mask-image: $mask-update;
+    }
+
+    @include respond-down("desktop-md-variation") {
+      $var_rg_px: 180px;
+      $var_rg_pr: 14%;
+      height: 110px;
+
+      $mask-update:
+        radial-gradient(
+          circle $var_rg_px at $var_rg_pr 0px,
+          black 100%,
+          transparent 100%
+        ),
+        linear-gradient(black 35px, transparent 35px);
+
+      -webkit-mask-image: $mask-update;
+      mask-image: $mask-update;
+    }
+
+    @include respond-down("desktop-sm") {
+      $var_rg_px: 180px;
+      $var_rg_pr: 15%;
+      height: 100px;
+
+      $mask-update:
+        radial-gradient(
+          circle $var_rg_px at $var_rg_pr 0px,
+          black 100%,
+          transparent 100%
+        ),
+        linear-gradient(black 35px, transparent 35px);
+
+      -webkit-mask-image: $mask-update;
+      mask-image: $mask-update;
+    }
+
+    @include respond-down("laptop") {
+      $var_rg_px: 180px;
+      $var_rg_pr: 17%;
+      height: 95px;
+
+      $mask-update:
+        radial-gradient(
+          circle $var_rg_px at $var_rg_pr 0px,
+          black 100%,
+          transparent 100%
+        ),
+        linear-gradient(black 35px, transparent 35px);
+
+      -webkit-mask-image: $mask-update;
+      mask-image: $mask-update;
+    }
+
+    @include respond-down("tablet-l") {
+      $var_rg_px: 180px;
+      $var_rg_pr: 18%;
+      height: 90px;
+
+      $mask-update:
+        radial-gradient(
+          circle $var_rg_px at $var_rg_pr 0px,
+          black 100%,
+          transparent 100%
+        ),
+        linear-gradient(black 35px, transparent 35px);
+
+      -webkit-mask-image: $mask-update;
+      mask-image: $mask-update;
+    }
+
+    @include respond-down("mobile-l") {
+      $var_rg_px: 180px;
+      $var_rg_pr: 20%;
+      height: 85px;
+
+      $mask-update:
+        radial-gradient(
+          circle $var_rg_px at $var_rg_pr 0px,
+          black 100%,
+          transparent 100%
+        ),
+        linear-gradient(black 35px, transparent 35px);
+
+      -webkit-mask-image: $mask-update;
+      mask-image: $mask-update;
+    }
+
     @include respond-down("mobile-lg") {
-    display: none;
-  }
+      $var_rg_px: 180px;
+      $var_rg_pr: 20%;
+      height: 80px;
 
+      $mask-update:
+        radial-gradient(
+          circle $var_rg_px at $var_rg_pr 0px,
+          black 100%,
+          transparent 100%
+        ),
+        linear-gradient(black 35px, transparent 35px);
 
-//@include respond-down("burger") {
- //   display: none;
-  //}
-    
+      -webkit-mask-image: $mask-update;
+      mask-image: $mask-update;
+    }
+
+    @include respond-down("mobile-sm") {
+      $var_rg_px: 130px;
+      $var_rg_pr: 20%;
+      height: 80px;
+
+      $mask-update:
+        radial-gradient(
+          circle $var_rg_px at $var_rg_pr 0px,
+          black 100%,
+          transparent 100%
+        ),
+        linear-gradient(black 35px, transparent 35px);
+
+      -webkit-mask-image: $mask-update;
+      mask-image: $mask-update;
+    }
+
+    @include respond-down("mobile-md") {
+      $var_rg_px: 120px;
+      $var_rg_pr: 20%;
+      height: 70px;
+
+      $mask-update:
+        radial-gradient(
+          circle $var_rg_px at $var_rg_pr 0px,
+          black 100%,
+          transparent 100%
+        ),
+        linear-gradient(black 35px, transparent 35px);
+
+      -webkit-mask-image: $mask-update;
+      mask-image: $mask-update;
+    }
   }
 
   .Nav__logo-img {
-    height: 46px;
-    width: auto;
-    margin-top: -20px;
+    height: 48px;
+    margin-top: -65px;
+    position: relative;
     z-index: 40;
-    display: block;
-    pointer-events: none;
-    @include respond-down("mobile-lg") { height: 34px;margin-top: 30px; }
+
+    @include respond-down("mobile-lg") {
+      margin-top: -20px;
+    }
+
+    
+    @include respond-down("mobile-sm") {
+      height: 40px;
+      margin-top: -14px;
+    }
+
+     @include respond-down("mobile-md") {
+      height: 35px;
+    }
   }
 }
 
-.Nav__connector {
-  position:absolute;
-  height: 30px;
-  width:100%;
-  margin-top: -85px;
-  background: #0a0a0a;
- z-index: 10;
- @include respond-down("mobile-lg") {
-    display: none;
-  }
-}
 
 .Nav__pill {
   display: flex;
   align-items: center;
   padding: 0 0.625rem;
   height: 58px;
-  margin-top: 20px;
+  margin-top: 25px;
   background: $glass-bg;
   backdrop-filter: blur(20px) saturate(1.5);
   -webkit-backdrop-filter: blur(20px) saturate(1.5);
@@ -134,7 +343,9 @@ $glass-hover:  rgba(255, 255, 255, 0.06);
   box-shadow:
     0 4px 24px rgba(0, 0, 0, 0.45),
     inset 0 1px 0 rgba(255, 255, 255, 0.05);
-  transition: background 0.35s ease, box-shadow 0.35s ease;
+  transition:
+    background 0.35s ease,
+    box-shadow 0.35s ease;
 
   .Nav--scrolled & {
     background: rgba(8, 8, 10, 0.93);
@@ -144,7 +355,9 @@ $glass-hover:  rgba(255, 255, 255, 0.06);
       inset 0 1px 0 rgba(255, 255, 255, 0.04);
   }
 
-  @include respond-down("mobile-lg") { height: 50px; }
+  @include respond-down("mobile-lg") {
+    height: 50px;
+  }
 }
 
 .Nav__links {
@@ -153,7 +366,9 @@ $glass-hover:  rgba(255, 255, 255, 0.06);
   gap: 0.2rem;
   padding: 0 0.4rem;
 
-  @include respond-down("burger") { display: none; }
+  @include respond-down("burger") {
+    display: none;
+  }
 }
 
 .Nav__link {
@@ -168,10 +383,14 @@ $glass-hover:  rgba(255, 255, 255, 0.06);
   color: rgba(255, 255, 255, 0.5);
   letter-spacing: 0.4px;
   text-transform: uppercase;
-  transition: color 0.2s ease, background 0.2s ease;
+  transition:
+    color 0.2s ease,
+    background 0.2s ease;
   white-space: nowrap;
 
-  svg { flex-shrink: 0; }
+  svg {
+    flex-shrink: 0;
+  }
 
   &:hover {
     color: rgba(255, 255, 255, 0.85);
@@ -190,14 +409,24 @@ $glass-hover:  rgba(255, 255, 255, 0.06);
     padding: 0.5rem 1.1rem;
     box-shadow: 0 2px 10px $accent-glow;
 
-    svg { color: #000; }
-    &:hover { background: #ffd44d; }
+    svg {
+      color: #000;
+    }
+    &:hover {
+      background: #ffd44d;
+    }
   }
 }
 
 @keyframes labelIn {
-  from { opacity: 0; transform: translateX(-4px); }
-  to   { opacity: 1; transform: translateX(0); }
+  from {
+    opacity: 0;
+    transform: translateX(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 .Nav__separator {
@@ -207,7 +436,9 @@ $glass-hover:  rgba(255, 255, 255, 0.06);
   margin: 0 0.4rem;
   flex-shrink: 0;
 
-  @include respond-down("burger") { display: none; }
+  @include respond-down("burger") {
+    display: none;
+  }
 }
 
 .Nav__actions {
@@ -229,7 +460,10 @@ $glass-hover:  rgba(255, 255, 255, 0.06);
   background: transparent;
   color: rgba(255, 255, 255, 0.55);
   cursor: pointer;
-  transition: color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+  transition:
+    color 0.2s ease,
+    background 0.2s ease,
+    transform 0.2s ease;
   text-decoration: none;
   flex-shrink: 0;
 
@@ -261,7 +495,9 @@ $glass-hover:  rgba(255, 255, 255, 0.06);
     text-transform: uppercase;
 
     .Nav__login-label {
-      @include respond-down("tablet") { display: none; }
+      @include respond-down("tablet") {
+        display: none;
+      }
     }
 
     &:hover {
@@ -293,7 +529,9 @@ $glass-hover:  rgba(255, 255, 255, 0.06);
     border-color: rgba(255, 255, 255, 0.15);
   }
 
-  @include respond-down("burger") { display: inline-flex; }
+  @include respond-down("burger") {
+    display: inline-flex;
+  }
 }
 
 .Nav__mobile {
@@ -321,8 +559,8 @@ $glass-hover:  rgba(255, 255, 255, 0.06);
   transform-origin: top right;
   transition:
     max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-    opacity    0.22s ease,
-    transform  0.22s ease;
+    opacity 0.22s ease,
+    transform 0.22s ease;
   z-index: 1999;
 
   &--open {
@@ -332,7 +570,9 @@ $glass-hover:  rgba(255, 255, 255, 0.06);
     transform: translateY(0) scale(1);
   }
 
-  @media (min-width: 992px) { display: none !important; }
+  @media (min-width: 992px) {
+    display: none !important;
+  }
 
   @include respond-down("mobile-lg") {
     right: 1.25rem;
@@ -355,15 +595,37 @@ $glass-hover:  rgba(255, 255, 255, 0.06);
   cursor: pointer;
   width: 100%;
   text-align: left;
-  transition: color 0.2s ease, background 0.2s ease;
+  transition:
+    color 0.2s ease,
+    background 0.2s ease;
 
-  svg { flex-shrink: 0; }
+  svg {
+    flex-shrink: 0;
+  }
 
-  &:hover { color: #fff; background: $glass-hover; }
+  &:hover {
+    color: #fff;
+    background: $glass-hover;
+  }
 
-  &--active { background: $accent-soft; color: $accent !important; font-weight: 700; }
-  &--login  { color: $accent; &:hover { background: $accent-soft; } }
-  &--logout { color: rgba(248, 113, 113, 0.75); &:hover { background: rgba(248, 113, 113, 0.08); color: #f87171; } }
+  &--active {
+    background: $accent-soft;
+    color: $accent !important;
+    font-weight: 700;
+  }
+  &--login {
+    color: $accent;
+    &:hover {
+      background: $accent-soft;
+    }
+  }
+  &--logout {
+    color: rgba(248, 113, 113, 0.75);
+    &:hover {
+      background: rgba(248, 113, 113, 0.08);
+      color: #f87171;
+    }
+  }
 }
 
 .Nav__mobile-divider {

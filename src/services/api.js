@@ -1,5 +1,7 @@
 import axios from 'axios';
 
+const AUTH_ROUTES = ['/auth/login', '/auth/me', '/auth/refresh-token', '/auth/check'];
+
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:4001/api',
   timeout: 10000,
@@ -19,7 +21,12 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    const isAuthRoute = AUTH_ROUTES.some(route => 
+      error.config?.url?.includes(route)
+    );
+    const alreadyOnLogin = window.location.pathname === '/login';
+
+    if (error.response?.status === 401 && !isAuthRoute && !alreadyOnLogin) {
       window.location.href = '/login';
     }
 

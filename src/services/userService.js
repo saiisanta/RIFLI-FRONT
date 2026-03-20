@@ -1,26 +1,8 @@
 import api from './api';
 
 const userService = {
-  //en authService
-  //requestPasswordReset: async (email) => {
-  //  try {
-  //   const response = await api.post('/users/request-reset', { email });
-  //    return response.data;
-  //  } catch (error) {
-  //    throw error.response?.data || error;
-  //  }
- // },
- // resetPassword: async (token, newPassword) => {
-  //  try {
-  //    const response = await api.post(`/users/reset-password/${token}`, {
-  //     newPassword
-  //   });
-  //    return response.data;
-   // } catch (error) {
-   //   throw error.response?.data || error;
-  //  }
-//  },
 
+  // ── Perfil propio ──────────────────────────────────────────
 
   getMyProfile: async () => {
     try {
@@ -40,9 +22,9 @@ const userService = {
     }
   },
 
-  deleteMyProfile: async () => {
+  deleteMyProfile: async (password) => {
     try {
-      const response = await api.delete('/users/me');
+      const response = await api.delete('/users/me', { data: { password } });
       return response.data;
     } catch (error) {
       throw error.response?.data || error;
@@ -58,13 +40,39 @@ const userService = {
     }
   },
 
+  updateAvatar: async (formData) => {
+    try {
+      const response = await api.patch('/users/avatar', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
 
+  deleteAvatar: async () => {
+    try {
+      const response = await api.delete('/users/avatar');
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+
+  // ── Admin ──────────────────────────────────────────────────
+
+  // FIX: incluye todos los query params que soporta el backend
   getUsers: async (params = {}) => {
     try {
-      const { page = 1, limit = 10, search = '', role = '' } = params;
-      const response = await api.get('/users', {
-        params: { page, limit, search, role },
-      });
+      const { page = 1, limit = 10, search = '', role = '', is_verified, address = '' } = params;
+      const query = { page, limit };
+      if (search)                  query.search      = search;
+      if (role)                    query.role        = role;
+      if (is_verified !== undefined && is_verified !== '') query.is_verified = is_verified;
+      if (address)                 query.address     = address;
+
+      const response = await api.get('/users', { params: query });
       return response.data;
     } catch (error) {
       throw error.response?.data || error;
@@ -80,9 +88,9 @@ const userService = {
     }
   },
 
-  getUserProfile: async (userId) => {
+  changeRole: async (userId, role) => {
     try {
-      const response = await api.get(`/users/${userId}/profile`);
+      const response = await api.put(`/users/${userId}/role`, { role });
       return response.data;
     } catch (error) {
       throw error.response?.data || error;
@@ -97,70 +105,6 @@ const userService = {
       throw error.response?.data || error;
     }
   },
-
-  // ==================== NO IMPLEMENTADOS====================
-  
-  // Crear usuario (admin)
-  // createUser: async (userData) => {
-  //   try {
-  //     const response = await api.post('/users', userData);
-  //     return response.data;
-  //   } catch (error) {
-  //     throw error.response?.data || error;
-  //   }
-  // },
-
-  // Actualizar usuario completo (admin)
-  // updateUser: async (userId, userData) => {
-  //   try {
-  //     const response = await api.put(`/users/${userId}`, userData);
-  //     return response.data;
-  //   } catch (error) {
-  //     throw error.response?.data || error;
-  //   }
-  // },
-
-  // Actualizar usuario parcial (admin)
-  // patchUser: async (userId, userData) => {
-  //   try {
-  //     const response = await api.patch(`/users/${userId}`, userData);
-  //     return response.data;
-  //   } catch (error) {
-  //     throw error.response?.data || error;
-  //   }
-  // },
-
-  updateAvatar: async (formData) => {
-  try {
-    const response = await api.patch('/users/avatar', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' }
-    });
-    return response.data;
-  } catch (error) {
-    throw error.response?.data || error;
-  }
-},
-deleteAvatar: async () => {
-  try {
-    const response = await api.delete('/users/avatar');
-    return response.data;
-  } catch (error) {
-    throw error.response?.data || error;
-  }
-},
-
-  // Historial de actividad
-  // getUserActivity: async (userId, params = {}) => {
-  //   try {
-  //     const { page = 1, limit = 20 } = params;
-  //     const response = await api.get(`/users/${userId}/activity`, {
-  //       params: { page, limit }
-  //     });
-  //     return response.data;
-  //   } catch (error) {
-  //     throw error.response?.data || error;
-  //   }
-  // },
 };
 
 export default userService;

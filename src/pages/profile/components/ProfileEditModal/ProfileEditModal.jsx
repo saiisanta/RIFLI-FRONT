@@ -5,6 +5,7 @@ import './ProfileEditModal.scss';
 
 const ProfileEditModal = ({ profile, onClose, onSave, onOpenAddressManager, loading, error }) => {
   const [selectedAddress, setSelectedAddress] = useState(null);
+  const [cuilParts, setCuilParts] = useState({ prefix: '', middle: '', suffix: '' });
 
   const validationRules = {
     email: {
@@ -30,8 +31,8 @@ const ProfileEditModal = ({ profile, onClose, onSave, onOpenAddressManager, load
     },
     document_number: {
       pattern: {
-        value: /^[0-9]{7,8}$/,
-        message: 'Debe tener 7 u 8 dígitos'
+        value: /^[0-9]{7,11}$/,
+        message: 'Formato de documento inválido'
       }
     }
   };
@@ -68,6 +69,14 @@ const ProfileEditModal = ({ profile, onClose, onSave, onOpenAddressManager, load
         document_number: profile.document_number || ''
       });
 
+     if (profile.document_number && profile.document_type !== 'DNI') {
+      setCuilParts({
+        prefix: profile.document_number.slice(0, 2),   // "20"
+        middle: profile.document_number.slice(2, 10),  // "12345678"
+        suffix: profile.document_number.slice(10, 11)  // "9"
+      });
+    }
+
       if (profile.Addresses && profile.Addresses.length > 0) {
         const defaultAddr = profile.Addresses.find(addr => addr.is_default) || profile.Addresses[0];
         setSelectedAddress(defaultAddr);
@@ -77,6 +86,21 @@ const ProfileEditModal = ({ profile, onClose, onSave, onOpenAddressManager, load
 
   const onSubmit = async (formData) => {
     await onSave(formData);
+  };
+
+  const handleCuilPartChange = (part, value) => {
+    const updated = { ...cuilParts, [part]: value };
+    setCuilParts(updated);
+    // Combina como XX-XXXXXXXX-X y lo manda al campo document_number
+    const combined = `${updated.prefix}${updated.middle}${updated.suffix}`;
+    handleChange({ target: { name: 'document_number', value: combined } });
+  };
+
+  const handleDocumentTypeChange = (e) => {
+    handleChange(e);
+    // Resetea el número al cambiar de tipo
+    handleChange({ target: { name: 'document_number', value: '' } });
+    setCuilParts({ prefix: '', middle: '', suffix: '' });
   };
 
   const handleOpenAddressManagerClick = () => {
@@ -194,7 +218,7 @@ const ProfileEditModal = ({ profile, onClose, onSave, onOpenAddressManager, load
                   id="document_type"
                   name="document_type"
                   value={values.document_type}
-                  onChange={handleChange}
+                  onChange={handleDocumentTypeChange}
                   onBlur={handleBlur}
                   disabled={isSubmitting || loading}
                 >
@@ -206,18 +230,59 @@ const ProfileEditModal = ({ profile, onClose, onSave, onOpenAddressManager, load
 
               <div className="profile-form-group">
                 <label htmlFor="document_number">Número de Documento</label>
-                <input
-                  type="text"
-                  id="document_number"
-                  name="document_number"
-                  value={values.document_number}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  disabled={isSubmitting || loading}
-                  className={errors.document_number && touched.document_number ? 'input-error' : ''}
-                  placeholder="12345678"
-                  maxLength="8"
-                />
+                
+                {values.document_type === 'DNI' ? (
+                  // ── DNI: un solo campo ──────────────────────────────
+                  <input
+                    type="number"
+                    id="document_number"
+                    name="document_number"
+                    value={values.document_number}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    disabled={isSubmitting || loading}
+                    className={errors.document_number && touched.document_number ? 'input-error' : ''}
+                    placeholder="12345678"
+                    maxLength="8"
+                  />
+                ) : (
+                  // ── CUIL / CUIT: tres campos que se unifican ────────
+                  <div className="cuil-input-group">
+                    <input
+                      type="number"
+                      value={cuilParts.prefix}
+                      onChange={(e) => handleCuilPartChange('prefix', e.target.value)}
+                      onBlur={handleBlur}
+                      disabled={isSubmitting || loading}
+                      placeholder="12"
+                      maxLength="2"
+                      className={`cuil-part cuil-prefix${errors.document_number && touched.document_number ? ' input-error' : ''}`}
+                    />
+                    <span className="cuil-separator">-</span>
+                    <input
+                      type="number"
+                      value={cuilParts.middle}
+                      onChange={(e) => handleCuilPartChange('middle', e.target.value)}
+                      onBlur={handleBlur}
+                      disabled={isSubmitting || loading}
+                      placeholder="12345678"
+                      maxLength="8"
+                      className={`cuil-part cuil-middle${errors.document_number && touched.document_number ? ' input-error' : ''}`}
+                    />
+                    <span className="cuil-separator">-</span>
+                    <input
+                      type="number"
+                      value={cuilParts.suffix}
+                      onChange={(e) => handleCuilPartChange('suffix', e.target.value)}
+                      onBlur={handleBlur}
+                      disabled={isSubmitting || loading}
+                      placeholder="1"
+                      maxLength="1"
+                      className={`cuil-part cuil-suffix${errors.document_number && touched.document_number ? ' input-error' : ''}`}
+                    />
+                  </div>
+                )}
+
                 {errors.document_number && touched.document_number && (
                   <span className="profile-field-error">{errors.document_number}</span>
                 )}

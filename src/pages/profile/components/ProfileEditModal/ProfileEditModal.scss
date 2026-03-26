@@ -186,6 +186,33 @@
       font-size: 0.8rem;
     }
   }
+  /* Chrome, Safari, Edge, Opera */
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  /* Firefox */
+  input[type=number] {
+    -moz-appearance: textfield;
+  }
+
+  .cuil-input-group {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 0;
+
+    .cuil-separator {
+      font-weight: bold;
+      color: #ffffff;
+    }
+
+    .cuil-prefix  { width: 100px;  text-align: center; }
+    .cuil-middle  { flex: 1;      text-align: center; }
+    .cuil-suffix  { width: 60px;  text-align: center; }
+  }
 
   input {
     padding: 1rem 1.25rem;
@@ -498,3 +525,4 @@ select {
     color: var(--text-primary, #ffffff);
   }
 }
+

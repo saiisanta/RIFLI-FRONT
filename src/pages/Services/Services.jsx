@@ -4,7 +4,7 @@ import useServices from "../../hooks/useServices";
 import ServicesNavbar from "./components/ServicesNavbar/ServicesNavbar";
 import "./Services.scss";
 
-const API_URL = "http://localhost:4001";
+const API_URL = import.meta.env.VITE_API_URL;
 
 const Services = () => {
   const navigate = useNavigate();

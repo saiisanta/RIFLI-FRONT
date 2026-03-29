@@ -11,6 +11,14 @@
   align-items: center;
   overflow: hidden;
 
+  //Seleccion
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  //Drag
+  -webkit-user-drag: none;
+
   &::before {
     content: "";
     position: absolute;
@@ -18,9 +26,17 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: 
-      radial-gradient(circle at 20% 50%, rgba(255, 202, 44, 0.05) 0%, transparent 50%),
-      radial-gradient(circle at 80% 50%, rgba(255, 202, 44, 0.03) 0%, transparent 50%);
+    background:
+      radial-gradient(
+        circle at 20% 50%,
+        rgba(255, 202, 44, 0.05) 0%,
+        transparent 50%
+      ),
+      radial-gradient(
+        circle at 80% 50%,
+        rgba(255, 202, 44, 0.03) 0%,
+        transparent 50%
+      );
     pointer-events: none;
   }
 
@@ -69,7 +85,11 @@
       line-height: 1.2;
 
       span {
-        background: linear-gradient(135deg, var(--accent-yellow) 0%, #ffd95a 100%);
+        background: linear-gradient(
+          135deg,
+          var(--accent-yellow) 0%,
+          #ffd95a 100%
+        );
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
@@ -152,7 +172,7 @@
       transform: translateY(-12px) scale(1.02);
       border-color: rgba(255, 202, 44, 0.5);
       background: linear-gradient(135deg, #1a1a1a 0%, #1f1f1f 100%);
-      box-shadow: 
+      box-shadow:
         0 24px 48px rgba(0, 0, 0, 0.6),
         0 0 0 1px rgba(255, 202, 44, 0.3),
         inset 0 1px 0 rgba(255, 255, 255, 0.05);
@@ -176,12 +196,12 @@
       .service-icon-wrapper {
         transform: scale(1.15) rotate(-5deg);
         background: linear-gradient(
-          135deg, 
-          rgba(255, 202, 44, 0.15) 0%, 
+          135deg,
+          rgba(255, 202, 44, 0.15) 0%,
           rgba(255, 217, 90, 0.1) 100%
         );
         border-color: var(--accent-yellow);
-        box-shadow: 
+        box-shadow:
           0 8px 32px rgba(255, 202, 44, 0.25),
           inset 0 1px 0 rgba(255, 255, 255, 0.1);
       }
@@ -221,7 +241,7 @@
         border-color: transparent;
         font-weight: 800;
         transform: scale(1.025);
-        box-shadow: 
+        box-shadow:
           0 8px 28px rgba(255, 202, 44, 0.45),
           0 2px 8px rgba(255, 202, 44, 0.2),
           inset 0 1px 0 rgba(255, 255, 255, 0.3);
@@ -315,10 +335,11 @@
         object-fit: contain;
         position: relative;
         z-index: 1;
-        transition: filter 0.5s ease, transform 0.5s ease;
-        filter: brightness(0) saturate(100%)
-                invert(82%) sepia(55%) saturate(600%)
-                hue-rotate(2deg) brightness(103%) contrast(101%);
+        transition:
+          filter 0.5s ease,
+          transform 0.5s ease;
+        filter: brightness(0) saturate(100%) invert(82%) sepia(55%)
+          saturate(600%) hue-rotate(2deg) brightness(103%) contrast(101%);
       }
 
       // Emoji / fallback
@@ -335,10 +356,9 @@
     }
 
     &:hover .service-icon--img {
-      filter: brightness(0) saturate(100%)
-              invert(82%) sepia(55%) saturate(600%)
-              hue-rotate(2deg) brightness(130%) contrast(101%)
-              drop-shadow(0 0 8px rgba(255, 202, 44, 0.5));
+      filter: brightness(0) saturate(100%) invert(82%) sepia(55%) saturate(600%)
+        hue-rotate(2deg) brightness(130%) contrast(101%)
+        drop-shadow(0 0 8px rgba(255, 202, 44, 0.5));
     }
 
     .service-title {
@@ -429,7 +449,9 @@
         border-radius: 50%;
         background: rgba(255, 255, 255, 0.15);
         transform: translate(-50%, -50%);
-        transition: width 0.6s ease, height 0.6s ease;
+        transition:
+          width 0.6s ease,
+          height 0.6s ease;
       }
 
       &:hover::before {
@@ -452,8 +474,8 @@
       position: absolute;
       inset: -2px;
       background: linear-gradient(
-        135deg, 
-        var(--accent-yellow) 0%, 
+        135deg,
+        var(--accent-yellow) 0%,
         #ffd95a 50%,
         var(--accent-yellow) 100%
       );
@@ -474,7 +496,11 @@
     .decoration-circle {
       position: absolute;
       border-radius: 50%;
-      background: radial-gradient(circle, rgba(255, 202, 44, 0.1) 0%, transparent 70%);
+      background: radial-gradient(
+        circle,
+        rgba(255, 202, 44, 0.1) 0%,
+        transparent 70%
+      );
       filter: blur(40px);
 
       &.circle-1 {
@@ -517,7 +543,8 @@
 }
 
 @keyframes float {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0) scale(1);
   }
   50% {
@@ -526,7 +553,8 @@
 }
 
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     transform: translate(-50%, -50%) scale(1);
     opacity: 0.5;
   }
@@ -537,8 +565,12 @@
 }
 
 @keyframes shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 @include respond-down("laptop") {

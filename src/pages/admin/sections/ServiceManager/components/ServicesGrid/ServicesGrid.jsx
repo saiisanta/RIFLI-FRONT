@@ -2,6 +2,8 @@ import React from 'react';
 import { Pencil, Trash3, CheckCircle } from 'react-bootstrap-icons';
 import './ServicesGrid.scss';
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 const ServicesGrid = ({ servicios, onEdit, onDelete }) => {
   return (
     <div className="services-grid">
@@ -37,7 +39,7 @@ const ServicesGrid = ({ servicios, onEdit, onDelete }) => {
             <div className="services-grid-card-body">
               {s.icon && (
                 <img
-                  src={`http://localhost:4001${s.icon}`}
+                  src={`${API_URL}${s.icon}`}
                   alt="Icono del servicio"
                   className="services-grid-icon-img"
                 />

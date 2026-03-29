@@ -85,13 +85,15 @@ const QuoteManager = () => {
     setShowDetailModal(true);
   }, []);
 
-  const handleUpdateStatus = useCallback(async (quoteId, status, extra = {}) => {
-    try {
-      await updateStatus(quoteId, status, extra);
-    } catch (err) {
-      console.error('Error al actualizar estado:', err);
-    }
-  }, [updateStatus]);
+const handleUpdateStatus = useCallback(async (quoteId, status, rejectionReason) => {
+  try {
+    await updateStatus(quoteId, status, {
+      ...(rejectionReason && { rejection_reason: rejectionReason }),
+    });
+  } catch (err) {
+    console.error('Error al actualizar estado:', err);
+  }
+}, [updateStatus]);
 
   const handleReviewProof = useCallback(async (quoteId, paymentType, action, reason = '') => {
     try {

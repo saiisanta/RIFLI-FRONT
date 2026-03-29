@@ -3,7 +3,7 @@ import { Eye, FileEarmarkText, Trash3 } from 'react-bootstrap-icons';
 import Pagination from '../../../../components/Pagination/Pagination';
 import './QuoteTable.scss';
 
-const API_URL = 'http://localhost:4001';
+const API_URL = import.meta.env.VITE_API_URL;
 
 const STATUS_CONFIG = {
   PENDING:     { label: 'Pendiente',     cls: 'yellow'  },

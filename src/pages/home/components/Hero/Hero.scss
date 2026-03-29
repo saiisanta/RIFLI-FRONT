@@ -1,7 +1,7 @@
 @use "../../../../styles/breakpoints" as *;
 
 .hero-section {
-  background: url('../../../../assets/img/rifli/hero.png');
+  background: url("../../../../assets/img/rifli/hero.png");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -12,6 +12,14 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  //Seleccion
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  //Drag
+  -webkit-user-drag: none;
+  
 
   &::before {
     content: "";
@@ -42,7 +50,7 @@
   p {
     font-size: var(--fz-subtitle);
 
-    @include respond-down("desktop-sm"){
+    @include respond-down("desktop-sm") {
       margin-top: 1.5rem;
     }
   }

@@ -25,7 +25,7 @@ const Hero = () => {
   }, []);
 
   return (
-    <div className="hero-section">
+    <div className="hero-section" id='hero'>
       <Container className="text-white text-center text-md-start roboto">
         <div className="Brand-text">
           <h1 className="fw-bold display-5">

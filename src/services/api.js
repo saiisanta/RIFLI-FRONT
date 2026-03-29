@@ -1,7 +1,9 @@
 import axios from 'axios';
 
+const AUTH_ROUTES = ['/auth/login', '/auth/me', '/auth/refresh-token', '/auth/check'];
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:4001/api',
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:4001/api',
   timeout: 10000,
   withCredentials: true,
 });
@@ -13,28 +15,19 @@ api.interceptors.request.use(
     }
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
 api.interceptors.response.use(
-  (response) => {
-    return response;
-  },
-  async (error) => {
-    const originalRequest = error.config;
+  (response) => response,
+  (error) => {
+    const isAuthRoute = AUTH_ROUTES.some(route => 
+      error.config?.url?.includes(route)
+    );
+    const alreadyOnLogin = window.location.pathname === '/login';
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
-
-      try {
-        await api.post('/auth/refresh-token');
-        return api(originalRequest);
-      } catch (refreshError) {
-        window.location.href = '/login';
-        return Promise.reject(refreshError);
-      }
+    if (error.response?.status === 401 && !isAuthRoute && !alreadyOnLogin) {
+      window.location.href = '/login';
     }
 
     if (error.response) {

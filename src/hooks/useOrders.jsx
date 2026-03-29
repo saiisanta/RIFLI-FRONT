@@ -2,29 +2,31 @@ import { useState, useCallback } from 'react';
 import orderService from '../services/orderService';
 
 const useOrders = () => {
-  const [orders, setOrders] = useState([]);
-  const [order, setOrder] = useState(null);
+  const [orders, setOrders]   = useState([]);
+  const [order, setOrder]     = useState(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError]     = useState(null);
   const [pagination, setPagination] = useState({
-    page: 1,
-    limit: 10,
-    total: 0,
-    totalPages: 0,
+    page: 1, limit: 10, total: 0, total_pages: 0,
   });
+
+  const updateOrderInList = (orderId, updatedData) => {
+    setOrders(prev => prev.map(o => o.id === orderId ? { ...o, ...updatedData } : o));
+    setOrder(prev => prev?.id === orderId ? { ...prev, ...updatedData } : prev);
+  };
+
+  // ── Cliente ───────────────────────────────────────────────
 
   const fetchOrders = useCallback(async (params = {}) => {
     try {
       setLoading(true);
       setError(null);
       const data = await orderService.getOrders(params);
-      setOrders(data.orders || data.data || []);
-      if (data.pagination) {
-        setPagination(data.pagination);
-      }
+      setOrders(Array.isArray(data) ? data : data.orders || data.data || []);
+      if (data.pagination) setPagination(data.pagination);
       return data;
     } catch (err) {
-      setError(err.message || 'Error al cargar pedidos');
+      setError(err.message || err.error || 'Error al cargar pedidos');
       throw err;
     } finally {
       setLoading(false);
@@ -36,10 +38,11 @@ const useOrders = () => {
       setLoading(true);
       setError(null);
       const data = await orderService.getOrderById(orderId);
-      setOrder(data.order || data);
-      return data;
+      const o = data.order || data;
+      setOrder(o);
+      return o;
     } catch (err) {
-      setError(err.message || 'Error al cargar pedido');
+      setError(err.message || err.error || 'Error al cargar pedido');
       throw err;
     } finally {
       setLoading(false);
@@ -51,127 +54,118 @@ const useOrders = () => {
       setLoading(true);
       setError(null);
       const data = await orderService.createOrder(orderData);
-      setOrders((prev) => [data.order || data, ...prev]);
-      return data;
+      const newOrder = data.order || data;
+      setOrders(prev => [newOrder, ...prev]);
+      return newOrder;
     } catch (err) {
-      setError(err.message || 'Error al crear pedido');
+      setError(err.message || err.error || 'Error al crear pedido');
       throw err;
     } finally {
       setLoading(false);
     }
   }, []);
-
-  const updateStatus = useCallback(async (orderId, status) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await orderService.updateOrderStatus(orderId, status);
-      setOrders((prev) =>
-        prev.map((o) => (o.id === orderId ? { ...o, status } : o))
-      );
-      if (order?.id === orderId) {
-        setOrder((prev) => ({ ...prev, status }));
-      }
-      return data;
-    } catch (err) {
-      setError(err.message || 'Error al actualizar estado');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [order]);
 
   const cancelOrder = useCallback(async (orderId, reason = '') => {
     try {
       setLoading(true);
       setError(null);
-      await orderService.cancelOrder(orderId, reason);
-      setOrders((prev) =>
-        prev.map((o) => (o.id === orderId ? { ...o, status: 'cancelled' } : o))
-      );
-      if (order?.id === orderId) {
-        setOrder((prev) => ({ ...prev, status: 'cancelled' }));
-      }
-      return true;
-    } catch (err) {
-      setError(err.message || 'Error al cancelar pedido');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [order]);
-
-  const downloadInvoice = useCallback(async (orderId) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const blob = await orderService.getOrderInvoice(orderId);
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `invoice-${orderId}.pdf`;
-      link.click();
-      window.URL.revokeObjectURL(url);
-      return true;
-    } catch (err) {
-      setError(err.message || 'Error al descargar factura');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  const fetchTracking = useCallback(async (orderId) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await orderService.getOrderTracking(orderId);
+      const data = await orderService.cancelOrder(orderId, reason);
+      updateOrderInList(orderId, { status: 'CANCELLED', ...(data.order || data) });
       return data;
     } catch (err) {
-      setError(err.message || 'Error al obtener tracking');
+      setError(err.message || err.error || 'Error al cancelar pedido');
       throw err;
     } finally {
       setLoading(false);
     }
   }, []);
 
-  const requestRefund = useCallback(async (orderId, refundData) => {
+  // NUEVO: cliente confirma o rechaza el precio de envío
+  const confirmShipping = useCallback(async (orderId, action, cancellation_reason = '') => {
     try {
       setLoading(true);
       setError(null);
-      const data = await orderService.requestRefund(orderId, refundData);
+      const data = await orderService.confirmShipping(orderId, action, cancellation_reason);
+      const updated = data.order || data;
+      updateOrderInList(orderId, updated);
       return data;
     } catch (err) {
-      setError(err.message || 'Error al solicitar reembolso');
+      setError(err.message || err.error || 'Error al confirmar envío');
       throw err;
     } finally {
       setLoading(false);
     }
   }, []);
 
-  const reorder = useCallback(async (orderId) => {
+  const uploadPaymentProof = useCallback(async (orderId, file, proofData = {}) => {
     try {
       setLoading(true);
       setError(null);
-      const data = await orderService.reorder(orderId);
+      const data = await orderService.uploadPaymentProof(orderId, file, proofData);
+      updateOrderInList(orderId, { payment_status: 'PROOF_UPLOADED' });
       return data;
     } catch (err) {
-      setError(err.message || 'Error al reordenar');
+      setError(err.message || err.error || 'Error al subir comprobante');
       throw err;
     } finally {
       setLoading(false);
     }
   }, []);
 
-  const clearError = useCallback(() => {
-    setError(null);
+  // ── Admin ─────────────────────────────────────────────────
+
+  const setShippingCost = useCallback(async (orderId, shippingData) => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await orderService.setShippingCost(orderId, shippingData);
+      updateOrderInList(orderId, data);
+      return data;
+    } catch (err) {
+      setError(err.message || err.error || 'Error al setear costo de envío');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  const reviewProof = useCallback(async (orderId, reviewData) => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await orderService.reviewProof(orderId, reviewData);
+      updateOrderInList(orderId, data);
+      return data;
+    } catch (err) {
+      setError(err.message || err.error || 'Error al revisar comprobante');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const updateOrderStatus = useCallback(async (orderId, statusData) => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await orderService.updateOrderStatus(orderId, statusData);
+      updateOrderInList(orderId, data);
+      return data;
+    } catch (err) {
+      setError(err.message || err.error || 'Error al actualizar estado');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const clearError = useCallback(() => setError(null), []);
 
   const clearState = useCallback(() => {
     setOrders([]);
     setOrder(null);
     setError(null);
-    setPagination({ page: 1, limit: 10, total: 0, totalPages: 0 });
+    setPagination({ page: 1, limit: 10, total: 0, total_pages: 0 });
   }, []);
 
   return {
@@ -180,15 +174,17 @@ const useOrders = () => {
     loading,
     error,
     pagination,
+    // cliente
     fetchOrders,
     fetchOrderById,
     createOrder,
-    updateStatus,
     cancelOrder,
-    downloadInvoice,
-    fetchTracking,
-    requestRefund,
-    reorder,
+    confirmShipping,
+    uploadPaymentProof,
+    // admin
+    setShippingCost,
+    reviewProof,
+    updateOrderStatus,
     clearError,
     clearState,
   };

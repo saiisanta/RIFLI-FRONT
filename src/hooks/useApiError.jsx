@@ -16,52 +16,52 @@ const useApiError = (watchedFields = []) => {
    * @param {any} err - lo que llega del catch (objeto del back o Error nativo)
    */
   const handleApiError = useCallback((err) => {
-    // Limpiar estado anterior
-    setGeneralError(null);
-    setFieldErrors({});
+  setGeneralError(null);
+  setFieldErrors({});
 
-    if (!err) return;
+  if (!err) return;
 
-    // ── Formato 1: { errors: [...] } — express-validator ──────────
-    if (err.errors && Array.isArray(err.errors)) {
-      const fieldMap   = {};
-      const general    = [];
+  // Axios / Fetch: si viene dentro de response.data
+  const apiError = err.response?.data || err;
 
-      err.errors.forEach(({ msg, path }) => {
-        if (path && watchedFields.includes(path)) {
-          // Error asociado a un campo conocido del form
-          if (!fieldMap[path]) fieldMap[path] = [];
-          fieldMap[path].push(msg);
-        } else {
-          // Sin campo o campo no vigilado → va al error general
-          general.push(msg);
-        }
-      });
+  // ── Formato 1: express-validator ──────────
+  if (apiError.errors && Array.isArray(apiError.errors)) {
+    const fieldMap = {};
+    const general = [];
 
-      if (Object.keys(fieldMap).length) setFieldErrors(fieldMap);
-      if (general.length) setGeneralError(general.join(' · '));
-      return;
-    }
+    apiError.errors.forEach(({ msg, path }) => {
+      if (path && watchedFields.includes(path)) {
+        if (!fieldMap[path]) fieldMap[path] = [];
+        fieldMap[path].push(msg);
+      } else {
+        general.push(msg);
+      }
+    });
 
-    // ── Formato 2: { error: 'string' } — error directo ────────────
-    if (err.error && typeof err.error === 'string') {
-      setGeneralError(err.error);
-      return;
-    }
+    if (Object.keys(fieldMap).length) setFieldErrors(fieldMap);
+    if (general.length) setGeneralError(general.join(' · '));
+    return;
+  }
 
-    // ── Fallback: Error nativo de JS o string ──────────────────────
-    if (err.message) {
-      setGeneralError(err.message);
-      return;
-    }
+  // ── Formato 2: error simple ──────────
+  if (apiError.error && typeof apiError.error === 'string') {
+    setGeneralError(apiError.error);
+    return;
+  }
 
-    if (typeof err === 'string') {
-      setGeneralError(err);
-      return;
-    }
+  // ── Formato 3: message ──────────
+  if (apiError.message) {
+    setGeneralError(apiError.message);
+    return;
+  }
 
-    setGeneralError('Ocurrió un error inesperado. Intentá de nuevo.');
-  }, [watchedFields]);
+  if (typeof apiError === 'string') {
+    setGeneralError(apiError);
+    return;
+  }
+
+  setGeneralError('Ocurrió un error inesperado. Intentá de nuevo.');
+}, [watchedFields]);
 
   const clearApiError = useCallback(() => {
     setGeneralError(null);

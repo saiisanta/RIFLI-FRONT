@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAuthContext } from '../../context/AuthContext';
 import useForm from '../../hooks/useForm';
+import useApiError from '../../hooks/useApiError';
 import AuthPageLayout from './components/AuthPageLayout';
 import './auth.scss';
 
@@ -10,7 +11,14 @@ const ResetPassword = () => {
   const navigate = useNavigate();
   const { resetPassword, clearError } = useAuthContext();
   const [success, setSuccess] = useState(false);
-  const [error, setError] = useState('');
+
+  // Hook errores API
+  const { 
+    generalError, 
+    handleApiError, 
+    clearApiError, 
+    getFieldError 
+  } = useApiError(['newPassword', 'confirmPassword']);
 
   const validationRules = {
     newPassword: {
@@ -47,13 +55,15 @@ const ResetPassword = () => {
   );
 
   const onSubmit = async (formData) => {
+    clearApiError();
+
     try {
-      setError('');
       await resetPassword(token, formData.newPassword);
       setSuccess(true);
       setTimeout(() => navigate('/login'), 3000);
     } catch (err) {
-      setError(err.error || err.message || 'Error al restablecer contraseña');
+      console.error("Error en reset password:", err);
+      handleApiError(err);
     }
   };
 
@@ -61,8 +71,12 @@ const ResetPassword = () => {
     if (!token) {
       navigate('/forgot-password');
     }
-    return () => clearError();
-  }, [token, navigate, clearError]);
+
+    return () => {
+      clearError();
+      clearApiError();
+    };
+  }, [token, navigate, clearError, clearApiError]);
 
   if (success) {
     return (
@@ -95,9 +109,9 @@ const ResetPassword = () => {
         <p className="auth-subtitle">Ingresa tu nueva contraseña</p>
       </div>
 
-      {error && (
+      {generalError && (
         <div className="error-message" role="alert">
-          {error}
+          {generalError}
         </div>
       )}
 
@@ -112,12 +126,19 @@ const ResetPassword = () => {
             onChange={handleChange}
             onBlur={handleBlur}
             disabled={isSubmitting}
-            className={errors.newPassword && touched.newPassword ? 'input-error' : ''}
+            className={
+              (errors.newPassword && touched.newPassword) || getFieldError('newPassword')
+                ? 'input-error'
+                : ''
+            }
             placeholder="Mínimo 8 caracteres"
             autoComplete="new-password"
           />
           {errors.newPassword && touched.newPassword && (
             <span className="field-error">{errors.newPassword}</span>
+          )}
+          {!errors.newPassword && getFieldError('newPassword') && (
+            <span className="field-error">{getFieldError('newPassword')}</span>
           )}
         </div>
 
@@ -132,13 +153,18 @@ const ResetPassword = () => {
             onBlur={handleBlur}
             disabled={isSubmitting}
             className={
-              errors.confirmPassword && touched.confirmPassword ? 'input-error' : ''
+              (errors.confirmPassword && touched.confirmPassword) || getFieldError('confirmPassword')
+                ? 'input-error'
+                : ''
             }
             placeholder="Repite tu contraseña"
             autoComplete="new-password"
           />
           {errors.confirmPassword && touched.confirmPassword && (
             <span className="field-error">{errors.confirmPassword}</span>
+          )}
+          {!errors.confirmPassword && getFieldError('confirmPassword') && (
+            <span className="field-error">{getFieldError('confirmPassword')}</span>
           )}
         </div>
 

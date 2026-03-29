@@ -1,170 +1,145 @@
-import React, { useState } from "react";
+import React from "react";
 import PropTypes from "prop-types";
+import { FiTrash2, FiShoppingCart } from "react-icons/fi";
 import "./CartPage.scss";
 
-const CartPage = ({ cart, cartTotal, onClose, onRemove, onChangeQuantity }) => {
-  const [checkoutStep, setCheckoutStep] = useState(0);
+const API_URL = import.meta.env.VITE_API_URL;
 
-  const handleCheckout = () => {
-    setCheckoutStep(1);
-  };
+const formatCurrency = (amount) =>
+  new Intl.NumberFormat("es-AR", {
+    style: "currency", currency: "ARS", maximumFractionDigits: 0,
+  }).format(amount || 0);
 
-  const handleCheckoutNext = () => {
-    if (checkoutStep < 3) {
-      setCheckoutStep(checkoutStep + 1);
-    } else {
-      alert("¡Compra finalizada!");
-      onClose();
-      setCheckoutStep(0);
-    }
-  };
-
-  const handleCheckoutBack = () => {
-    if (checkoutStep > 0) {
-      setCheckoutStep(checkoutStep - 1);
-    }
-  };
+const CartPage = ({
+  items,
+  totals,
+  onClose,
+  onRemove,
+  onUpdateQuantity,
+  onClearCart,
+  onCheckout,
+  loading,
+}) => {
+  const cartTotal = totals?.total || totals?.subtotal || 0;
+  const itemCount = items.reduce((acc, item) => acc + (item.quantity || 0), 0);
 
   return (
     <div className="cart-page-overlay" onClick={onClose}>
-      <div className="cart-page-content" onClick={(e) => e.stopPropagation()}>
+      <div className="cart-page-content" onClick={e => e.stopPropagation()}>
         <button className="cart-close" onClick={onClose} aria-label="Cerrar">
           &times;
         </button>
 
-        {checkoutStep === 0 ? (
-          <>
-            <h2>Tu Carrito</h2>
+        <div className="cart-header">
+          <h2>
+            <FiShoppingCart size={22} />
+            Tu Carrito
+          </h2>
+          {items.length > 0 && (
+            <span className="cart-item-count">{itemCount} producto{itemCount !== 1 ? 's' : ''}</span>
+          )}
+        </div>
 
-            {cart.length === 0 ? (
-              <div className="cart-empty">
-                <p>Tu carrito está vacío</p>
-                <button className="btn-primary" onClick={onClose}>
-                  Seguir comprando
-                </button>
-              </div>
-            ) : (
-              <>
-                <div className="cart-items">
-                  {cart.map((item) => {
-                    const hasDiscount = item.discount_percentage > 0;
-                    const finalPrice = hasDiscount 
-                      ? (item.price * (1 - item.discount_percentage / 100)).toFixed(2)
-                      : item.price;
-                    
-                    const brand = item.Brand || item.brand;
-                    const category = item.Category || item.category;
-
-                    return (
-                      <div key={item.id} className="cart-item">
-                        <img
-                          src={item.main_image ? `http://localhost:4001${item.main_image}` : "/api/images/placeholder.png"}
-                          alt={item.name}
-                          className="cart-item-image"
-                          onError={(e) => {
-                            if (!e.currentTarget.dataset.fallback) {
-                              e.currentTarget.src = "/api/images/placeholder.png";
-                              e.currentTarget.dataset.fallback = "true";
-                            }
-                          }}
-                        />
-                        <div className="cart-item-info">
-                          <h4>{item.name}</h4>
-                          <p className="cart-item-brand">{brand?.name || "Sin marca"}</p>
-                          <p className="cart-item-category">{category?.name || "Sin categoría"}</p>
-                          <div className="cart-item-price-container">
-                            {hasDiscount ? (
-                              <>
-                                <p className="cart-item-price-original">${item.price}</p>
-                                <p className="cart-item-price">${finalPrice}</p>
-                                <span className="cart-item-discount">-{item.discount_percentage}%</span>
-                              </>
-                            ) : (
-                              <p className="cart-item-price">${item.price}</p>
-                            )}
-                          </div>
-                          {item.stock > 0 && item.stock <= item.min_stock && (
-                            <p className="cart-item-low-stock">¡Solo quedan {item.stock} unidades!</p>
-                          )}
-                        </div>
-                        <div className="cart-item-controls">
-                          <div className="quantity-controls">
-                            <button 
-                              onClick={() => onChangeQuantity(item.id, -1)}
-                              aria-label="Disminuir cantidad"
-                            >
-                              -
-                            </button>
-                            <span>{item.quantity}</span>
-                            <button 
-                              onClick={() => onChangeQuantity(item.id, 1)}
-                              disabled={item.quantity >= item.stock}
-                              aria-label="Aumentar cantidad"
-                            >
-                              +
-                            </button>
-                          </div>
-                          <p className="cart-item-subtotal">
-                            Subtotal: ${(finalPrice * item.quantity).toFixed(2)}
-                          </p>
-                          <button
-                            className="btn-remove"
-                            onClick={() => onRemove(item.id)}
-                          >
-                            Eliminar
-                          </button>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-
-                <div className="cart-summary">
-                  <div className="cart-total">
-                    <span>Total:</span>
-                    <span className="total-amount">${cartTotal.toFixed(2)}</span>
-                  </div>
-                  <button className="btn-checkout" onClick={handleCheckout}>
-                    Proceder al pago
-                  </button>
-                </div>
-              </>
-            )}
-          </>
+        {items.length === 0 ? (
+          <div className="cart-empty">
+            <FiShoppingCart size={48} />
+            <p>Tu carrito está vacío</p>
+            <button className="btn-primary" onClick={onClose}>
+              Seguir comprando
+            </button>
+          </div>
         ) : (
           <>
-            <h2>Checkout - Paso {checkoutStep} de 3</h2>
+            <div className="cart-items">
+              {items.map((item) => {
+                const product = item.product || item;
+                const productId = item.productId || item.product_id || product.id;
+                const name = product.name || item.name;
+                const price = item.unit_price || item.price || product.price || 0;
+                const mainImage = product.main_image || item.main_image;
+                const stock = product.stock ?? 999;
+                const subtotal = item.subtotal || (price * item.quantity);
 
-            <div className="checkout-content">
-              {checkoutStep === 1 && (
-                <div className="checkout-step">
-                  <h3>📄 Datos del usuario</h3>
-                  <p>Nombre, email, dirección de envío...</p>
-                </div>
-              )}
-              {checkoutStep === 2 && (
-                <div className="checkout-step">
-                  <h3>🚚 Método de envío</h3>
-                  <p>Retiro en tienda, envío a domicilio...</p>
-                </div>
-              )}
-              {checkoutStep === 3 && (
-                <div className="checkout-step">
-                  <h3>💳 Método de pago</h3>
-                  <p>Tarjeta, efectivo, transferencia...</p>
-                </div>
-              )}
+                return (
+                  <div key={item.productId || item.product_id || item.id} className="cart-item">
+                    <img
+                      src={mainImage ? `${API_URL}${mainImage}` : "/api/images/placeholder.png"}
+                      alt={name}
+                      className="cart-item-image"
+                      onError={e => {
+                        if (!e.currentTarget.dataset.fallback) {
+                          e.currentTarget.src = "/api/images/placeholder.png";
+                          e.currentTarget.dataset.fallback = "true";
+                        }
+                      }}
+                    />
+                    <div className="cart-item-info">
+                      <h4>{name}</h4>
+                      <p className="cart-item-price">{formatCurrency(price)}</p>
+                    </div>
+                    <div className="cart-item-controls">
+                      <div className="quantity-controls">
+                        <button
+                          onClick={() => onUpdateQuantity(productId, item.quantity - 1)}
+                          disabled={item.quantity <= 1 || loading}
+                          aria-label="Disminuir"
+                        >
+                          −
+                        </button>
+                        <span>{item.quantity}</span>
+                        <button
+                          onClick={() => onUpdateQuantity(productId, item.quantity + 1)}
+                          disabled={item.quantity >= stock || loading}
+                          aria-label="Aumentar"
+                        >
+                          +
+                        </button>
+                      </div>
+                      <p className="cart-item-subtotal">{formatCurrency(subtotal)}</p>
+                      <button
+                        className="btn-remove"
+                        onClick={() => onRemove(productId)}
+                        disabled={loading}
+                      >
+                        <FiTrash2 size={14} />
+                        Eliminar
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
 
-            <div className="checkout-actions">
-              {checkoutStep > 1 && (
-                <button className="btn-secondary" onClick={handleCheckoutBack}>
-                  Volver
-                </button>
+            <div className="cart-summary">
+              {totals?.subtotal && totals.subtotal !== cartTotal && (
+                <div className="cart-totals-detail">
+                  <span>Subtotal</span>
+                  <span>{formatCurrency(totals.subtotal)}</span>
+                </div>
               )}
-              <button className="btn-primary" onClick={handleCheckoutNext}>
-                {checkoutStep === 3 ? "Finalizar compra" : "Siguiente"}
-              </button>
+              {totals?.tax > 0 && (
+                <div className="cart-totals-detail">
+                  <span>IVA</span>
+                  <span>{formatCurrency(totals.tax)}</span>
+                </div>
+              )}
+              <div className="cart-total">
+                <span>Total</span>
+                <span className="total-amount">{formatCurrency(cartTotal)}</span>
+              </div>
+
+              <p className="cart-shipping-note">
+                * El costo de envío se calculará al confirmar el pedido
+              </p>
+
+              <div className="cart-actions">
+                <button className="btn-clear" onClick={onClearCart} disabled={loading}>
+                  Vaciar carrito
+                </button>
+                <button className="btn-checkout" onClick={onCheckout} disabled={loading}>
+                  {loading ? "Procesando..." : "Solicitar pedido →"}
+                </button>
+              </div>
             </div>
           </>
         )}
@@ -174,11 +149,14 @@ const CartPage = ({ cart, cartTotal, onClose, onRemove, onChangeQuantity }) => {
 };
 
 CartPage.propTypes = {
-  cart: PropTypes.array.isRequired,
-  cartTotal: PropTypes.number.isRequired,
-  onClose: PropTypes.func.isRequired,
-  onRemove: PropTypes.func.isRequired,
-  onChangeQuantity: PropTypes.func.isRequired,
+  items:           PropTypes.array.isRequired,
+  totals:          PropTypes.object,
+  onClose:         PropTypes.func.isRequired,
+  onRemove:        PropTypes.func.isRequired,
+  onUpdateQuantity:PropTypes.func.isRequired,
+  onClearCart:     PropTypes.func.isRequired,
+  onCheckout:      PropTypes.func.isRequired,
+  loading:         PropTypes.bool,
 };
 
 export default CartPage;

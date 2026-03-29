@@ -1,0 +1,111 @@
+@use "../../../../../../styles/breakpoints" as *;
+
+.user-filters-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 3rem;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+
+  @include respond-down("tablet") {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+.user-filters-left {
+  h1 {
+    font-size: 2.5rem;
+    font-weight: 900;
+    color: var(--admin-text);
+    margin-bottom: 0.5rem;
+
+    @include respond-down("tablet")    { font-size: 2rem; }
+    @include respond-down("mobile-lg") { font-size: 1.75rem; }
+  }
+
+  .user-filters-subtitle {
+    color: var(--admin-text-muted);
+    font-size: 0.95rem;
+  }
+}
+
+.user-filters-actions {
+  display: flex;
+  gap: 0.875rem;
+  align-items: center;
+  flex-wrap: wrap;
+
+  @include respond-down("tablet") {
+    width: 100%;
+    flex-direction: column;
+  }
+}
+
+.user-filters-search-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  svg {
+    position: absolute;
+    left: 1rem;
+    color: var(--admin-text-muted);
+    pointer-events: none;
+  }
+
+  input {
+    padding: 0.75rem 1rem 0.75rem 3rem;
+    background: var(--admin-surface);
+    border: 1px solid var(--admin-border);
+    border-radius: 12px;
+    color: var(--admin-text);
+    font-size: 0.9rem;
+    width: 260px;
+    transition: all 0.3s ease;
+
+    @include respond-down("tablet") { width: 100%; }
+
+    &:focus {
+      outline: none;
+      border-color: var(--admin-accent);
+      box-shadow: 0 0 0 3px rgba(255, 202, 44, 0.1);
+    }
+
+    &::placeholder { color: var(--admin-text-muted); }
+  }
+
+  &--address input { width: 220px; }
+}
+
+.user-filters-select-wrapper {
+  select {
+    padding: 0.75rem 2.5rem 0.75rem 1rem;
+    background: var(--admin-surface);
+    border: 1px solid var(--admin-border);
+    border-radius: 12px;
+    color: var(--admin-text);
+    font-size: 0.9rem;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ffca2c' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+
+    @include respond-down("tablet") { width: 100%; }
+
+    &:focus {
+      outline: none;
+      border-color: var(--admin-accent);
+      box-shadow: 0 0 0 3px rgba(255, 202, 44, 0.1);
+    }
+
+    option {
+      background: var(--admin-card);
+      color: var(--admin-text);
+    }
+  }
+}

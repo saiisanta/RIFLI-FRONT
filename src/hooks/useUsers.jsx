@@ -2,16 +2,26 @@ import { useState, useCallback } from 'react';
 import userService from '../services/userService';
 
 const useUsers = () => {
-  const [users, setUsers] = useState([]);
-  const [user, setUser] = useState(null);
+  const [users, setUsers]   = useState([]);
+  const [user, setUser]     = useState(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError]   = useState(null);
+  // FIX: keys matching backend response (total_pages, not totalPages)
   const [pagination, setPagination] = useState({
-    page: 1,
-    limit: 10,
-    total: 0,
-    totalPages: 0,
+    page:        1,
+    limit:       10,
+    total:       0,
+    total_pages: 0,
   });
+
+  // ── Helpers ───────────────────────────────────────────────
+
+  const updateUserInList = (userId, updatedData) => {
+    setUsers(prev => prev.map(u => u.id === userId ? { ...u, ...updatedData } : u));
+    setUser(prev => prev?.id === userId ? { ...prev, ...updatedData } : prev);
+  };
+
+  // ── Admin ─────────────────────────────────────────────────
 
   const fetchUsers = useCallback(async (params = {}) => {
     try {
@@ -19,12 +29,10 @@ const useUsers = () => {
       setError(null);
       const data = await userService.getUsers(params);
       setUsers(data.users || data.data || []);
-      if (data.pagination) {
-        setPagination(data.pagination);
-      }
+      if (data.pagination) setPagination(data.pagination);
       return data;
     } catch (err) {
-      setError(err.message || 'Error al cargar usuarios');
+      setError(err.message || err.error || 'Error al cargar usuarios');
       throw err;
     } finally {
       setLoading(false);
@@ -39,202 +47,129 @@ const useUsers = () => {
       setUser(data.user || data);
       return data;
     } catch (err) {
-      setError(err.message || 'Error al cargar usuario');
+      setError(err.message || err.error || 'Error al cargar usuario');
       throw err;
     } finally {
       setLoading(false);
     }
   }, []);
 
-  const createUser = useCallback(async (userData) => {
+  const changeRole = useCallback(async (userId, role) => {
     try {
       setLoading(true);
       setError(null);
-      const data = await userService.createUser(userData);
-      setUsers((prev) => [data.user || data, ...prev]);
+      const data = await userService.changeRole(userId, role);
+      const updated = data.user || data;
+      updateUserInList(userId, { role: updated.role || role });
       return data;
     } catch (err) {
-      setError(err.message || 'Error al crear usuario');
+      setError(err.message || err.error || 'Error al cambiar rol');
       throw err;
     } finally {
       setLoading(false);
     }
   }, []);
-
-  const updateUser = useCallback(async (userId, userData) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await userService.updateUser(userId, userData);
-      setUsers((prev) =>
-        prev.map((u) => (u.id === userId ? data.user || data : u))
-      );
-      if (user?.id === userId) {
-        setUser(data.user || data);
-      }
-      return data;
-    } catch (err) {
-      setError(err.message || 'Error al actualizar usuario');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [user]);
-
-  const patchUser = useCallback(async (userId, userData) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await userService.patchUser(userId, userData);
-      setUsers((prev) =>
-        prev.map((u) => (u.id === userId ? { ...u, ...data.user } : u))
-      );
-      if (user?.id === userId) {
-        setUser((prev) => ({ ...prev, ...data.user }));
-      }
-      return data;
-    } catch (err) {
-      setError(err.message || 'Error al actualizar usuario');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [user]);
 
   const deleteUser = useCallback(async (userId) => {
     try {
       setLoading(true);
       setError(null);
       await userService.deleteUser(userId);
-      setUsers((prev) => prev.filter((u) => u.id !== userId));
+      setUsers(prev => prev.filter(u => u.id !== userId));
       return true;
     } catch (err) {
-      setError(err.message || 'Error al eliminar usuario');
+      setError(err.message || err.error || 'Error al eliminar usuario');
       throw err;
     } finally {
       setLoading(false);
     }
   }, []);
 
-  const fetchUserProfile = useCallback(async (userId) => {
+  // ── Perfil propio ─────────────────────────────────────────
+
+  const getMyProfile = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
-      const data = await userService.getUserProfile(userId);
+      const data = await userService.getMyProfile();
+      setUser(data.user || data);
       return data;
     } catch (err) {
-      setError(err.message || 'Error al cargar perfil');
+      setError(err.message || err.error || 'Error al cargar perfil');
       throw err;
     } finally {
       setLoading(false);
     }
   }, []);
 
-  const changePassword = useCallback(async (userId, passwordData) => {
+  const updateMyProfile = useCallback(async (userData) => {
     try {
       setLoading(true);
       setError(null);
-      const data = await userService.changePassword(userId, passwordData);
+      const data = await userService.updateMyProfile(userData);
+      setUser(prev => ({ ...prev, ...(data.user || data) }));
       return data;
     } catch (err) {
-      setError(err.message || 'Error al cambiar contraseña');
+      setError(err.message || err.error || 'Error al actualizar perfil');
       throw err;
     } finally {
       setLoading(false);
     }
   }, []);
 
-  const updateAvatar = useCallback(async (userId, file) => {
+  const changePassword = useCallback(async (passwordData) => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await userService.changePassword(passwordData);
+      return data;
+    } catch (err) {
+      setError(err.message || err.error || 'Error al cambiar contraseña');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const updateAvatar = useCallback(async (file) => {
     try {
       setLoading(true);
       setError(null);
       const formData = new FormData();
       formData.append('avatar', file);
-      const data = await userService.updateAvatar(userId, formData);
-      if (user?.id === userId) {
-        setUser((prev) => ({ ...prev, avatar: data.avatar }));
-      }
+      const data = await userService.updateAvatar(formData);
+      setUser(prev => ({ ...prev, avatar_url: data.avatar_url }));
       return data;
     } catch (err) {
-      setError(err.message || 'Error al actualizar avatar');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [user]);
-
-const deleteAvatar = useCallback(async () => {
-  try {
-    setLoading(true);
-    setError(null);
-    const data = await userService.deleteAvatar();
-    
-    // Actualizar el usuario local quitando el avatar
-    setUser((prev) => ({ ...prev, avatar_url: null }));
-    
-    return data;
-  } catch (err) {
-    setError(err.message || err.error || 'Error al eliminar avatar');
-    throw err;
-  } finally {
-    setLoading(false);
-  }
-}, []);
-
-  const fetchUserActivity = useCallback(async (userId, params = {}) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await userService.getUserActivity(userId, params);
-      return data;
-    } catch (err) {
-      setError(err.message || 'Error al cargar actividad');
+      setError(err.message || err.error || 'Error al actualizar avatar');
       throw err;
     } finally {
       setLoading(false);
     }
   }, []);
 
-  const updatePreferences = useCallback(async (userId, preferences) => {
+  const deleteAvatar = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
-      const data = await userService.updatePreferences(userId, preferences);
-      if (user?.id === userId) {
-        setUser((prev) => ({ ...prev, preferences: data.preferences }));
-      }
+      const data = await userService.deleteAvatar();
+      setUser(prev => ({ ...prev, avatar_url: null }));
       return data;
     } catch (err) {
-      setError(err.message || 'Error al actualizar preferencias');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [user]);
-
-  const fetchUserStats = useCallback(async (userId) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await userService.getUserStats(userId);
-      return data;
-    } catch (err) {
-      setError(err.message || 'Error al cargar estadísticas');
+      setError(err.message || err.error || 'Error al eliminar avatar');
       throw err;
     } finally {
       setLoading(false);
     }
   }, []);
 
-  const clearError = useCallback(() => {
-    setError(null);
-  }, []);
+  const clearError = useCallback(() => setError(null), []);
 
   const clearState = useCallback(() => {
     setUsers([]);
     setUser(null);
     setError(null);
-    setPagination({ page: 1, limit: 10, total: 0, totalPages: 0 });
+    setPagination({ page: 1, limit: 10, total: 0, total_pages: 0 });
   }, []);
 
   return {
@@ -243,19 +178,17 @@ const deleteAvatar = useCallback(async () => {
     loading,
     error,
     pagination,
+    // admin
     fetchUsers,
     fetchUserById,
-    createUser,
-    updateUser,
-    patchUser,
+    changeRole,
     deleteUser,
-    fetchUserProfile,
+    // perfil propio
+    getMyProfile,
+    updateMyProfile,
     changePassword,
     updateAvatar,
     deleteAvatar,
-    fetchUserActivity,
-    updatePreferences,
-    fetchUserStats,
     clearError,
     clearState,
   };

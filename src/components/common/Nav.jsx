@@ -14,12 +14,29 @@ import { AuthContext } from "../../context/AuthContext";
 import NotificationBell from "../NotificationBell/NotificationBell";
 import "./nav.scss";
 
-const HIDDEN_PATHS = [
-  "/dashboard", "/admin", "/admin/products", "/admin/categories",
-  "/admin/brands", "/admin/users", "/admin/services", "/admin/orders",
-  "/admin/quotes", "/admin/stats", "/shop", "/login", "/register",
-  "/forgot-password", "/profile", "/servicios", "/presupuestos",
-];
+const shouldHideNavbar = (pathname) => {
+  const hiddenExact = [
+    "/login",
+    "/register",
+    "/forgot-password",
+    "/dashboard",
+    "/shop",
+    "/profile",
+    "/servicios",
+    "/presupuestos",
+  ];
+
+  const hiddenStartsWith = [
+    "/reset-password/",
+    "/verify-email/",
+    "/admin",
+  ];
+
+  return (
+    hiddenExact.includes(pathname) ||
+    hiddenStartsWith.some(path => pathname.startsWith(path))
+  );
+};
 
 const NAV_LINKS = [
   { label: "Home",      renderIcon: (s, sw) => <Home size={s} strokeWidth={sw} />, href: "/#hero",      section: ".hero-section"  },
@@ -30,6 +47,7 @@ const NAV_LINKS = [
 const getY = () => document.body.scrollTop;
 
 const NavBar = () => {
+  
   const { user, logout, loading } = useContext(AuthContext);
   const isAuthenticated = !!(user && user.email);
 
@@ -85,8 +103,7 @@ const NavBar = () => {
 
   const handleNotifOpen = () => setMobileOpen(false);
 
-  if (HIDDEN_PATHS.includes(pathname)) return null;
-
+  if (shouldHideNavbar(pathname)) return null;
   return (
     <header className={`Nav ${!visible ? "Nav--hidden" : ""} ${isScrolled ? "Nav--scrolled" : ""}`}>
       

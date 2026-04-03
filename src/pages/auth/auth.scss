@@ -1292,17 +1292,18 @@
 }
 
 .email-highlight {
+  display: block;
   background: rgba(255, 202, 44, 0.1);
   border: 1px solid rgba(255, 202, 44, 0.3);
-  padding: 0.875rem 1.25rem;
+  padding: 0.5rem 1rem;
   border-radius: 12px;
   font-weight: 700;
   color: var(--auth-accent);
-  margin: 1rem 0;
+  margin-top: 0.5rem;
   word-break: break-all;
   font-size: 1.05rem;
   letter-spacing: 0.5px;
-
+  width: fit-content;
   @include respond-down("mobile-lg") {
     padding: 0.75rem 1rem;
     font-size: 0.95rem;
@@ -1317,6 +1318,7 @@
   text-align: center;
 
   strong {
+    flex-wrap: wrap;
     color: var(--auth-accent);
   }
 }
@@ -1403,7 +1405,7 @@
   background: rgba(16, 185, 129, 0.1);
   border: 1px solid rgba(16, 185, 129, 0.3);
   border-radius: 12px;
-  padding: 1.25rem 1.5rem;
+  padding: 1rem 1.25rem;
   margin-bottom: 1.5rem;
   animation: slideInDown 0.5s ease;
 
@@ -1560,7 +1562,6 @@
 
 .verified-content {
   flex: 1;
-
   p {
     margin: 0;
   }

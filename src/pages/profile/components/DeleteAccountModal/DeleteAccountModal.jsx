@@ -5,6 +5,7 @@ import './DeleteAccountModal.scss';
 const DeleteAccountModal = ({ onClose, onConfirm, loading, error }) => {
   const [confirmText, setConfirmText] = useState('');
   const [step, setStep] = useState(1); // 1: advertencia, 2: confirmación
+  const [password, setPassword] = useState('');
 
   const CONFIRM_PHRASE = 'ELIMINAR MI CUENTA';
   const isConfirmValid = confirmText === CONFIRM_PHRASE;
@@ -15,7 +16,7 @@ const DeleteAccountModal = ({ onClose, onConfirm, loading, error }) => {
 
   const handleConfirmDelete = () => {
     if (isConfirmValid) {
-      onConfirm();
+      onConfirm(password);
     }
   };
 
@@ -112,9 +113,7 @@ const DeleteAccountModal = ({ onClose, onConfirm, loading, error }) => {
               </div>
 
               <div className="delete-form-group">
-                <label htmlFor="confirmText">
-                  Escribí la frase para confirmar *
-                </label>
+                <label htmlFor="confirmText">Escribí la frase para confirmar *</label>
                 <input
                   type="text"
                   id="confirmText"
@@ -125,11 +124,24 @@ const DeleteAccountModal = ({ onClose, onConfirm, loading, error }) => {
                   className={confirmText && !isConfirmValid ? 'input-error' : ''}
                   autoComplete="off"
                 />
-                {confirmText && !isConfirmValid && (
+                {confirmText && confirmText !== CONFIRM_PHRASE && (
                   <span className="delete-field-error">
                     La frase no coincide. Debe ser exactamente: {CONFIRM_PHRASE}
                   </span>
                 )}
+              </div>
+
+              <div className="delete-form-group">
+                <label htmlFor="deletePassword">Ingresá tu contraseña para confirmar *</label>
+                <input
+                  type="password"
+                  id="deletePassword"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  disabled={loading}
+                  placeholder="Tu contraseña actual"
+                  autoComplete="current-password"
+                />
               </div>
 
               <div className="delete-modal-actions">

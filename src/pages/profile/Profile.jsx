@@ -62,9 +62,9 @@ const Profile = () => {
     }
   };
 
-  const handleDeleteAccount = async () => {
+  const handleDeleteAccount = async (password) => {
     try {
-      await deleteProfile();
+      await deleteProfile(password);
       navigate('/login?account_deleted=true');
     } catch (err) {
       console.error('Error al eliminar cuenta:', err);

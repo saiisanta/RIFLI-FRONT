@@ -53,11 +53,11 @@ const useProfile = () => {
     }
   }, []);
 
-  const deleteProfile = useCallback(async () => {
+  const deleteProfile = useCallback(async (password) => {
     try {
       setLoading(true);
       setError(null);
-      await userService.deleteMyProfile();
+      await userService.deleteMyProfile(password); // ← pasar password
       setProfile(null);
       return true;
     } catch (err) {

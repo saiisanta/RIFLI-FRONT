@@ -190,7 +190,10 @@ const Register = () => {
             <li>Una vez verificado, podrás iniciar sesión</li>
           </ol>
           <p className="verification-note">
-            El enlace es válido por <strong>24 horas</strong>
+            El enlace es válido por 
+            <div>
+              <strong>24 horas</strong>
+            </div>
           </p>
         </div>
 

@@ -271,7 +271,7 @@ $glass-hover: rgba(255, 255, 255, 0.06);
     }
 
     @include respond-down("mobile-sm") {
-      $var_rg_px: 130px;
+      $var_rg_px: 120px;
       $var_rg_pr: 20%;
       height: 80px;
 
@@ -289,7 +289,7 @@ $glass-hover: rgba(255, 255, 255, 0.06);
 
     @include respond-down("mobile-md") {
       $var_rg_px: 120px;
-      $var_rg_pr: 20%;
+      $var_rg_pr: 17%;
       height: 70px;
 
       $mask-update:
@@ -318,7 +318,8 @@ $glass-hover: rgba(255, 255, 255, 0.06);
     
     @include respond-down("mobile-sm") {
       height: 40px;
-      margin-top: -14px;
+      margin-top: -10px;
+      margin-left: -20px;
     }
 
      @include respond-down("mobile-md") {

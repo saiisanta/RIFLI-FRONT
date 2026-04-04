@@ -51,22 +51,19 @@ const Dashboard = () => {
       path: "/shop", 
       type: "shop" 
     },
-    { 
+    user.role !== 'ADMIN' && { 
       title: "Presupuestos", 
       icon: FaFileInvoiceDollar, 
       path: "/presupuestos", 
       type: "billing" 
-    }
-  ];
-
-  if (user.role === 'ADMIN') {
-    dashboardCards.push({ 
+    },
+    user.role === 'ADMIN' && { 
       title: "Admin", 
       icon: FaCogs, 
       path: "/admin", 
       type: "admin" 
-    });
-  }
+    }
+  ].filter(Boolean);
 
   return (
     <div className="dashboard-wrapper">
@@ -91,7 +88,7 @@ const Dashboard = () => {
               icon={card.icon}
               path={card.path}
               type={card.type}
-              onClick={navigate}
+              onClick={() => navigate(card.path)}
             />
           ))}
         </Row>

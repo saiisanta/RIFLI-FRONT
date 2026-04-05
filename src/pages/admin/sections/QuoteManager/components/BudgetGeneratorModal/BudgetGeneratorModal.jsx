@@ -48,25 +48,17 @@ const BudgetGeneratorModal = ({
   uploadBudgetPdf,
   loading,
 }) => {
-  // ── Materials ─────────────────────────────────────────────
   const [materials, setMaterials] = useState([newMaterial()]);
-
-  // ── Labor ─────────────────────────────────────────────────
   const [laborItems, setLaborItems] = useState([newLabor()]);
-
-  // ── Totals config ─────────────────────────────────────────
   const [discountPct, setDiscountPct]   = useState(0);
   const [taxPct, setTaxPct]             = useState(21);
   const [validUntil, setValidUntil]     = useState('');
   const [completionDays, setCompletionDays] = useState('');
   const [internalNotes, setInternalNotes]   = useState('');
-
-  // ── UI state ──────────────────────────────────────────────
   const [saving, setSaving]         = useState(false);
   const [generating, setGenerating] = useState(false);
   const [error, setError]           = useState(null);
 
-  // ── Load existing budget on mount ─────────────────────────
   useEffect(() => {
     if (quote.materials_budget?.items?.length) {
       setMaterials(
@@ -95,7 +87,6 @@ const BudgetGeneratorModal = ({
     if (quote.internal_notes)      setInternalNotes(quote.internal_notes);
   }, [quote]);
 
-  // ── Live totals ───────────────────────────────────────────
   const materialsTotal = materials.reduce((s, i) => s + (Number(i.subtotal) || 0), 0);
   const laborTotal     = laborItems.reduce((s, i) => s + (Number(i.subtotal) || 0), 0);
   const subtotal       = materialsTotal + laborTotal;
@@ -107,7 +98,6 @@ const BudgetGeneratorModal = ({
   const depositAmt     = total * (depositPct / 100);
   const finalAmt       = total - depositAmt;
 
-  // ── Material handlers ─────────────────────────────────────
   const updateMaterial = (index, field, value) => {
     setMaterials(prev => {
       const next = [...prev];
@@ -121,7 +111,6 @@ const BudgetGeneratorModal = ({
     if (materials.length > 1) setMaterials(prev => prev.filter((_, i) => i !== index));
   };
 
-  // ── Labor handlers ────────────────────────────────────────
   const updateLabor = (index, field, value) => {
     setLaborItems(prev => {
       const next = [...prev];
@@ -135,7 +124,6 @@ const BudgetGeneratorModal = ({
     if (laborItems.length > 1) setLaborItems(prev => prev.filter((_, i) => i !== index));
   };
 
-  // ── Build payload ─────────────────────────────────────────
   const buildPayload = useCallback(() => ({
     materials_budget: {
       items: materials
@@ -166,7 +154,6 @@ const BudgetGeneratorModal = ({
     internal_notes:      internalNotes || undefined,
   }), [materials, laborItems, discountPct, taxPct, validUntil, completionDays, internalNotes, materialsTotal, laborTotal]);
 
-  // ── Save budget (JSON only, no PDF yet) ───────────────────
   const handleSave = async () => {
     setSaving(true);
     setError(null);
@@ -180,28 +167,19 @@ const BudgetGeneratorModal = ({
     }
   };
 
-  // ── Generate PDF, upload and save ─────────────────────────
   const handleGeneratePdf = async () => {
     setGenerating(true);
     setError(null);
     try {
-      // 1. Save budget data first
       const updated = await addBudget(quote.id, buildPayload());
-
-      // 2. Generate PDF blob
       const pdfData = {
         quote: { ...updated, ...buildPayload() },
         totals: { materialsTotal, laborTotal, subtotal, discountAmt, taxAmt, total, depositPct, depositAmt, finalAmt },
         discountPct: Number(discountPct),
         taxPct: Number(taxPct),
       };
-
       const blob = await pdf(<BudgetPdfDocument data={pdfData} />).toBlob();
-
-      // 3. Upload PDF to backend
       const pdfResult = await uploadBudgetPdf(updated.id || quote.id, blob);
-
-      // 4. Close with real pdf path
       onSaved({ ...updated, budget_pdf: pdfResult.pdf_url });
     } catch (err) {
       setError(err.message || 'Error al generar el PDF');
@@ -213,10 +191,9 @@ const BudgetGeneratorModal = ({
   const isLoading = saving || generating || loading;
 
   return (
-    <div className="bgm-overlay" onClick={onClose}>
+    <div className="bgm-overlay">
       <div className="bgm-container" onClick={e => e.stopPropagation()}>
 
-        {/* Header */}
         <div className="bgm-header">
           <div className="bgm-header-left">
             <h2>Generador de Presupuesto</h2>
@@ -236,7 +213,6 @@ const BudgetGeneratorModal = ({
             </div>
           )}
 
-          {/* ── Client / service summary ── */}
           <div className="bgm-summary">
             <div className="bgm-summary-item">
               <span className="bgm-summary-key">Cliente</span>
@@ -258,7 +234,6 @@ const BudgetGeneratorModal = ({
             </div>
           </div>
 
-          {/* ── Materials ── */}
           <div className="bgm-section">
             <div className="bgm-section-header">
               <span className="bgm-section-title">Materiales</span>
@@ -348,7 +323,6 @@ const BudgetGeneratorModal = ({
             </div>
           </div>
 
-          {/* ── Labor ── */}
           <div className="bgm-section">
             <div className="bgm-section-header">
               <span className="bgm-section-title">Mano de obra</span>
@@ -429,7 +403,6 @@ const BudgetGeneratorModal = ({
             </div>
           </div>
 
-          {/* ── Config row ── */}
           <div className="bgm-config-row">
             <div className="bgm-config-group">
               <label>Descuento (%)</label>
@@ -485,7 +458,6 @@ const BudgetGeneratorModal = ({
             />
           </div>
 
-          {/* ── Live totals panel ── */}
           <div className="bgm-totals">
             <div className="bgm-totals-title">Resumen</div>
             <div className="bgm-totals-grid">
@@ -516,7 +488,6 @@ const BudgetGeneratorModal = ({
 
         </div>
 
-        {/* Footer */}
         <div className="bgm-footer">
           <button className="bgm-btn-cancel" onClick={onClose} disabled={isLoading}>
             Cancelar

@@ -11,8 +11,6 @@
   @include respond-down("mobile-lg") { padding: 0 1rem 3rem; }
 }
 
-// ── Loading / error / empty ───────────────────────────────────
-
 .mo-loading {
   display: flex;
   align-items: center;
@@ -105,8 +103,6 @@
   &:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255,202,44,0.35); }
 }
 
-// ── List header ───────────────────────────────────────────────
-
 .mo-list-header {
   display: flex;
   justify-content: space-between;
@@ -152,7 +148,6 @@
 
 .mo-cards { display: flex; flex-direction: column; gap: 0.875rem; }
 
-// ── Order card ────────────────────────────────────────────────
 
 .mo-card {
   background: var(--shop-surface);
@@ -233,8 +228,6 @@
   transition: all 0.25s ease;
   &:hover { border-color: var(--shop-accent); color: var(--shop-accent); }
 }
-
-// ── Card body ─────────────────────────────────────────────────
 
 .mo-card-body {
   border-top: 1px solid var(--shop-border);
@@ -377,8 +370,6 @@
   svg { flex-shrink: 0; }
 }
 
-// ── Card actions ──────────────────────────────────────────────
-
 .mo-card-actions { border-top: 1px solid var(--shop-border); padding-top: 0.5rem; }
 
 .mo-btn-cancel {
@@ -397,8 +388,6 @@
   &:hover { background: rgba(239,68,68,0.1); border-color: var(--shop-error); }
 }
 
-// ── Status badges ─────────────────────────────────────────────
-
 .mo-badge {
   display: inline-flex;
   align-items: center;
@@ -415,8 +404,6 @@
   &.mo-badge--red     { background: rgba(239,68,68,0.12);    color: var(--shop-error); }
   &.mo-badge--gray    { background: rgba(107,114,128,0.12);  color: #9ca3af; }
 }
-
-// ── Proof section ─────────────────────────────────────────────
 
 .mo-proof-section {
   background: var(--shop-card);
@@ -591,9 +578,6 @@
   animation: mo-spin 0.7s linear infinite;
 }
 
-/* ── Agregar al final de MyOrders.scss ───────────────────── */
-
-// ── Shipping confirm panel ────────────────────────────────────
 
 .mo-shipping-confirm {
   background: var(--shop-card);
@@ -695,5 +679,74 @@
 
     &:hover:not(:disabled) { background: rgba(239, 68, 68, 0.1); border-color: var(--shop-error); }
     &:disabled { opacity: 0.4; cursor: not-allowed; }
+  }
+}
+
+.mo-bank-transfer-info {
+  background: rgba(255, 202, 44, 0.04);
+  border: 1px solid rgba(255, 202, 44, 0.2);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+ 
+.mo-bank-transfer-title {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--shop-accent);
+ 
+  svg { flex-shrink: 0; }
+}
+ 
+.mo-bank-transfer-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: 1px solid var(--shop-border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+ 
+.mo-bank-transfer-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0.875rem;
+  border-bottom: 1px solid var(--shop-border);
+  gap: 0.75rem;
+ 
+  &:last-child { border-bottom: none; }
+}
+ 
+.mo-bank-transfer-label {
+  font-size: 0.78rem;
+  color: var(--shop-text-muted);
+  font-weight: 500;
+  flex-shrink: 0;
+}
+ 
+.mo-bank-transfer-value {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--shop-text);
+  text-align: right;
+  word-break: break-all;
+ 
+  &--mono {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.4px;
+  }
+ 
+  &--highlight {
+    color: var(--shop-accent);
+    font-weight: 700;
   }
 }

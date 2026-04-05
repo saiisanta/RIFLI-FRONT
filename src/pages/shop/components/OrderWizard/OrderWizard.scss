@@ -41,7 +41,6 @@
   to   { opacity: 1; transform: translateY(0); }
 }
 
-// ── Header ────────────────────────────────────────────────────
 
 .ow-header {
   display: flex;
@@ -74,8 +73,6 @@
 
   &:hover { background: var(--shop-error); color: #fff; border-color: var(--shop-error); }
 }
-
-// ── Steps ─────────────────────────────────────────────────────
 
 .ow-steps {
   display: flex;
@@ -137,8 +134,6 @@
 
   &.done { background: var(--shop-success); }
 }
-
-// ── Body ──────────────────────────────────────────────────────
 
 .ow-body {
   overflow-y: auto;
@@ -226,7 +221,6 @@
   &:hover { background: var(--shop-accent); color: #000; }
 }
 
-// ── Address list ──────────────────────────────────────────────
 
 .ow-address-list {
   display: flex;
@@ -295,7 +289,6 @@
   transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-// ── Payment ───────────────────────────────────────────────────
 
 .ow-payment-options {
   display: flex;
@@ -366,7 +359,6 @@
 
 .ow-char-count { font-size: 0.72rem; color: var(--shop-text-muted); align-self: flex-end; }
 
-// ── Preview ───────────────────────────────────────────────────
 
 .ow-preview-section {
   display: flex;
@@ -491,7 +483,6 @@
   font-size: 0.875rem;
 }
 
-// ── Success ───────────────────────────────────────────────────
 
 .ow-success {
   padding: 3rem 2rem;
@@ -507,7 +498,6 @@
   .ow-success-hint { font-size: 0.78rem; color: var(--shop-text-muted); opacity: 0.6; }
 }
 
-// ── Footer ────────────────────────────────────────────────────
 
 .ow-footer {
   display: flex;
@@ -558,3 +548,92 @@
   &:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(255,202,44,0.4); }
   &:disabled { opacity: 0.45; cursor: not-allowed; transform: none; box-shadow: none; }
 }
+
+.ow-bank-info {
+  background: var(--shop-card);
+  border: 1px solid rgba(255, 202, 44, 0.25);
+  border-radius: 14px;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  animation: ow-up 0.2s ease;
+}
+ 
+.ow-bank-info-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.75px;
+  color: var(--shop-accent);
+ 
+  svg { flex-shrink: 0; }
+}
+ 
+.ow-bank-info-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: 1px solid var(--shop-border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+ 
+.ow-bank-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.6rem 1rem;
+  border-bottom: 1px solid var(--shop-border);
+  gap: 1rem;
+ 
+  &:last-child { border-bottom: none; }
+}
+ 
+.ow-bank-info-label {
+  font-size: 0.8rem;
+  color: var(--shop-text-muted);
+  font-weight: 500;
+  flex-shrink: 0;
+}
+ 
+.ow-bank-info-value {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--shop-text);
+  text-align: right;
+  word-break: break-all;
+ 
+  &--mono {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.82rem;
+    letter-spacing: 0.5px;
+  }
+ 
+  &--highlight {
+    color: var(--shop-accent);
+    font-weight: 700;
+    font-size: 0.95rem;
+  }
+}
+ 
+.ow-bank-info-note {
+  font-size: 0.78rem;
+  color: var(--shop-text-muted);
+  margin: 0;
+  font-style: italic;
+  line-height: 1.5;
+}
+ 
+ 
+.ow-preview-bank-hint {
+  font-size: 0.82rem;
+  color: var(--shop-text-muted);
+  margin: 0.35rem 0 0;
+ 
+  strong { color: var(--shop-accent); }
+}
+ 

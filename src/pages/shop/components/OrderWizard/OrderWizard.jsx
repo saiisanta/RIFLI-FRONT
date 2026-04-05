@@ -2,9 +2,10 @@ import React, { useState, useCallback, useEffect } from 'react';
 import {
   FiChevronRight, FiChevronLeft, FiCheck,
   FiMapPin, FiCreditCard, FiEye, FiCheckCircle,
-  FiAlertCircle, FiX,
+  FiAlertCircle, FiX, FiInfo,
 } from 'react-icons/fi';
 import useOrders from '../../../../hooks/useOrders';
+import useBankAccount from '../../../../hooks/useBankAccount';
 import addressService from '../../../../services/addressService';
 import './OrderWizard.scss';
 
@@ -27,21 +28,20 @@ const formatCurrency = (amount) =>
 const OrderWizard = ({ items, totals, onClose, onSuccess }) => {
   const [step, setStep] = useState(1);
 
-  // Step 1
   const [addresses, setAddresses]             = useState([]);
   const [addressLoading, setAddressLoading]   = useState(false);
   const [selectedAddress, setSelectedAddress] = useState(null);
 
-  // Step 2
   const [paymentMethod, setPaymentMethod] = useState('BANK_TRANSFER');
   const [customerNotes, setCustomerNotes] = useState('');
 
-  // Submit
   const { createOrder, loading: orderLoading, error: orderError, clearError } = useOrders();
+  const { account: bankAccount, fetchBankAccount } = useBankAccount();
   const [submitSuccess, setSubmitSuccess] = useState(false);
 
   useEffect(() => {
     loadAddresses();
+    fetchBankAccount();
   }, []);
 
   const loadAddresses = useCallback(async () => {
@@ -50,7 +50,6 @@ const OrderWizard = ({ items, totals, onClose, onSuccess }) => {
       const data = await addressService.getMyAddresses();
       const list = Array.isArray(data) ? data : data.addresses || [];
       setAddresses(list);
-      // Auto-seleccionar la principal
       const def = list.find(a => a.is_default);
       if (def) setSelectedAddress(def);
     } catch {
@@ -76,8 +75,6 @@ const OrderWizard = ({ items, totals, onClose, onSuccess }) => {
 
   const subtotal = totals?.subtotal || totals?.total || 0;
 
-  // ── Success ───────────────────────────────────────────────
-
   if (submitSuccess) {
     return (
       <div className="ow-overlay">
@@ -100,7 +97,6 @@ const OrderWizard = ({ items, totals, onClose, onSuccess }) => {
     <div className="ow-overlay" onClick={onClose}>
       <div className="ow-modal" onClick={e => e.stopPropagation()}>
 
-        {/* Header */}
         <div className="ow-header">
           <h2>Solicitar pedido</h2>
           <button className="ow-close-btn" onClick={onClose} aria-label="Cerrar">
@@ -108,7 +104,6 @@ const OrderWizard = ({ items, totals, onClose, onSuccess }) => {
           </button>
         </div>
 
-        {/* Step indicator */}
         <div className="ow-steps">
           {STEPS.map((s, i) => (
             <React.Fragment key={s.id}>
@@ -125,10 +120,8 @@ const OrderWizard = ({ items, totals, onClose, onSuccess }) => {
           ))}
         </div>
 
-        {/* Body */}
         <div className="ow-body">
 
-          {/* ── STEP 1: Address ── */}
           {step === 1 && (
             <div className="ow-panel">
               <div className="ow-panel-header">
@@ -177,7 +170,6 @@ const OrderWizard = ({ items, totals, onClose, onSuccess }) => {
             </div>
           )}
 
-          {/* ── STEP 2: Payment ── */}
           {step === 2 && (
             <div className="ow-panel">
               <div className="ow-panel-header">
@@ -202,6 +194,38 @@ const OrderWizard = ({ items, totals, onClose, onSuccess }) => {
                 ))}
               </div>
 
+              {paymentMethod === 'BANK_TRANSFER' && bankAccount && (
+                <div className="ow-bank-info">
+                  <div className="ow-bank-info-title">
+                    <FiInfo size={15} />
+                    Datos para la transferencia
+                  </div>
+                  <div className="ow-bank-info-grid">
+                    <div className="ow-bank-info-row">
+                      <span className="ow-bank-info-label">Banco</span>
+                      <span className="ow-bank-info-value">{bankAccount.bank_name}</span>
+                    </div>
+                    <div className="ow-bank-info-row">
+                      <span className="ow-bank-info-label">Titular</span>
+                      <span className="ow-bank-info-value">{bankAccount.holder_name}</span>
+                    </div>
+                    {bankAccount.alias && (
+                      <div className="ow-bank-info-row">
+                        <span className="ow-bank-info-label">Alias</span>
+                        <span className="ow-bank-info-value ow-bank-info-value--highlight">{bankAccount.alias}</span>
+                      </div>
+                    )}
+                    <div className="ow-bank-info-row">
+                      <span className="ow-bank-info-label">CBU</span>
+                      <span className="ow-bank-info-value ow-bank-info-value--mono">{bankAccount.cbu}</span>
+                    </div>
+                  </div>
+                  <p className="ow-bank-info-note">
+                    Una vez confirmado el envío y el precio final, podrás subir el comprobante desde Mis Pedidos.
+                  </p>
+                </div>
+              )}
+
               <div className="ow-notes-group">
                 <label>Notas adicionales <span className="ow-optional">(opcional)</span></label>
                 <textarea
@@ -217,7 +241,6 @@ const OrderWizard = ({ items, totals, onClose, onSuccess }) => {
             </div>
           )}
 
-          {/* ── STEP 3: Preview ── */}
           {step === 3 && (
             <div className="ow-panel">
               <div className="ow-panel-header">
@@ -225,7 +248,6 @@ const OrderWizard = ({ items, totals, onClose, onSuccess }) => {
                 <p>Confirmá los detalles antes de enviar</p>
               </div>
 
-              {/* Items */}
               <div className="ow-preview-section">
                 <div className="ow-preview-title">Productos</div>
                 <div className="ow-items-list">
@@ -257,7 +279,6 @@ const OrderWizard = ({ items, totals, onClose, onSuccess }) => {
                 </div>
               </div>
 
-              {/* Address */}
               <div className="ow-preview-section">
                 <div className="ow-preview-title">Dirección de entrega</div>
                 <div className="ow-preview-card">
@@ -267,15 +288,18 @@ const OrderWizard = ({ items, totals, onClose, onSuccess }) => {
                 </div>
               </div>
 
-              {/* Payment */}
               <div className="ow-preview-section">
                 <div className="ow-preview-title">Método de pago</div>
                 <div className="ow-preview-card">
                   <strong>{PAYMENT_METHODS.find(p => p.value === paymentMethod)?.label}</strong>
+                  {paymentMethod === 'BANK_TRANSFER' && bankAccount && (
+                    <p className="ow-preview-bank-hint">
+                      Transferir a <strong>{bankAccount.alias || bankAccount.cbu}</strong> — {bankAccount.holder_name}
+                    </p>
+                  )}
                 </div>
               </div>
 
-              {/* Totals */}
               <div className="ow-preview-totals">
                 <div className="ow-totals-row">
                   <span>Subtotal</span>
@@ -294,7 +318,6 @@ const OrderWizard = ({ items, totals, onClose, onSuccess }) => {
                 </p>
               </div>
 
-              {/* Notes */}
               {customerNotes && (
                 <div className="ow-preview-section">
                   <div className="ow-preview-title">Notas</div>
@@ -304,7 +327,6 @@ const OrderWizard = ({ items, totals, onClose, onSuccess }) => {
                 </div>
               )}
 
-              {/* Error */}
               {orderError && (
                 <div className="ow-error-banner">
                   <FiAlertCircle size={16} />
@@ -316,7 +338,6 @@ const OrderWizard = ({ items, totals, onClose, onSuccess }) => {
 
         </div>
 
-        {/* Footer */}
         <div className="ow-footer">
           {step === 1 ? (
             <button className="ow-btn-cancel" onClick={onClose}>Cancelar</button>

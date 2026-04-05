@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import AdminSidebar from './components/AdminSidebar/AdminSidebar';
+import BankAccountManager from './sections/BankAccountManager/BankAccountManager';
 import ProductManager from './sections/ProductManager/ProductManager';
 import CategoryManager from './sections/CategoryManager/CategoryManager';
 import BrandManager from './sections/BrandManager/BrandManager';
@@ -31,6 +32,7 @@ const AdminPanel = () => {
       <main className="dashboard-main">
         <Routes>
           <Route path="/" element={<Navigate to="products" replace />} />
+          <Route path="bank" element={<BankAccountManager />} />
           <Route path="products" element={<ProductManager />} />
           <Route path="categories" element={<CategoryManager />} />
           <Route path="brands" element={<BrandManager />} />

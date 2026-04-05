@@ -1,44 +1,28 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from 'react';
 import {
-  FiChevronDown,
-  FiChevronUp,
-  FiPlusCircle,
-  FiFileText,
-  FiMapPin,
-  FiCalendar,
-  FiDollarSign,
-  FiClock,
-  FiCheck,
-  FiX,
-  FiAlertCircle,
-  FiRefreshCw,
-  FiUpload,
-  FiShield,
-} from "react-icons/fi";
-import useQuotes from "../../../../hooks/useQuotes";
-import AdminDialog from "../../../../components/AdminDialog/AdminDialog";
-import "./QuotesList.scss";
+  FiChevronDown, FiChevronUp, FiPlusCircle, FiFileText,
+  FiMapPin, FiCalendar, FiDollarSign, FiClock, FiCheck,
+  FiX, FiAlertCircle, FiRefreshCw, FiUpload, FiShield, FiInfo,
+} from 'react-icons/fi';
+import useQuotes from '../../../../hooks/useQuotes';
+import useBankAccount from '../../../../hooks/useBankAccount';
+import AdminDialog from '../../../../components/AdminDialog/AdminDialog';
+import './QuotesList.scss';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-// ── Status config ─────────────────────────────────────────────
-
 const STATUS_CONFIG = {
-  PENDING: { label: "Pendiente", color: "yellow", icon: FiClock },
-  QUOTED: { label: "Presupuestado", color: "blue", icon: FiFileText },
-  ACCEPTED: { label: "Aceptado", color: "green", icon: FiCheck },
-  REJECTED: { label: "Rechazado", color: "red", icon: FiX },
-  IN_PROGRESS: { label: "En progreso", color: "orange", icon: FiRefreshCw },
-  COMPLETED: { label: "Completado", color: "success", icon: FiCheck },
-  CANCELLED: { label: "Cancelado", color: "gray", icon: FiX },
+  PENDING:     { label: 'Pendiente',     color: 'yellow', icon: FiClock },
+  QUOTED:      { label: 'Presupuestado', color: 'blue',   icon: FiFileText },
+  ACCEPTED:    { label: 'Aceptado',      color: 'green',  icon: FiCheck },
+  REJECTED:    { label: 'Rechazado',     color: 'red',    icon: FiX },
+  IN_PROGRESS: { label: 'En progreso',   color: 'orange', icon: FiRefreshCw },
+  COMPLETED:   { label: 'Completado',    color: 'success',icon: FiCheck },
+  CANCELLED:   { label: 'Cancelado',     color: 'gray',   icon: FiX },
 };
 
 const StatusBadge = ({ status }) => {
-  const cfg = STATUS_CONFIG[status] || {
-    label: status,
-    color: "gray",
-    icon: FiClock,
-  };
+  const cfg = STATUS_CONFIG[status] || { label: status, color: 'gray', icon: FiClock };
   const Icon = cfg.icon;
   return (
     <span className={`ql-status-badge ql-status--${cfg.color}`}>
@@ -48,15 +32,13 @@ const StatusBadge = ({ status }) => {
   );
 };
 
-// ── Payment proof status config ───────────────────────────────
-
 const PROOF_STATUS = {
-  PENDING: { label: "Sin comprobante", color: "gray" },
-  PENDING_PROOF: { label: "Pendiente de pago", color: "yellow" },
-  PROOF_UPLOADED: { label: "Comprobante enviado", color: "blue" },
-  APPROVED: { label: "Aprobado", color: "green" },
-  REJECTED: { label: "Rechazado", color: "red" },
-  PAID: { label: "Pago confirmado", color: "success" },
+  PENDING:        { label: 'Sin comprobante',     color: 'gray' },
+  PENDING_PROOF:  { label: 'Pendiente de pago',   color: 'yellow' },
+  PROOF_UPLOADED: { label: 'Comprobante enviado', color: 'blue' },
+  APPROVED:       { label: 'Aprobado',            color: 'green' },
+  REJECTED:       { label: 'Rechazado',           color: 'red' },
+  PAID:           { label: 'Pago confirmado',      color: 'success' },
 };
 
 const ProofStatusBadge = ({ status }) => {
@@ -66,34 +48,23 @@ const ProofStatusBadge = ({ status }) => {
   );
 };
 
-// ── Format helpers ────────────────────────────────────────────
-
 const formatDate = (dateStr) => {
-  if (!dateStr) return "—";
-  return new Date(dateStr).toLocaleDateString("es-AR", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-  });
+  if (!dateStr) return '—';
+  return new Date(dateStr).toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' });
 };
 
 const formatCurrency = (amount) => {
-  if (amount === null || amount === undefined) return "—";
-  return new Intl.NumberFormat("es-AR", {
-    style: "currency",
-    currency: "ARS",
-    maximumFractionDigits: 0,
-  }).format(amount);
+  if (amount === null || amount === undefined) return '—';
+  return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(amount);
 };
 
 const renderServiceDetails = (details, formSchema) => {
-  if (!details || typeof details !== "object") return null;
+  if (!details || typeof details !== 'object') return null;
   const fields = formSchema?.fields || [];
   return Object.entries(details).map(([key, val]) => {
     const fieldDef = fields.find((f) => f.id === key);
-    const label = fieldDef?.label || key.replace(/_/g, " ");
-    const displayVal =
-      typeof val === "boolean" ? (val ? "Sí" : "No") : String(val ?? "—");
+    const label = fieldDef?.label || key.replace(/_/g, ' ');
+    const displayVal = typeof val === 'boolean' ? (val ? 'Sí' : 'No') : String(val ?? '—');
     return (
       <div key={key} className="ql-detail-row">
         <span className="ql-detail-key">{label}</span>
@@ -103,30 +74,24 @@ const renderServiceDetails = (details, formSchema) => {
   });
 };
 
-// ── Payment proof uploader ────────────────────────────────────
-
-const PaymentProofUploader = ({ quote, paymentType, onUpload }) => {
-  const [file, setFile] = useState(null);
-  const [uploading, setUploading] = useState(false);
+const PaymentProofUploader = ({ quote, paymentType, onUpload, bankAccount }) => {
+  const [file, setFile]               = useState(null);
+  const [uploading, setUploading]     = useState(false);
   const [uploadError, setUploadError] = useState(null);
 
-  const isDeposit = paymentType === "deposit";
-  const proofUrl = isDeposit ? quote.deposit_proof_url : quote.final_proof_url;
-  const proofStatus = isDeposit
-    ? quote.deposit_payment_status
-    : quote.final_payment_status;
-  const amount = isDeposit ? quote.deposit_amount : quote.final_payment_amount;
-  const label = isDeposit ? "Seña" : "Pago final";
+  const isDeposit   = paymentType === 'deposit';
+  const proofUrl    = isDeposit ? quote.deposit_proof_url : quote.final_proof_url;
+  const proofStatus = isDeposit ? quote.deposit_payment_status : quote.final_payment_status;
+  const amount      = isDeposit ? quote.deposit_amount : quote.final_payment_amount;
+  const label       = isDeposit ? 'Seña' : 'Pago final';
 
-  const canUpload = !["PAID", "APPROVED", "PROOF_UPLOADED"].includes(
-    proofStatus,
-  );
+  const canUpload = !['PAID', 'APPROVED', 'PROOF_UPLOADED'].includes(proofStatus);
 
   const handleFileChange = (e) => {
     const f = e.target.files[0];
     if (!f) return;
     if (f.size > 10 * 1024 * 1024) {
-      setUploadError("El archivo no puede superar los 10MB");
+      setUploadError('El archivo no puede superar los 10MB');
       return;
     }
     setFile(f);
@@ -141,16 +106,14 @@ const PaymentProofUploader = ({ quote, paymentType, onUpload }) => {
       await onUpload(quote.id, file, paymentType);
       setFile(null);
     } catch (err) {
-      setUploadError(err.message || "Error al subir el comprobante");
+      setUploadError(err.message || 'Error al subir el comprobante');
     } finally {
       setUploading(false);
     }
   };
 
   return (
-    <div
-      className={`ql-proof-section ql-proof-section--${(proofStatus || "pending").toLowerCase()}`}
-    >
+    <div className={`ql-proof-section ql-proof-section--${(proofStatus || 'pending').toLowerCase()}`}>
       <div className="ql-proof-header">
         <div className="ql-proof-header-left">
           <FiShield size={14} />
@@ -159,7 +122,7 @@ const PaymentProofUploader = ({ quote, paymentType, onUpload }) => {
             <span className="ql-proof-amount">{formatCurrency(amount)}</span>
           )}
         </div>
-        <ProofStatusBadge status={proofStatus || "PENDING"} />
+        <ProofStatusBadge status={proofStatus || 'PENDING'} />
       </div>
 
       {proofUrl && (
@@ -175,23 +138,52 @@ const PaymentProofUploader = ({ quote, paymentType, onUpload }) => {
         </a>
       )}
 
-      {proofStatus === "REJECTED" && (
+      {proofStatus === 'REJECTED' && (
         <p className="ql-proof-msg ql-proof-msg--rejected">
           <FiAlertCircle size={13} />
           Tu comprobante fue rechazado. Por favor subí uno nuevo.
         </p>
       )}
-      {proofStatus === "PROOF_UPLOADED" && (
+      {proofStatus === 'PROOF_UPLOADED' && (
         <p className="ql-proof-msg ql-proof-msg--waiting">
           <FiClock size={13} />
           Comprobante recibido — esperando revisión del equipo.
         </p>
       )}
-      {(proofStatus === "PAID" || proofStatus === "APPROVED") && (
+      {(proofStatus === 'PAID' || proofStatus === 'APPROVED') && (
         <p className="ql-proof-msg ql-proof-msg--confirmed">
           <FiCheck size={13} />
           Pago verificado y confirmado.
         </p>
+      )}
+
+      {canUpload && bankAccount && (
+        <div className="ql-bank-transfer-info">
+          <div className="ql-bank-transfer-title">
+            <FiInfo size={13} />
+            Datos para transferir
+          </div>
+          <div className="ql-bank-transfer-grid">
+            <div className="ql-bank-transfer-row">
+              <span className="ql-bank-transfer-label">Banco</span>
+              <span className="ql-bank-transfer-value">{bankAccount.bank_name}</span>
+            </div>
+            <div className="ql-bank-transfer-row">
+              <span className="ql-bank-transfer-label">Titular</span>
+              <span className="ql-bank-transfer-value">{bankAccount.holder_name}</span>
+            </div>
+            {bankAccount.alias && (
+              <div className="ql-bank-transfer-row">
+                <span className="ql-bank-transfer-label">Alias</span>
+                <span className="ql-bank-transfer-value ql-bank-transfer-value--highlight">{bankAccount.alias}</span>
+              </div>
+            )}
+            <div className="ql-bank-transfer-row">
+              <span className="ql-bank-transfer-label">CBU</span>
+              <span className="ql-bank-transfer-value ql-bank-transfer-value--mono">{bankAccount.cbu}</span>
+            </div>
+          </div>
+        </div>
       )}
 
       {canUpload && (
@@ -206,10 +198,10 @@ const PaymentProofUploader = ({ quote, paymentType, onUpload }) => {
             />
             <label
               htmlFor={`proof-${paymentType}-${quote.id}`}
-              className={`ql-proof-file-label ${file ? "has-file" : ""}`}
+              className={`ql-proof-file-label ${file ? 'has-file' : ''}`}
             >
               <FiUpload size={16} />
-              <span>{file ? file.name : "Seleccionar comprobante"}</span>
+              <span>{file ? file.name : 'Seleccionar comprobante'}</span>
               <small>PDF, JPG o PNG — máx 10MB</small>
             </label>
           </div>
@@ -228,13 +220,9 @@ const PaymentProofUploader = ({ quote, paymentType, onUpload }) => {
             disabled={!file || uploading}
           >
             {uploading ? (
-              <>
-                <span className="ql-proof-spinner" /> Subiendo…
-              </>
+              <><span className="ql-proof-spinner" /> Subiendo…</>
             ) : (
-              <>
-                <FiUpload size={14} /> Enviar comprobante
-              </>
+              <><FiUpload size={14} /> Enviar comprobante</>
             )}
           </button>
         </div>
@@ -243,53 +231,36 @@ const PaymentProofUploader = ({ quote, paymentType, onUpload }) => {
   );
 };
 
-// ── Dialog initial state ──────────────────────────────────────
-
 const DIALOG_CLOSED = {
-  open: false,
-  type: "confirm",
-  variant: "default",
-  title: "",
-  message: "",
-  placeholder: "",
-  confirmLabel: "Confirmar",
-  onConfirm: null,
+  open: false, type: 'confirm', variant: 'default',
+  title: '', message: '', placeholder: '',
+  confirmLabel: 'Confirmar', onConfirm: null,
 };
 
-// ── Quote Card ────────────────────────────────────────────────
-
-const QuoteCard = ({ quote: quoteProp, onAccept, onReject, onUploadProof }) => {
-  const [quote, setQuote] = useState(quoteProp);
-  const [expanded, setExpanded] = useState(false);
+const QuoteCard = ({ quote: quoteProp, onAccept, onReject, onUploadProof, bankAccount }) => {
+  const [quote, setQuote]             = useState(quoteProp);
+  const [expanded, setExpanded]       = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
-  const [dialog, setDialog] = useState(DIALOG_CLOSED);
+  const [dialog, setDialog]           = useState(DIALOG_CLOSED);
 
-  const address = quote.address;
-  const service = quote.service;
+  const address    = quote.address;
+  const service    = quote.service;
   const formSchema = service?.form_schema;
 
   const closeDialog = () => setDialog(DIALOG_CLOSED);
 
-  // ─── Aceptar ──────────────────────────────────────────────────────────────
   const handleAccept = () => {
     setDialog({
-      open: true,
-      type: "confirm",
-      variant: "default",
-      title: "Aceptar presupuesto",
+      open: true, type: 'confirm', variant: 'default',
+      title: 'Aceptar presupuesto',
       message: `¿Confirmás que querés aceptar el presupuesto ${quote.quote_number} por ${formatCurrency(quote.quoted_amount)}?`,
-      placeholder: "",
-      confirmLabel: "Sí, aceptar",
+      placeholder: '', confirmLabel: 'Sí, aceptar',
       onConfirm: async () => {
         closeDialog();
         setActionLoading(true);
         try {
           await onAccept(quote.id);
-          setQuote((prev) => ({
-            ...prev,
-            status: "ACCEPTED",
-            accepted_at: new Date().toISOString(),
-          }));
+          setQuote((prev) => ({ ...prev, status: 'ACCEPTED', accepted_at: new Date().toISOString() }));
         } finally {
           setActionLoading(false);
         }
@@ -297,27 +268,22 @@ const QuoteCard = ({ quote: quoteProp, onAccept, onReject, onUploadProof }) => {
     });
   };
 
-  // ─── Rechazar ─────────────────────────────────────────────────────────────
   const handleReject = () => {
     setDialog({
-      open: true,
-      type: "prompt",
-      variant: "danger",
-      title: "Rechazar presupuesto",
-      message:
-        "¿Por qué rechazás el presupuesto? Podés dejarlo en blanco si preferís.",
-      placeholder: "Motivo del rechazo (opcional)...",
-      confirmLabel: "Rechazar",
+      open: true, type: 'prompt', variant: 'danger',
+      title: 'Rechazar presupuesto',
+      message: '¿Por qué rechazás el presupuesto? Podés dejarlo en blanco si preferís.',
+      placeholder: 'Motivo del rechazo (opcional)...',
+      confirmLabel: 'Rechazar',
       onConfirm: async (reason) => {
         closeDialog();
         setActionLoading(true);
         try {
-          await onReject(quote.id, reason || "");
+          await onReject(quote.id, reason || '');
           setQuote((prev) => ({
-            ...prev,
-            status: "REJECTED",
+            ...prev, status: 'REJECTED',
             rejected_at: new Date().toISOString(),
-            rejection_reason: reason || "",
+            rejection_reason: reason || '',
           }));
         } finally {
           setActionLoading(false);
@@ -326,12 +292,8 @@ const QuoteCard = ({ quote: quoteProp, onAccept, onReject, onUploadProof }) => {
     });
   };
 
-  const showPayments = ["ACCEPTED", "IN_PROGRESS", "COMPLETED"].includes(
-    quote.status,
-  );
-  const depositConfirmed = ["PAID", "APPROVED"].includes(
-    quote.deposit_payment_status,
-  );
+  const showPayments = ['ACCEPTED', 'IN_PROGRESS', 'COMPLETED'].includes(quote.status);
+  const depositConfirmed = ['PAID', 'APPROVED'].includes(quote.deposit_payment_status);
 
   return (
     <>
@@ -348,17 +310,14 @@ const QuoteCard = ({ quote: quoteProp, onAccept, onReject, onUploadProof }) => {
         onCancel={closeDialog}
       />
 
-      <div className={`ql-card ${expanded ? "expanded" : ""}`}>
-        {/* ── Header ── */}
+      <div className={`ql-card ${expanded ? 'expanded' : ''}`}>
         <div className="ql-card-header" onClick={() => setExpanded(!expanded)}>
           <div className="ql-card-left">
             <span className="ql-quote-number">{quote.quote_number}</span>
             <StatusBadge status={quote.status} />
           </div>
           <div className="ql-card-meta">
-            <span className="ql-card-service">
-              {quote.service_type || service?.type}
-            </span>
+            <span className="ql-card-service">{quote.service_type || service?.type}</span>
             <span className="ql-card-date">
               <FiCalendar size={13} />
               {formatDate(quote.createdAt)}
@@ -375,10 +334,8 @@ const QuoteCard = ({ quote: quoteProp, onAccept, onReject, onUploadProof }) => {
           </button>
         </div>
 
-        {/* ── Body ── */}
         {expanded && (
           <div className="ql-card-body">
-            {/* Address */}
             {address && (
               <div className="ql-detail-section">
                 <div className="ql-detail-section-title">
@@ -389,26 +346,23 @@ const QuoteCard = ({ quote: quoteProp, onAccept, onReject, onUploadProof }) => {
                   {address.street} {address.number}
                   {address.floor && `, Piso ${address.floor}`}
                   {address.apartment && `, Depto ${address.apartment}`}
-                  {", "}
+                  {', '}
                   {address.city}, {address.province}
                 </p>
               </div>
             )}
 
-            {/* Service details */}
-            {quote.service_details &&
-              Object.keys(quote.service_details).length > 0 && (
-                <div className="ql-detail-section">
-                  <div className="ql-detail-section-title">
-                    <FiFileText size={14} /> Detalles del proyecto
-                  </div>
-                  <div className="ql-detail-grid">
-                    {renderServiceDetails(quote.service_details, formSchema)}
-                  </div>
+            {quote.service_details && Object.keys(quote.service_details).length > 0 && (
+              <div className="ql-detail-section">
+                <div className="ql-detail-section-title">
+                  <FiFileText size={14} /> Detalles del proyecto
                 </div>
-              )}
+                <div className="ql-detail-grid">
+                  {renderServiceDetails(quote.service_details, formSchema)}
+                </div>
+              </div>
+            )}
 
-            {/* Client notes */}
             {quote.client_notes && (
               <div className="ql-detail-section">
                 <div className="ql-detail-section-title">Notas del cliente</div>
@@ -416,7 +370,6 @@ const QuoteCard = ({ quote: quoteProp, onAccept, onReject, onUploadProof }) => {
               </div>
             )}
 
-            {/* Budget summary */}
             {quote.quoted_amount && (
               <div className="ql-budget-summary">
                 <div className="ql-detail-section-title">
@@ -480,13 +433,12 @@ const QuoteCard = ({ quote: quoteProp, onAccept, onReject, onUploadProof }) => {
                 {quote.estimated_completion_days && (
                   <p className="ql-budget-validity">
                     <FiCalendar size={12} />
-                    Tiempo estimado: {quote.estimated_completion_days} días
-                    hábiles
+                    Tiempo estimado: {quote.estimated_completion_days} días hábiles
                   </p>
                 )}
               </div>
             )}
-            {/* Motivo de rechazo/cancelación */}
+
             {quote.rejection_reason && (
               <div className="ql-detail-section">
                 <div className="ql-detail-section-title">
@@ -498,8 +450,7 @@ const QuoteCard = ({ quote: quoteProp, onAccept, onReject, onUploadProof }) => {
               </div>
             )}
 
-            {/* Accept / Reject — only when QUOTED */}
-            {quote.status === "QUOTED" && (
+            {quote.status === 'QUOTED' && (
               <div className="ql-card-actions">
                 <button
                   type="button"
@@ -522,7 +473,6 @@ const QuoteCard = ({ quote: quoteProp, onAccept, onReject, onUploadProof }) => {
               </div>
             )}
 
-            {/* Payment proofs — ACCEPTED, IN_PROGRESS, COMPLETED */}
             {showPayments && (
               <div className="ql-payments-section">
                 <div className="ql-payments-title">
@@ -533,12 +483,14 @@ const QuoteCard = ({ quote: quoteProp, onAccept, onReject, onUploadProof }) => {
                   quote={quote}
                   paymentType="deposit"
                   onUpload={onUploadProof}
+                  bankAccount={bankAccount}
                 />
                 {depositConfirmed && (
                   <PaymentProofUploader
                     quote={quote}
                     paymentType="final"
                     onUpload={onUploadProof}
+                    bankAccount={bankAccount}
                   />
                 )}
               </div>
@@ -550,42 +502,29 @@ const QuoteCard = ({ quote: quoteProp, onAccept, onReject, onUploadProof }) => {
   );
 };
 
-// ── Main List ─────────────────────────────────────────────────
-
 const QuotesList = ({ onNewQuote }) => {
   const {
-    quotes,
-    loading,
-    error,
-    fetchQuotes,
-    acceptQuote,
-    rejectQuote,
-    uploadPaymentProof,
-    clearError,
+    quotes, loading, error,
+    fetchQuotes, acceptQuote, rejectQuote, uploadPaymentProof, clearError,
   } = useQuotes();
 
-  const load = useCallback(() => {
-    fetchQuotes();
-  }, [fetchQuotes]);
+  const { account: bankAccount, fetchBankAccount } = useBankAccount();
+
+  const load = useCallback(() => { fetchQuotes(); }, [fetchQuotes]);
 
   useEffect(() => {
     load();
+    fetchBankAccount();
   }, [load]);
 
   const handleAccept = async (quoteId) => {
-    try {
-      await acceptQuote(quoteId);
-    } catch (err) {
-      console.error("Error al aceptar:", err);
-    }
+    try { await acceptQuote(quoteId); }
+    catch (err) { console.error('Error al aceptar:', err); }
   };
 
   const handleReject = async (quoteId, reason) => {
-    try {
-      await rejectQuote(quoteId, reason);
-    } catch (err) {
-      console.error("Error al rechazar:", err);
-    }
+    try { await rejectQuote(quoteId, reason); }
+    catch (err) { console.error('Error al rechazar:', err); }
   };
 
   const handleUploadProof = async (quoteId, file, paymentType) => {
@@ -623,8 +562,7 @@ const QuotesList = ({ onNewQuote }) => {
         </div>
         <h3>Todavía no tenés solicitudes</h3>
         <p>
-          Cuando solicites un presupuesto, aparecerá acá con su estado y
-          seguimiento.
+          Cuando solicites un presupuesto, aparecerá acá con su estado y seguimiento.
         </p>
         <button className="ql-empty-btn" onClick={onNewQuote} type="button">
           <FiPlusCircle size={16} />
@@ -639,7 +577,7 @@ const QuotesList = ({ onNewQuote }) => {
       <div className="ql-list-header">
         <div className="ql-list-title">
           <h2>
-            {quotes.length} {quotes.length === 1 ? "solicitud" : "solicitudes"}
+            {quotes.length} {quotes.length === 1 ? 'solicitud' : 'solicitudes'}
           </h2>
         </div>
         <button className="ql-new-btn" onClick={onNewQuote} type="button">
@@ -666,6 +604,7 @@ const QuotesList = ({ onNewQuote }) => {
             onAccept={handleAccept}
             onReject={handleReject}
             onUploadProof={handleUploadProof}
+            bankAccount={bankAccount}
           />
         ))}
       </div>

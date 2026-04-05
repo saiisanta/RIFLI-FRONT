@@ -1,0 +1,44 @@
+@use "../../../../../../styles/breakpoints" as *;
+
+.ba-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 3rem;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+
+  @include respond-down("tablet") {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+.ba-header-left {
+  h1 {
+    font-size: 2.5rem;
+    font-weight: 900;
+    color: var(--admin-text);
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+
+    svg {
+      color: var(--admin-accent);
+    }
+
+    @include respond-down("tablet") {
+      font-size: 2rem;
+    }
+
+    @include respond-down("mobile-lg") {
+      font-size: 1.75rem;
+    }
+  }
+
+  .ba-header-subtitle {
+    color: var(--admin-text-muted);
+    font-size: 0.95rem;
+  }
+}

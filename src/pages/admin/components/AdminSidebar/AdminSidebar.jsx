@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { 
+  Bank,
   BoxArrowLeft, 
   ChevronRight,
   Box,
@@ -19,6 +20,7 @@ const AdminSidebar = ({ sidebarOpen, setSidebarOpen }) => {
   const location = useLocation();
 
   const menuItems = [
+    { path: '/admin/bank',    label: 'Banco',     icon: Bank },
     { path: '/admin/products',    label: 'Productos',     icon: Box },
     { path: '/admin/categories',  label: 'Categorías',    icon: Grid3x3 },
     { path: '/admin/brands',      label: 'Marcas',        icon: Award },

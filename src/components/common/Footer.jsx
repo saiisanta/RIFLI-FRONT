@@ -11,8 +11,7 @@ export default function Footer() {
           <h2>RIFLI</h2>
           <p>
             Nos dedicamos a brindar soluciones integrales en instalaciones eléctricas,
-            seguridad, gas, construcción en seco y distribución de materiales. 
-            Garantizamos calidad, experiencia y compromiso en cada proyecto.
+            seguridad y de gas.
           </p>
         </div>
 
@@ -23,16 +22,14 @@ export default function Footer() {
               <li>Seguridad</li>
               <li>Electricidad</li>
               <li>Gasista</li>
-              <li>Trabajos en seco</li>
-              <li>Distribución</li>
             </ul>
           </div>
           <div className="footer-contact">
             <h4>Contacto</h4>
             <ul>
-              <li>📞 +54 9 11 1234 5678</li>
-              <li>✉️ riflisoporte@gmail.com</li>
-              <li>📍 Firmat, Santa Fe</li>
+              <li>+54 9 11 1234 5678</li>
+              <li>riflisoporte@gmail.com</li>
+              <li>Firmat, Santa Fe</li>
             </ul>
           </div>
         </div>

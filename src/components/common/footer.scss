@@ -3,7 +3,7 @@
 .site-footer {
   background-color: #1a1a1a;
   color: #ffffff;
-  padding: 4rem 2rem 2rem;
+  padding: 2rem 2rem 2rem;
   font-family: "Roboto", sans-serif;
   border-top: 3px solid var(--accent-yellow);
 }
@@ -14,11 +14,17 @@
   flex-wrap: wrap;
   max-width: 1200px;
   margin: 0 auto;
-  padding-bottom: 3rem;
+  padding-bottom: 1rem;
+  padding-top: 1rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 
   @include respond-down("burger") {
     flex-direction: column;
+    align-items: center;
     gap: 3rem;
   }
 }
@@ -28,16 +34,20 @@
 
   h2 {
     color: var(--accent-yellow);
-    margin-bottom: 1.5rem;
+    margin-bottom: 0.5rem;
     font-size: var(--fz-subtitle);
     font-weight: 700;
 
-    @include respond-down("mobile-lg") {
+    @include respond-down("burger") {
       text-align: center;
+      margin-bottom: 2rem;
+      width: 100%;
+      background: transparent;
     }
   }
 
   p {
+    padding-top: 0rem;
     font-size: var(--fz-body);
     color: #ccc;
     line-height: 1.6;
@@ -46,10 +56,8 @@
 
     @include respond-down("burger") {
       max-width: 100%;
-    }
-
-    @include respond-down("mobile-lg") {
       text-align: center;
+      padding-top: 1rem;
     }
   }
 }
@@ -62,14 +70,15 @@
   flex-wrap: wrap;
 
   @include respond-down("burger") {
-    justify-content: flex-start;
-    gap: 2rem;
+    width: 100%;
+    justify-content: center;
+    gap: 3rem;
   }
 
   @include respond-down("mobile-lg") {
     flex-direction: column;
     align-items: center;
-    text-align: center;
+    gap: 2rem;
   }
 }
 
@@ -77,16 +86,18 @@
 .footer-contact {
   min-width: 160px;
 
+  @include respond-down("burger") {
+    text-align: center;
+    flex: 0 1 auto;
+  }
+
   h4 {
     color: var(--accent-yellow);
     margin-bottom: 1.5rem;
     font-size: 1.2rem;
     text-transform: uppercase;
     letter-spacing: 1px;
-
-    @include respond-down("mobile-lg") {
-      text-align: center;
-    }
+    margin-top: 0rem;
   }
 
   ul {
@@ -103,7 +114,7 @@
       gap: 10px;
       transition: color 0.3s ease;
 
-      @include respond-down("mobile-lg") {
+      @include respond-down("burger") {
         justify-content: center;
       }
 
@@ -119,6 +130,10 @@
   padding-top: 2rem;
   font-size: 0.9rem;
   color: #777;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 
   p {
     margin: 0;

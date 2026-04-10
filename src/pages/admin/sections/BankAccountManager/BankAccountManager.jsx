@@ -1,44 +1,28 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import useBankAccount from '../../../../hooks/useBankAccount';
+import useApiError from '../../../../hooks/useApiError';
+import RateLimitToast from '../../../../components/RateLimitToast/RateLimitToast';
 import BankAccountHeader from './components/BankAccountHeader/BankAccountHeader';
 import BankAccountForm from './components/BankAccountForm/BankAccountForm';
 import BankAccountCard from './components/BankAccountCard/BankAccountCard';
 import './BankAccountManager.scss';
 
 const BankAccountManager = () => {
-  const {
-    account,
-    loading,
-    error,
-    fetchBankAccount,
-    createBankAccount,
-    updateBankAccount,
-    toggleBankAccount,
-    clearError,
-  } = useBankAccount();
+  const { account, loading, error, createBankAccount, updateBankAccount, toggleBankAccount, clearError } = useBankAccount();
 
-  useEffect(() => {
-    fetchBankAccount();
-  }, [fetchBankAccount]);
+  const { generalError, rateLimitError, handleApiError, clearApiError, clearRateLimitError } = useApiError();
 
   const handleSubmit = async (formData) => {
+    clearApiError();
     try {
-      if (account) {
-        await updateBankAccount(formData);
-      } else {
-        await createBankAccount(formData);
-      }
-    } catch (err) {
-      console.error('Error al guardar cuenta bancaria:', err);
-    }
+      if (account) { await updateBankAccount(formData); } else { await createBankAccount(formData); }
+    } catch (err) { handleApiError(err); }
   };
 
   const handleToggle = async () => {
-    try {
-      await toggleBankAccount();
-    } catch (err) {
-      console.error('Error al cambiar estado:', err);
-    }
+    clearApiError();
+    try { await toggleBankAccount(); }
+    catch (err) { handleApiError(err); }
   };
 
   if (loading && !account) {
@@ -51,25 +35,20 @@ const BankAccountManager = () => {
   }
 
   return (
-    <div className="ba-manager">
-      <BankAccountHeader />
-
-      <BankAccountForm
-        account={account}
-        loading={loading}
-        errorMsg={error}
-        onSubmit={handleSubmit}
-        onErrorClose={clearError}
-      />
-
-      {account && (
-        <BankAccountCard
+    <>
+      <RateLimitToast message={rateLimitError} onClose={clearRateLimitError} />
+      <div className="ba-manager">
+        <BankAccountHeader />
+        <BankAccountForm
           account={account}
           loading={loading}
-          onToggle={handleToggle}
+          errorMsg={generalError || error}
+          onSubmit={handleSubmit}
+          onErrorClose={() => { clearError(); clearApiError(); }}
         />
-      )}
-    </div>
+        {account && <BankAccountCard account={account} loading={loading} onToggle={handleToggle} />}
+      </div>
+    </>
   );
 };
 

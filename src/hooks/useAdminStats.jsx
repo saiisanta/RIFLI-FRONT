@@ -1,82 +1,46 @@
-import { useState, useCallback} from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import adminService from '../services/adminService';
 
-export const useAdminStats = () => {
-    const [stats, setStats] = useState(null);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
-  
-    const fetchDashboard = useCallback(async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const data = await adminService.getDashboard();
-        setStats(data);
-        return data;
-      } catch (err) {
-        setError(err.message || 'Error al cargar dashboard');
-        throw err;
-      } finally {
-        setLoading(false);
-      }
-    }, []);
-  
-    const fetchAnalytics = useCallback(async (params = {}) => {
-      try {
-        setLoading(true);
-        setError(null);
-        const data = await adminService.getAnalytics(params);
-        return data;
-      } catch (err) {
-        setError(err.message || 'Error al cargar analytics');
-        throw err;
-      } finally {
-        setLoading(false);
-      }
-    }, []);
-  
-    const banUser = useCallback(async (userId, reason = '') => {
-      try {
-        setLoading(true);
-        setError(null);
-        const data = await adminService.banUser(userId, reason);
-        return data;
-      } catch (err) {
-        setError(err.message || 'Error al banear usuario');
-        throw err;
-      } finally {
-        setLoading(false);
-      }
-    }, []);
-  
-    const unbanUser = useCallback(async (userId) => {
-      try {
-        setLoading(true);
-        setError(null);
-        const data = await adminService.unbanUser(userId);
-        return data;
-      } catch (err) {
-        setError(err.message || 'Error al desbanear usuario');
-        throw err;
-      } finally {
-        setLoading(false);
-      }
-    }, []);
-  
-    const clearError = useCallback(() => {
-      setError(null);
-    }, []);
-  
-    return {
-      stats,
-      loading,
-      error,
-      fetchDashboard,
-      fetchAnalytics,
-      banUser,
-      unbanUser,
-      clearError,
-    };
-  };
+const DASHBOARD_KEY = ['admin', 'dashboard'];
 
-  export default useAdminStats;
+const useAdminStats = () => {
+  const queryClient = useQueryClient();
+
+  const {
+    data: stats = null,
+    isLoading: loading,
+    error: queryError,
+    refetch: fetchDashboard,
+  } = useQuery({
+    queryKey: DASHBOARD_KEY,
+    queryFn: adminService.getDashboard,
+    staleTime: 1000 * 60 * 2,
+  });
+
+  const error = queryError?.message ?? null;
+
+  const fetchAnalytics = (params = {}) => adminService.getAnalytics(params);
+
+  const banMutation = useMutation({
+    mutationFn: ({ userId, reason }) => adminService.banUser(userId, reason),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: DASHBOARD_KEY }),
+  });
+
+  const unbanMutation = useMutation({
+    mutationFn: adminService.unbanUser,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: DASHBOARD_KEY }),
+  });
+
+  return {
+    stats,
+    loading,
+    error,
+    fetchDashboard,
+    fetchAnalytics,
+    banUser: (userId, reason = '') => banMutation.mutateAsync({ userId, reason }),
+    unbanUser: unbanMutation.mutateAsync,
+    clearError: () => {},
+  };
+};
+
+export default useAdminStats;

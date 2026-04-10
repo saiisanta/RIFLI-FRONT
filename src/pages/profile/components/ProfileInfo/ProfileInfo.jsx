@@ -1,41 +1,17 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef } from 'react';
 import { FiMail, FiPhone, FiMapPin, FiLock, FiAlertTriangle, FiCamera, FiTrash2, FiFileText } from 'react-icons/fi';
-import addressService from "../../../../services/addressService"; // Asegúrate de que la ruta sea correcta
+import useAddresses  from '../../../../hooks/useAddress';;
 import './ProfileInfo.scss';
 
 const ProfileInfo = ({ profile, onChangePassword, onDeleteAccount, onAvatarChange, onAvatarDelete }) => {
   const [avatarPreview, setAvatarPreview] = useState(null);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
-  const [selectedAddress, setSelectedAddress] = useState(null);
-  const [addressLoading, setAddressLoading] = useState(false);
   const fileInputRef = useRef(null);
 
-  const fetchPrimaryAddress = useCallback(async () => {
-    try {
-      setAddressLoading(true);
-      const data = await addressService.getMyAddresses();
-      const addresses = Array.isArray(data) ? data : data.addresses || [];
+  const { addresses, loading: addressLoading } = useAddresses();
+  const selectedAddress = addresses.find((a) => a.is_default) ?? addresses[0] ?? null;
 
-      if (addresses.length > 0) {
-        const defaultAddr = addresses.find((addr) => addr.is_default) || addresses[0];
-        setSelectedAddress(defaultAddr);
-      } else {
-        setSelectedAddress(null);
-      }
-    } catch (err) {
-      console.error("Error al cargar dirección principal en ProfileInfo:", err);
-    } finally {
-      setAddressLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchPrimaryAddress();
-  }, [fetchPrimaryAddress]);
-
-  const handleAvatarClick = () => {
-    fileInputRef.current?.click();
-  };
+  const handleAvatarClick = () => fileInputRef.current?.click();
 
   const handleAvatarChange = async (e) => {
     const file = e.target.files?.[0];
@@ -46,7 +22,6 @@ const ProfileInfo = ({ profile, onChangePassword, onDeleteAccount, onAvatarChang
       alert('Solo se permiten imágenes JPG, PNG o WEBP');
       return;
     }
-
     if (file.size > 5 * 1024 * 1024) {
       alert('La imagen no debe superar los 5MB');
       return;
@@ -61,7 +36,7 @@ const ProfileInfo = ({ profile, onChangePassword, onDeleteAccount, onAvatarChang
       await onAvatarChange(file);
       setAvatarPreview(null);
     } catch (error) {
-      console.error(error)
+      console.error(error);
       setAvatarPreview(null);
       alert('Error al subir la imagen');
     } finally {
@@ -72,8 +47,7 @@ const ProfileInfo = ({ profile, onChangePassword, onDeleteAccount, onAvatarChang
 
   const formatDocumentNumber = (number) => {
     if (!number) return 'No especificado';
-    const numStr = number.toString();
-    return numStr.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
   };
 
   const displayAvatar = avatarPreview || profile?.avatar_url;
@@ -88,9 +62,9 @@ const ProfileInfo = ({ profile, onChangePassword, onDeleteAccount, onAvatarChang
           <div className="profile-avatar-upload-section">
             <div className="profile-avatar-preview">
               {displayAvatar ? (
-                <img 
+                <img
                   src={avatarPreview ? avatarPreview : `http://localhost:4001${profile.avatar_url}`}
-                  alt="Avatar" 
+                  alt="Avatar"
                   className="avatar-preview-img"
                   onError={(e) => {
                     e.target.style.display = 'none';
@@ -196,4 +170,4 @@ const ProfileInfo = ({ profile, onChangePassword, onDeleteAccount, onAvatarChang
   );
 };
 
-export default ProfileInfo; 
+export default ProfileInfo;

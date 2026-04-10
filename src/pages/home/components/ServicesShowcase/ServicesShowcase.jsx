@@ -1,29 +1,24 @@
-import React, { useContext, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../../../../context/AuthContext";
-import useServices from "../../../../hooks/useServices";
-import "./ServicesShowcase.scss";
+import React, { useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { AuthContext } from '../../../../context/AuthContext';
+import useServices from '../../../../hooks/useServices';
+import './ServicesShowcase.scss';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 const ServicesShowcase = () => {
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
-  const { services, loading, fetchServices } = useServices();
-
-  useEffect(() => {
-    fetchServices();
-  }, [fetchServices]);
+  const { services, loading } = useServices();
 
   const handleViewMore = () => {
     if (user && user.email) {
-      navigate("/servicios");
+      navigate('/servicios');
     } else {
-      navigate("/login");
+      navigate('/login');
     }
   };
 
-  // Skeleton cards mientras carga
   if (loading) {
     return (
       <section id="servicios" className="services-showcase">
@@ -69,7 +64,6 @@ const ServicesShowcase = () => {
           const mainImage = Array.isArray(service.images) && service.images.length > 0
             ? `${API_URL}${service.images[0]}`
             : null;
-
           const features = Array.isArray(service.features) ? service.features : [];
 
           return (
@@ -80,11 +74,7 @@ const ServicesShowcase = () => {
             >
               <div className="service-image-wrapper">
                 {mainImage ? (
-                  <img
-                    src={mainImage}
-                    alt={service.type}
-                    className="service-image"
-                  />
+                  <img src={mainImage} alt={service.type} className="service-image" />
                 ) : (
                   <div className="service-image service-image--placeholder" />
                 )}
@@ -100,16 +90,12 @@ const ServicesShowcase = () => {
                       className="service-icon service-icon--img"
                     />
                   ) : (
-                    <span className="service-icon service-icon--fallback">
-                      ⚡
-                    </span>
+                    <span className="service-icon service-icon--fallback">⚡</span>
                   )}
                 </div>
 
                 <h3 className="service-title">{service.type}</h3>
-                <p className="service-description">
-                  {service.short_description || ""}
-                </p>
+                <p className="service-description">{service.short_description || ''}</p>
 
                 {features.length > 0 && (
                   <div className="service-features">

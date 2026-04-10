@@ -1,133 +1,69 @@
-import { useState, useCallback, useEffect } from "react";
-import cartService from "../services/cartService";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import cartService from '../services/cartService';
+
+const CART_KEY = ['cart'];
+
+const parseCart = (data) => {
+  const c = data?.cart ?? data;
+  return {
+    cart: c ?? null,
+    items: c?.items ?? [],
+    totals: {
+      subtotal: Number(c?.subtotal) || 0,
+      total:    Number(c?.total)    || Number(c?.subtotal) || 0,
+      tax:      Number(c?.tax)      || 0,
+      shipping: Number(c?.shipping) || 0,
+      discount: Number(c?.discount) || 0,
+    },
+  };
+};
 
 const useCart = () => {
-  const [cart, setCart] = useState(null);
-  const [items, setItems] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [totals, setTotals] = useState({
-    subtotal: 0,
-    tax: 0,
-    shipping: 0,
-    discount: 0,
-    total: 0,
+  const queryClient = useQueryClient();
+
+  const {
+    data,
+    isLoading: loading,
+    error: queryError,
+  } = useQuery({
+    queryKey: CART_KEY,
+    queryFn: cartService.getCart,
+    staleTime: 1000 * 60 * 2,
+    retry: false,
+    select: parseCart,
   });
 
-  const syncCart = (data) => {
-    const c = data.cart || data;
-    setCart(c);
-    setItems(c?.items || []);
-    // FIX: el backend devuelve subtotal directo, no un objeto totals
-    setTotals({
-      subtotal: Number(c.subtotal) || 0,
-      total: Number(c.total) || Number(c.subtotal) || 0,
-      tax: Number(c.tax) || 0,
-      shipping: Number(c.shipping) || 0,
-      discount: Number(c.discount) || 0,
-    });
-  };
+  const cart   = data?.cart   ?? null;
+  const items  = data?.items  ?? [];
+  const totals = data?.totals ?? { subtotal: 0, total: 0, tax: 0, shipping: 0, discount: 0 };
+  const error  = queryError?.status === 404 ? null : (queryError?.message ?? null);
 
-  useEffect(() => {
-    fetchCart();
-  }, []);
+  const setCart = (responseData) => queryClient.setQueryData(CART_KEY, responseData);
 
-  const fetchCart = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await cartService.getCart();
-      console.log("cart response:", data);
-      syncCart(data);
-      return data;
-    } catch (err) {
-      // Cart vacío es OK — no es un error real
-      if (err?.status !== 404) {
-        setError(err.message || err.error || "Error al cargar carrito");
-      }
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const addMutation = useMutation({
+    mutationFn: cartService.addToCart,
+    onSuccess: setCart,
+  });
 
-  const addToCart = useCallback(async ({ product_id, quantity = 1 }) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await cartService.addToCart({ product_id, quantity });
-      syncCart(data);
-      return data;
-    } catch (err) {
-      setError(err.message || err.error || "Error al agregar al carrito");
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const updateMutation = useMutation({
+    mutationFn: ({ productId, quantity }) => cartService.updateCartItem(productId, quantity),
+    onSuccess: setCart,
+  });
 
-  // FIX: product_id no itemId
-  const updateQuantity = useCallback(async (productId, quantity) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await cartService.updateCartItem(productId, quantity);
-      syncCart(data);
-      return data;
-    } catch (err) {
-      setError(err.message || err.error || "Error al actualizar cantidad");
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const removeMutation = useMutation({
+    mutationFn: cartService.removeFromCart,
+    onSuccess: setCart,
+  });
 
-  const removeFromCart = useCallback(async (productId) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await cartService.removeFromCart(productId);
-      syncCart(data);
-      return data;
-    } catch (err) {
-      setError(err.message || err.error || "Error al eliminar del carrito");
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const clearMutation = useMutation({
+    mutationFn: cartService.clearCart,
+    onSuccess: () => queryClient.setQueryData(CART_KEY, null),
+  });
 
-  const clearCart = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      await cartService.clearCart();
-      setCart(null);
-      setItems([]);
-      setTotals({ subtotal: 0, tax: 0, shipping: 0, discount: 0, total: 0 });
-      return true;
-    } catch (err) {
-      setError(err.message || err.error || "Error al vaciar carrito");
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const isInCart = (productId) =>
+    items.some((item) => item.product_id === productId || item.product?.id === productId);
 
-  const isInCart = useCallback(
-    (productId) => {
-      return items.some(
-        (item) =>
-          item.product_id === productId || item.product?.id === productId,
-      );
-    },
-    [items],
-  );
-
-  const getItemCount = useCallback(() => {
-    return items.reduce((total, item) => total + (item.quantity || 0), 0);
-  }, [items]);
-
-  const clearError = useCallback(() => setError(null), []);
+  const itemCount = items.reduce((total, item) => total + (item.quantity || 0), 0);
 
   return {
     cart,
@@ -135,14 +71,14 @@ const useCart = () => {
     loading,
     error,
     totals,
-    itemCount: getItemCount(),
-    fetchCart,
-    addToCart,
-    updateQuantity,
-    removeFromCart,
-    clearCart,
+    itemCount,
+    fetchCart: () => queryClient.invalidateQueries({ queryKey: CART_KEY }),
+    addToCart: addMutation.mutateAsync,
+    updateQuantity: (productId, quantity) => updateMutation.mutateAsync({ productId, quantity }),
+    removeFromCart: removeMutation.mutateAsync,
+    clearCart: clearMutation.mutateAsync,
     isInCart,
-    clearError,
+    clearError: () => {},
   };
 };
 

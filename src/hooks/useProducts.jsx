@@ -1,315 +1,121 @@
-import { useState, useCallback } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import productService from '../services/productService';
 
-const useProducts = () => {
-  const [products, setProducts] = useState([]);
-  const [product, setProduct] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [pagination, setPagination] = useState({
-    page: 1,
-    limit: 12,
-    total: 0,
-    totalPages: 0,
+const PRODUCTS_KEY = ['products'];
+const productKey = (id) => ['products', id];
+
+const useProducts = (params = {}) => {
+  const queryClient = useQueryClient();
+
+  const {
+    data,
+    isLoading: loading,
+    error: queryError,
+  } = useQuery({
+    queryKey: [...PRODUCTS_KEY, params],
+    queryFn: () => productService.getProducts(params),
+    staleTime: 1000 * 60 * 5,
+    select: (d) => ({
+      products: Array.isArray(d) ? d : (d.products ?? d.data ?? []),
+      pagination: d.pagination ?? { page: 1, limit: 12, total: 0, totalPages: 0 },
+    }),
   });
 
-  const fetchProducts = useCallback(async (params = {}) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await productService.getProducts(params);
-      
-      if (Array.isArray(data)) {
-        setProducts(data);
-      } else {
-        setProducts(data.products || data.data || []);
-        if (data.pagination) {
-          setPagination(data.pagination);
-        }
-      }
-      
-      return data;
-    } catch (err) {
-      setError(err.message || 'Error al cargar productos');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const products   = data?.products   ?? [];
+  const pagination = data?.pagination ?? { page: 1, limit: 12, total: 0, totalPages: 0 };
+  const error      = queryError?.message ?? null;
 
-  const fetchProductById = useCallback(async (productId) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await productService.getProductById(productId);
-      setProduct(data.product || data);
-      return data;
-    } catch (err) {
-      setError(err.message || 'Error al cargar producto');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const invalidate = () => queryClient.invalidateQueries({ queryKey: PRODUCTS_KEY });
 
-  const createProduct = useCallback(async (productData) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await productService.createProduct(productData);
-      setProducts((prev) => [data.product || data, ...prev]);
-      return data;
-    } catch (err) {
-      setError(err.message || 'Error al crear producto');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const patchProduct = (productId, patch) =>
+    queryClient.setQueriesData({ queryKey: PRODUCTS_KEY }, (prev) => {
+      if (!prev) return prev;
+      const list = prev.products ?? prev;
+      const updated = Array.isArray(list)
+        ? list.map((p) => (p.id === productId ? { ...p, ...patch } : p))
+        : list;
+      return prev.products ? { ...prev, products: updated } : updated;
+    });
 
-  const updateProduct = useCallback(async (productId, productData) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await productService.updateProduct(productId, productData);
-      setProducts((prev) =>
-        prev.map((p) => (p.id === productId ? data.product || data : p))
-      );
-      if (product?.id === productId) {
-        setProduct(data.product || data);
-      }
-      return data;
-    } catch (err) {
-      setError(err.message || 'Error al actualizar producto');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [product]);
+  const createMutation = useMutation({
+    mutationFn: productService.createProduct,
+    onSuccess: invalidate,
+  });
 
-  const patchProduct = useCallback(async (productId, productData) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await productService.patchProduct(productId, productData);
-      setProducts((prev) =>
-        prev.map((p) => (p.id === productId ? { ...p, ...data.product } : p))
-      );
-      if (product?.id === productId) {
-        setProduct((prev) => ({ ...prev, ...data.product }));
-      }
-      return data;
-    } catch (err) {
-      setError(err.message || 'Error al actualizar producto');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [product]);
+  const updateMutation = useMutation({
+    mutationFn: ({ productId, productData }) => productService.updateProduct(productId, productData),
+    onSuccess: (data, { productId }) => patchProduct(productId, data.product ?? data),
+  });
 
-  const deleteProduct = useCallback(async (productId) => {
-    try {
-      setLoading(true);
-      setError(null);
-      await productService.deleteProduct(productId);
-      setProducts((prev) => prev.filter((p) => p.id !== productId));
-      return true;
-    } catch (err) {
-      setError(err.message || 'Error al eliminar producto');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const patchMutation = useMutation({
+    mutationFn: ({ productId, productData }) => productService.patchProduct(productId, productData),
+    onSuccess: (data, { productId }) => patchProduct(productId, data.product ?? data),
+  });
 
-  const fetchProductReviews = useCallback(async (productId, params = {}) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await productService.getProductReviews(productId, params);
-      return data;
-    } catch (err) {
-      setError(err.message || 'Error al cargar reseñas');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const deleteMutation = useMutation({
+    mutationFn: productService.deleteProduct,
+    onSuccess: (_, productId) =>
+      queryClient.setQueriesData({ queryKey: PRODUCTS_KEY }, (prev) => {
+        if (!prev) return prev;
+        const list = prev.products ?? prev;
+        const updated = Array.isArray(list) ? list.filter((p) => p.id !== productId) : list;
+        return prev.products ? { ...prev, products: updated } : updated;
+      }),
+  });
 
-  const createReview = useCallback(async (productId, reviewData) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await productService.createProductReview(productId, reviewData);
-      return data;
-    } catch (err) {
-      setError(err.message || 'Error al crear reseña');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const uploadImagesMutation = useMutation({
+    mutationFn: ({ productId, formData }) => productService.uploadProductImages(productId, formData),
+    onSuccess: (data, { productId }) =>
+      queryClient.setQueryData(productKey(productId), (prev) =>
+        prev ? { ...prev, images: data.images } : prev
+      ),
+  });
 
-  const searchProducts = useCallback(async (searchParams) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await productService.searchProducts(searchParams);
-      setProducts(data.products || data.data || []);
-      if (data.pagination) {
-        setPagination(data.pagination);
-      }
-      return data;
-    } catch (err) {
-      setError(err.message || 'Error al buscar productos');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const deleteImageMutation = useMutation({
+    mutationFn: ({ productId, imageId }) => productService.deleteProductImage(productId, imageId),
+    onSuccess: (_, { productId, imageId }) =>
+      queryClient.setQueryData(productKey(productId), (prev) =>
+        prev ? { ...prev, images: prev.images?.filter((img) => img.id !== imageId) } : prev
+      ),
+  });
 
-  const uploadImages = useCallback(async (productId, files) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const formData = new FormData();
-      files.forEach((file) => {
-        formData.append('images', file);
-      });
-      const data = await productService.uploadProductImages(productId, formData);
-      if (product?.id === productId) {
-        setProduct((prev) => ({ ...prev, images: data.images }));
-      }
-      return data;
-    } catch (err) {
-      setError(err.message || 'Error al subir imágenes');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [product]);
-
-  const deleteImage = useCallback(async (productId, imageId) => {
-    try {
-      setLoading(true);
-      setError(null);
-      await productService.deleteProductImage(productId, imageId);
-      if (product?.id === productId) {
-        setProduct((prev) => ({
-          ...prev,
-          images: prev.images.filter((img) => img.id !== imageId),
-        }));
-      }
-      return true;
-    } catch (err) {
-      setError(err.message || 'Error al eliminar imagen');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [product]);
-
-  const fetchRelatedProducts = useCallback(async (productId, limit = 4) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await productService.getRelatedProducts(productId, limit);
-      return data;
-    } catch (err) {
-      setError(err.message || 'Error al cargar productos relacionados');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  const fetchFeaturedProducts = useCallback(async (limit = 8) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await productService.getFeaturedProducts(limit);
-      return data;
-    } catch (err) {
-      setError(err.message || 'Error al cargar productos destacados');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  // Obtener productos en oferta
-  const fetchProductsOnSale = useCallback(async (params = {}) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await productService.getProductsOnSale(params);
-      setProducts(data.products || data.data || []);
-      if (data.pagination) {
-        setPagination(data.pagination);
-      }
-      return data;
-    } catch (err) {
-      setError(err.message || 'Error al cargar productos en oferta');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  // Actualizar stock
-  const updateStock = useCallback(async (productId, stockData) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await productService.updateProductStock(productId, stockData);
-      if (product?.id === productId) {
-        setProduct((prev) => ({ ...prev, stock: data.stock }));
-      }
-      return data;
-    } catch (err) {
-      setError(err.message || 'Error al actualizar stock');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [product]);
-
-  // Limpiar error
-  const clearError = useCallback(() => {
-    setError(null);
-  }, []);
-
-  // Limpiar estado
-  const clearState = useCallback(() => {
-    setProducts([]);
-    setProduct(null);
-    setError(null);
-    setPagination({ page: 1, limit: 12, total: 0, totalPages: 0 });
-  }, []);
+  const updateStockMutation = useMutation({
+    mutationFn: ({ productId, stockData }) => productService.updateProductStock(productId, stockData),
+    onSuccess: (data, { productId }) => patchProduct(productId, { stock: data.stock }),
+  });
 
   return {
     products,
-    product,
+    product: null,
     loading,
     error,
     pagination,
-    fetchProducts,
-    fetchProductById,
-    createProduct,
-    updateProduct,
-    patchProduct,
-    deleteProduct,
-    fetchProductReviews,
-    createReview,
-    searchProducts,
-    uploadImages,
-    deleteImage,
-    fetchRelatedProducts,
-    fetchFeaturedProducts,
-    fetchProductsOnSale,
-    updateStock,
-    clearError,
-    clearState,
+    fetchProducts: invalidate,
+    fetchProductById: (id) =>
+      queryClient.fetchQuery({
+        queryKey: productKey(id),
+        queryFn: () => productService.getProductById(id),
+        staleTime: 1000 * 60 * 5,
+      }),
+    createProduct: createMutation.mutateAsync,
+    updateProduct: (id, data) => updateMutation.mutateAsync({ productId: id, productData: data }),
+    patchProduct: (id, data) => patchMutation.mutateAsync({ productId: id, productData: data }),
+    deleteProduct: deleteMutation.mutateAsync,
+    fetchProductReviews: productService.getProductReviews,
+    createReview: productService.createProductReview,
+    searchProducts: productService.searchProducts,
+    uploadImages: (id, files) => {
+      const formData = new FormData();
+      files.forEach((f) => formData.append('images', f));
+      return uploadImagesMutation.mutateAsync({ productId: id, formData });
+    },
+    deleteImage: (productId, imageId) => deleteImageMutation.mutateAsync({ productId, imageId }),
+    fetchRelatedProducts: productService.getRelatedProducts,
+    fetchFeaturedProducts: productService.getFeaturedProducts,
+    fetchProductsOnSale: productService.getProductsOnSale,
+    updateStock: (id, stockData) => updateStockMutation.mutateAsync({ productId: id, stockData }),
+    clearError: () => {},
+    clearState: () => queryClient.removeQueries({ queryKey: PRODUCTS_KEY }),
   };
 };
 

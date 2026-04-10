@@ -1,187 +1,84 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import authService from '../services/authService';
 
+export const AUTH_KEY = ['auth', 'me'];
+
 const useAuth = () => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  
-  const isCheckingAuth = useRef(false);
-  const hasCheckedAuth = useRef(false);
+  const queryClient = useQueryClient();
 
-  const checkAuthStatus = useCallback(async () => {
-    // Evitar múltiples llamadas simultáneas
-    if (isCheckingAuth.current) {
-      return;
-    }
+  const {
+    data: user = null,
+    isLoading: loading,
+    error: queryError,
+  } = useQuery({
+    queryKey: AUTH_KEY,
+    queryFn: () => authService.getCurrentUser().then((d) => d.user ?? d),
+    retry: false,
+    staleTime: 1000 * 60 * 10,
+  });
 
-    try {
-      isCheckingAuth.current = true;
-      setLoading(true);
-      
-      // ✅ Hacer la petición directamente - las cookies se envían automáticamente
-      const data = await authService.getCurrentUser();
-      setUser(data.user);
-      setIsAuthenticated(true);
-      setError(null);
-    } catch (err) {
-      console.error('Error verificando autenticación:', err);
-      // Si falla (401), significa que no hay sesión válida
-      setUser(null);
-      setIsAuthenticated(false);
-      setError(null);
-    } finally {
-      setLoading(false);
-      isCheckingAuth.current = false;
-      hasCheckedAuth.current = true;
-    }
-  }, []);
+  const isAuthenticated = !!user;
+  const error = queryError?.message ?? queryError?.error ?? null;
 
-  useEffect(() => {
-    if (!hasCheckedAuth.current) {
-      checkAuthStatus();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const registerMutation = useMutation({
+    mutationFn: authService.register,
+    onSuccess: (d) => {
+      if (d.user) queryClient.setQueryData(AUTH_KEY, d.user);
+    },
+  });
 
-  const register = useCallback(async (userData) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await authService.register(userData);
-      
-      // Si el backend devuelve el usuario después del registro
-      if (data.user) {
-        setUser(data.user);
-        setIsAuthenticated(true);
-      }
-      
-      return data;
-    } catch (err) {
-      const errorMsg = err.message || err.error || 'Error al registrar usuario';
-      setError(errorMsg);
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const loginMutation = useMutation({
+    mutationFn: authService.login,
+    onSuccess: (d) => queryClient.setQueryData(AUTH_KEY, d.user),
+  });
 
-  const login = useCallback(async (credentials) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await authService.login(credentials);
-      setUser(data.user);
-      setIsAuthenticated(true);
-      return data;
-    } catch (err) {
-      const errorMsg = err.error || err.message || 'Error al iniciar sesión';
-      setError(errorMsg);
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const logoutMutation = useMutation({
+    mutationFn: authService.logout,
+    onSettled: () => {
+      queryClient.setQueryData(AUTH_KEY, null);
+      queryClient.clear();
+    },
+  });
 
-  const logout = useCallback(async () => {
-    try {
-      setLoading(true);
-      await authService.logout();
-    } catch (err) {
-      console.error('Error al cerrar sesión:', err);
-    } finally {
-      setUser(null);
-      setIsAuthenticated(false);
-      setError(null);
-      setLoading(false);
-      hasCheckedAuth.current = false;
-    }
-  }, []);
+  const forgotPasswordMutation = useMutation({
+    mutationFn: authService.forgotPassword,
+  });
 
-  const forgotPassword = useCallback(async (email) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await authService.forgotPassword(email);
-      return data;
-    } catch (err) {
-      const errorMsg = err.error || err.message || 'Error al solicitar recuperación';
-      setError(errorMsg);
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const resetPasswordMutation = useMutation({
+    mutationFn: ({ token, newPassword }) => authService.resetPassword(token, newPassword),
+  });
 
-  const resetPassword = useCallback(async (token, newPassword) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await authService.resetPassword(token, newPassword);
-      return data;
-    } catch (err) {
-      const errorMsg = err.error || err.message || 'Error al resetear contraseña';
-      setError(errorMsg);
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const verifyEmailMutation = useMutation({
+    mutationFn: authService.verifyEmail,
+  });
 
-  const verifyEmail = useCallback(async (token) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await authService.verifyEmail(token);
-      return data;
-    } catch (err) {
-      const errorMsg = err.error || err.message || 'Error al verificar email';
-      setError(errorMsg);
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const resendVerificationMutation = useMutation({
+    mutationFn: authService.resendVerification,
+  });
 
-  const resendVerification = useCallback(async (email) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await authService.resendVerification(email);
-      return data;
-    } catch (err) {
-      const errorMsg = err.error || err.message || 'Error al reenviar verificación';
-      setError(errorMsg);
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const updateUser = (userData) => {
+    queryClient.setQueryData(AUTH_KEY, (prev) => prev ? { ...prev, ...userData } : prev);
+  };
 
-  const updateUser = useCallback((userData) => {
-    setUser((prevUser) => ({ ...prevUser, ...userData }));
-  }, []);
-
-  const clearError = useCallback(() => {
-    setError(null);
-  }, []);
+  const checkAuthStatus = () => {
+    queryClient.invalidateQueries({ queryKey: AUTH_KEY });
+  };
 
   return {
     user,
     loading,
     error,
     isAuthenticated,
-    register,
-    login,
-    logout,
-    forgotPassword,
-    resetPassword,
-    verifyEmail,
-    resendVerification,
+    register: registerMutation.mutateAsync,
+    login: loginMutation.mutateAsync,
+    logout: logoutMutation.mutateAsync,
+    forgotPassword: forgotPasswordMutation.mutateAsync,
+    resetPassword: ({ token, newPassword }) => resetPasswordMutation.mutateAsync({ token, newPassword }),
+    verifyEmail: verifyEmailMutation.mutateAsync,
+    resendVerification: resendVerificationMutation.mutateAsync,
     checkAuthStatus,
     updateUser,
-    clearError,
+    clearError: () => {},
   };
 };
 

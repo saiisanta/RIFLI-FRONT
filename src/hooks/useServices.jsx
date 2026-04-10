@@ -1,105 +1,66 @@
-import { useState, useCallback} from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import serviceService from '../services/serviceService';
 
-export const useServices = () => {
-    const [services, setServices] = useState([]);
-    const [service, setService] = useState(null);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
-  
-    const fetchServices = useCallback(async (params = {}) => {
-      try {
-        setLoading(true);
-        setError(null);
-        const data = await serviceService.getServices(params);
-        setServices(Array.isArray(data) ? data : data.services || data.data || []);
-        return data;
-      } catch (err) {
-        setError(err.message || 'Error al cargar servicios');
-        throw err;
-      } finally {
-        setLoading(false);
-      }
-    }, []);
-  
-    const fetchServiceById = useCallback(async (serviceId) => {
-      try {
-        setLoading(true);
-        setError(null);
-        const data = await serviceService.getServiceById(serviceId);
-        setService(data.service || data);
-        return data;
-      } catch (err) {
-        setError(err.message || 'Error al cargar servicio');
-        throw err;
-      } finally {
-        setLoading(false);
-      }
-    }, []);
-  
-    const createService = useCallback(async (serviceData) => {
-      try {
-        setLoading(true);
-        setError(null);
-        const data = await serviceService.createService(serviceData);
-        setServices((prev) => [data.service || data, ...prev]);
-        return data;
-      } catch (err) {
-        setError(err.message || 'Error al crear servicio');
-        throw err;
-      } finally {
-        setLoading(false);
-      }
-    }, []);
-  
-    const updateService = useCallback(async (serviceId, serviceData) => {
-      try {
-        setLoading(true);
-        setError(null);
-        const data = await serviceService.updateService(serviceId, serviceData);
-        setServices((prev) =>
-          prev.map((s) => (s.id === serviceId ? data.service || data : s))
-        );
-        return data;
-      } catch (err) {
-        setError(err.message || 'Error al actualizar servicio');
-        throw err;
-      } finally {
-        setLoading(false);
-      }
-    }, []);
-  
-    const deleteService = useCallback(async (serviceId) => {
-      try {
-        setLoading(true);
-        setError(null);
-        await serviceService.deleteService(serviceId);
-        setServices((prev) => prev.filter((s) => s.id !== serviceId));
-        return true;
-      } catch (err) {
-        setError(err.message || 'Error al eliminar servicio');
-        throw err;
-      } finally {
-        setLoading(false);
-      }
-    }, []);
-  
-    const clearError = useCallback(() => {
-      setError(null);
-    }, []);
-  
-    return {
-      services,
-      service,
-      loading,
-      error,
-      fetchServices,
-      fetchServiceById,
-      createService,
-      updateService,
-      deleteService,
-      clearError,
-    };
+const SERVICES_KEY = ['services'];
+const serviceKey = (id) => ['services', id];
+
+export const useServices = (params = {}) => {
+  const queryClient = useQueryClient();
+
+  const {
+    data: services = [],
+    isLoading: loading,
+    error: queryError,
+  } = useQuery({
+    queryKey: [...SERVICES_KEY, params],
+    queryFn: () =>
+      serviceService
+        .getServices(params)
+        .then((d) => (Array.isArray(d) ? d : d.services ?? d.data ?? [])),
+    staleTime: 1000 * 60 * 10,
+  });
+
+  const error = queryError?.message ?? null;
+
+  const createMutation = useMutation({
+    mutationFn: serviceService.createService,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: SERVICES_KEY }),
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ serviceId, serviceData }) => serviceService.updateService(serviceId, serviceData),
+    onSuccess: (data, { serviceId }) =>
+      queryClient.setQueriesData({ queryKey: SERVICES_KEY }, (prev) => {
+        if (!Array.isArray(prev)) return prev;
+        return prev.map((s) => (s.id === serviceId ? data.service ?? data : s));
+      }),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: serviceService.deleteService,
+    onSuccess: (_, serviceId) =>
+      queryClient.setQueriesData({ queryKey: SERVICES_KEY }, (prev) =>
+        Array.isArray(prev) ? prev.filter((s) => s.id !== serviceId) : prev
+      ),
+  });
+
+  return {
+    services,
+    service: null,
+    loading,
+    error,
+    fetchServices: () => queryClient.invalidateQueries({ queryKey: SERVICES_KEY }),
+    fetchServiceById: (id) =>
+      queryClient.fetchQuery({
+        queryKey: serviceKey(id),
+        queryFn: () => serviceService.getServiceById(id),
+        staleTime: 1000 * 60 * 5,
+      }),
+    createService: createMutation.mutateAsync,
+    updateService: (id, data) => updateMutation.mutateAsync({ serviceId: id, serviceData: data }),
+    deleteService: deleteMutation.mutateAsync,
+    clearError: () => {},
   };
-  
-  export default useServices;
+};
+
+export default useServices;

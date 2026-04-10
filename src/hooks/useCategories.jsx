@@ -1,83 +1,56 @@
-import { useState, useCallback } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import categoryService from '../services/categoryService';
 
+const CATEGORIES_KEY = ['categories'];
+
 const useCategories = () => {
-  const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const queryClient = useQueryClient();
 
-  const fetchCategories = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await categoryService.getCategories();
-      setCategories(Array.isArray(data) ? data : data.categories || []);
-      return data;
-    } catch (err) {
-      setError(err.message || 'Error al cargar categorías');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const {
+    data: categories = [],
+    isLoading: loading,
+    error: queryError,
+  } = useQuery({
+    queryKey: CATEGORIES_KEY,
+    queryFn: () =>
+      categoryService.getCategories().then((d) => (Array.isArray(d) ? d : d.categories ?? [])),
+    staleTime: 1000 * 60 * 10,
+  });
 
-  const createCategory = useCallback(async (categoryData) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const newCategory = await categoryService.createCategory(categoryData);
-      setCategories(prev => [...prev, newCategory]);
-      return newCategory;
-    } catch (err) {
-      setError(err.message || 'Error al crear categoría');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const error = queryError?.message ?? null;
 
-  const updateCategory = useCallback(async (categoryId, categoryData) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const updatedCategory = await categoryService.updateCategory(categoryId, categoryData);
-      setCategories(prev => prev.map(c => c.id === categoryId ? updatedCategory : c));
-      return updatedCategory;
-    } catch (err) {
-      setError(err.message || 'Error al actualizar categoría');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const createMutation = useMutation({
+    mutationFn: categoryService.createCategory,
+    onSuccess: (newCat) =>
+      queryClient.setQueryData(CATEGORIES_KEY, (prev = []) => [...prev, newCat]),
+  });
 
-  const deleteCategory = useCallback(async (categoryId) => {
-    try {
-      setLoading(true);
-      setError(null);
-      await categoryService.deleteCategory(categoryId);
-      setCategories(prev => prev.filter(c => c.id !== categoryId));
-    } catch (err) {
-      setError(err.message || 'Error al eliminar categoría');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const updateMutation = useMutation({
+    mutationFn: ({ categoryId, categoryData }) =>
+      categoryService.updateCategory(categoryId, categoryData),
+    onSuccess: (updated) =>
+      queryClient.setQueryData(CATEGORIES_KEY, (prev = []) =>
+        prev.map((c) => (c.id === updated.id ? updated : c))
+      ),
+  });
 
-  const clearError = useCallback(() => {
-    setError(null);
-  }, []);
+  const deleteMutation = useMutation({
+    mutationFn: categoryService.deleteCategory,
+    onSuccess: (_, categoryId) =>
+      queryClient.setQueryData(CATEGORIES_KEY, (prev = []) =>
+        prev.filter((c) => c.id !== categoryId)
+      ),
+  });
 
   return {
     categories,
     loading,
     error,
-    fetchCategories,
-    createCategory,
-    updateCategory,
-    deleteCategory,
-    clearError,
+    fetchCategories: () => queryClient.invalidateQueries({ queryKey: CATEGORIES_KEY }),
+    createCategory: createMutation.mutateAsync,
+    updateCategory: (id, data) => updateMutation.mutateAsync({ categoryId: id, categoryData: data }),
+    deleteCategory: deleteMutation.mutateAsync,
+    clearError: () => {},
   };
 };
 

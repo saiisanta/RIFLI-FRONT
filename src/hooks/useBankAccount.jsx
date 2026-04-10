@@ -1,90 +1,50 @@
-import { useState, useCallback } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import bankAccountService from '../services/bankAccountService';
 
+export const BANK_KEY = ['bankAccount'];
+
 const useBankAccount = () => {
-  const [account, setAccount] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const queryClient = useQueryClient();
 
-  const fetchBankAccount = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await bankAccountService.getBankAccount();
-      setAccount(data);
-      return data;
-    } catch (err) {
-      setError(err.message || err.error || 'Error al cargar la cuenta bancaria');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const {
+    data: account = null,
+    isLoading: loading,
+    error: queryError,
+  } = useQuery({
+    queryKey: BANK_KEY,
+    queryFn: bankAccountService.getBankAccount,
+    staleTime: 1000 * 60 * 10,
+    retry: false,
+  });
 
-  const createBankAccount = useCallback(async (accountData) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await bankAccountService.createBankAccount(accountData);
-      setAccount(data);
-      return data;
-    } catch (err) {
-      setError(err.message || err.error || 'Error al crear la cuenta bancaria');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const error = queryError?.message ?? queryError?.error ?? null;
 
-  const updateBankAccount = useCallback(async (accountData) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await bankAccountService.updateBankAccount(accountData);
-      setAccount(data);
-      return data;
-    } catch (err) {
-      setError(err.message || err.error || 'Error al actualizar la cuenta bancaria');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const createMutation = useMutation({
+    mutationFn: bankAccountService.createBankAccount,
+    onSuccess: (data) => queryClient.setQueryData(BANK_KEY, data),
+  });
 
-  const toggleBankAccount = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await bankAccountService.toggleBankAccount();
-      if (data.account) setAccount(data.account);
-      return data;
-    } catch (err) {
-      setError(err.message || err.error || 'Error al cambiar el estado de la cuenta');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const updateMutation = useMutation({
+    mutationFn: bankAccountService.updateBankAccount,
+    onSuccess: (data) => queryClient.setQueryData(BANK_KEY, data),
+  });
 
-  const clearError = useCallback(() => {
-    setError(null);
-  }, []);
-
-  const clearState = useCallback(() => {
-    setAccount(null);
-    setError(null);
-  }, []);
+  const toggleMutation = useMutation({
+    mutationFn: bankAccountService.toggleBankAccount,
+    onSuccess: (data) => queryClient.setQueryData(BANK_KEY, data.account ?? data),
+  });
 
   return {
     account,
     loading,
     error,
-    fetchBankAccount,
-    createBankAccount,
-    updateBankAccount,
-    toggleBankAccount,
-    clearError,
-    clearState,
+    fetchBankAccount: () => queryClient.invalidateQueries({ queryKey: BANK_KEY }),
+    createBankAccount: createMutation.mutateAsync,
+    updateBankAccount: updateMutation.mutateAsync,
+    toggleBankAccount: toggleMutation.mutateAsync,
+    isSubmitting: createMutation.isPending || updateMutation.isPending || toggleMutation.isPending,
+    clearError: () => queryClient.resetQueries({ queryKey: BANK_KEY }),
+    clearState: () => queryClient.removeQueries({ queryKey: BANK_KEY }),
   };
 };
 

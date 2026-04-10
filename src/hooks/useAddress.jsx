@@ -1,145 +1,66 @@
-import api from './api';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import addressService from '../services/addressService';
 
-const addressService = {
-  /**
-   * 
-   * @returns {Promise<Object>}
-   */
-  getMyAddresses: async () => {
-    try {
-      const response = await api.get('/addresses');
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || error;
-    }
-  },
+export const ADDRESSES_KEY = ['addresses'];
 
-  /**
-   * 
-   * @param {number} addressId
-   * @returns {Promise<Object>}
-   */
-  getAddressById: async (addressId) => {
-    try {
-      const response = await api.get(`/addresses/${addressId}`);
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || error;
-    }
-  },
+const useAddresses = () => {
+  const queryClient = useQueryClient();
 
-  /**
-   * 
-   * @param {Object} addressData
-   * @param {string} addressData.alias
-   * @param {string} addressData.street
-   * @param {string} addressData.number
-   * @param {string} [addressData.floor]
-   * @param {string} [addressData.apartment]
-   * @param {string} addressData.city
-   * @param {string} addressData.province
-   * @param {string} addressData.postal_code
-   * @param {string} [addressData.country='Argentina']
-   * @param {string} [addressData.additional_info]
-   * @param {boolean} [addressData.is_default=false]
-   * @returns {Promise<Object>}
-   */
-  createAddress: async (addressData) => {
-    try {
-      const response = await api.post('/addresses', addressData);
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || error;
-    }
-  },
+  const {
+    data: addresses = [],
+    isLoading: loading,
+    error: queryError,
+  } = useQuery({
+    queryKey: ADDRESSES_KEY,
+    queryFn: () =>
+      addressService.getMyAddresses().then((d) => (Array.isArray(d) ? d : d.addresses ?? [])),
+    staleTime: 1000 * 60 * 5,
+  });
 
-  /**
-   * 
-   * @param {number} addressId
-   * @param {Object} addressData
-   * @returns {Promise<Object>}
-   */
-  updateAddress: async (addressId, addressData) => {
-    try {
-      const response = await api.put(`/addresses/${addressId}`, addressData);
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || error;
-    }
-  },
+  const error = queryError?.message ?? null;
+  const invalidate = () => queryClient.invalidateQueries({ queryKey: ADDRESSES_KEY });
 
-  /**
-   * 
-   * @param {number} addressId
-   * @returns {Promise<Object>}
-   */
-  deleteAddress: async (addressId) => {
-    try {
-      const response = await api.delete(`/addresses/${addressId}`);
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || error;
-    }
-  },
+  const createMutation = useMutation({
+    mutationFn: addressService.createAddress,
+    onSuccess: invalidate,
+  });
 
-  /**
-   * @param {number} addressId
-   * @returns {Promise<Object>}
-   */
-  setDefaultAddress: async (addressId) => {
-    try {
-      const response = await api.put(`/addresses/${addressId}/default`);
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || error;
-    }
-  },
+  const updateMutation = useMutation({
+    mutationFn: ({ addressId, addressData }) => addressService.updateAddress(addressId, addressData),
+    onSuccess: invalidate,
+  });
 
-  /**
-   * @param {string} postalCode
-   * @returns {boolean}
-   */
-  validateArgentinaPostalCode: (postalCode) => {
-    const patterns = [
-      /^[A-Z]?\d{4}$/,
-      /^[A-Z]\d{4}[A-Z]{3}$/
-    ];
-    return patterns.some(pattern => pattern.test(postalCode));
-  },
+  const deleteMutation = useMutation({
+    mutationFn: addressService.deleteAddress,
+    onSuccess: (_, addressId) =>
+      queryClient.setQueryData(ADDRESSES_KEY, (prev = []) =>
+        prev.filter((a) => a.id !== addressId)
+      ),
+  });
 
-  /**
-   * @param {Object} address
-   * @returns {string}
-   * 
-   * @example
-   * formatFullAddress({
-   *   street: 'Av. Corrientes',
-   *   number: '1234',
-   *   floor: '5',
-   *   apartment: 'A',
-   *   city: 'Buenos Aires',
-   *   province: 'Buenos Aires',
-   *   postal_code: '1000'
-   * })
-   * // Returns: "Av. Corrientes 1234, Piso 5, Depto A - Buenos Aires, Buenos Aires (CP 1000)"
-   */
-  formatFullAddress: (address) => {
-    if (!address) return '';
-    
-    let formatted = `${address.street} ${address.number}`;
-    
-    if (address.floor) formatted += `, Piso ${address.floor}`;
-    if (address.apartment) formatted += `, Depto ${address.apartment}`;
-    
-    formatted += ` - ${address.city}, ${address.province}`;
-    formatted += ` (CP ${address.postal_code})`;
-    
-    if (address.country && address.country !== 'Argentina') {
-      formatted += `, ${address.country}`;
-    }
-    
-    return formatted;
-  }
+  const setDefaultMutation = useMutation({
+    mutationFn: addressService.setDefaultAddress,
+    onSuccess: invalidate,
+  });
+
+  return {
+    addresses,
+    loading,
+    error,
+    fetchAddresses: invalidate,
+    createAddress: createMutation.mutateAsync,
+    updateAddress: (id, data) => updateMutation.mutateAsync({ addressId: id, addressData: data }),
+    deleteAddress: deleteMutation.mutateAsync,
+    setDefaultAddress: setDefaultMutation.mutateAsync,
+    isSubmitting:
+      createMutation.isPending ||
+      updateMutation.isPending ||
+      deleteMutation.isPending ||
+      setDefaultMutation.isPending,
+    clearError: () => {},
+    validateArgentinaPostalCode: addressService.validateArgentinaPostalCode,
+    formatFullAddress: addressService.formatFullAddress,
+  };
 };
 
-export default addressService;
+export default useAddresses;

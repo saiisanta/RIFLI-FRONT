@@ -1,13 +1,13 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useContext } from 'react';
 import { Bell, CheckCheck, Loader2 } from 'lucide-react';
-import useNotifications from '../../hooks/useNotifications';
+import { NotificationContext } from '../../context/NotificationContext';
 import NotificationItem from '../NotificationItem/NotificationItem';
 import './NotificationBell.scss';
 
 const NotificationBell = ({ onOpen }) => {
   const [open, setOpen] = useState(false);
-  const panelRef        = useRef(null);
-  const bellRef         = useRef(null);
+  const panelRef = useRef(null);
+  const bellRef  = useRef(null);
 
   const {
     notifications,
@@ -16,7 +16,7 @@ const NotificationBell = ({ onOpen }) => {
     markAsRead,
     markAllAsRead,
     deleteNotification,
-  } = useNotifications();
+  } = useContext(NotificationContext);
 
   useEffect(() => {
     const handleClickOutside = (e) => {

@@ -1,83 +1,55 @@
-import { useState, useCallback } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import brandService from '../services/brandService';
 
+const BRANDS_KEY = ['brands'];
+
 const useBrands = () => {
-  const [brands, setBrands] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const queryClient = useQueryClient();
 
-  const fetchBrands = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await brandService.getBrands();
-      setBrands(Array.isArray(data) ? data : data.brands || []);
-      return data;
-    } catch (err) {
-      setError(err.message || 'Error al cargar marcas');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const {
+    data: brands = [],
+    isLoading: loading,
+    error: queryError,
+  } = useQuery({
+    queryKey: BRANDS_KEY,
+    queryFn: () =>
+      brandService.getBrands().then((d) => (Array.isArray(d) ? d : d.brands ?? [])),
+    staleTime: 1000 * 60 * 10,
+  });
 
-  const createBrand = useCallback(async (brandData) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const newBrand = await brandService.createBrand(brandData);
-      setBrands(prev => [...prev, newBrand]);
-      return newBrand;
-    } catch (err) {
-      setError(err.message || 'Error al crear marca');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const error = queryError?.message ?? null;
 
-  const updateBrand = useCallback(async (brandId, brandData) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const updatedBrand = await brandService.updateBrand(brandId, brandData);
-      setBrands(prev => prev.map(b => b.id === brandId ? updatedBrand : b));
-      return updatedBrand;
-    } catch (err) {
-      setError(err.message || 'Error al actualizar marca');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const createMutation = useMutation({
+    mutationFn: brandService.createBrand,
+    onSuccess: (newBrand) =>
+      queryClient.setQueryData(BRANDS_KEY, (prev = []) => [...prev, newBrand]),
+  });
 
-  const deleteBrand = useCallback(async (brandId) => {
-    try {
-      setLoading(true);
-      setError(null);
-      await brandService.deleteBrand(brandId);
-      setBrands(prev => prev.filter(b => b.id !== brandId));
-    } catch (err) {
-      setError(err.message || 'Error al eliminar marca');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const updateMutation = useMutation({
+    mutationFn: ({ brandId, brandData }) => brandService.updateBrand(brandId, brandData),
+    onSuccess: (updated) =>
+      queryClient.setQueryData(BRANDS_KEY, (prev = []) =>
+        prev.map((b) => (b.id === updated.id ? updated : b))
+      ),
+  });
 
-  const clearError = useCallback(() => {
-    setError(null);
-  }, []);
+  const deleteMutation = useMutation({
+    mutationFn: brandService.deleteBrand,
+    onSuccess: (_, brandId) =>
+      queryClient.setQueryData(BRANDS_KEY, (prev = []) =>
+        prev.filter((b) => b.id !== brandId)
+      ),
+  });
 
   return {
     brands,
     loading,
     error,
-    fetchBrands,
-    createBrand,
-    updateBrand,
-    deleteBrand,
-    clearError,
+    fetchBrands: () => queryClient.invalidateQueries({ queryKey: BRANDS_KEY }),
+    createBrand: createMutation.mutateAsync,
+    updateBrand: (id, data) => updateMutation.mutateAsync({ brandId: id, brandData: data }),
+    deleteBrand: deleteMutation.mutateAsync,
+    clearError: () => {},
   };
 };
 

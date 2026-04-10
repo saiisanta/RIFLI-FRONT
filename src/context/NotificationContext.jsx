@@ -13,7 +13,6 @@ export const useNotificationContext = () => {
 
 export function NotificationProvider({ children }) {
   const notifications = useNotifications();
-
   return (
     <NotificationContext.Provider value={notifications}>
       {children}

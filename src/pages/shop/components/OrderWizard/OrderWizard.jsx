@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   FiChevronRight, FiChevronLeft, FiCheck,
   FiMapPin, FiCreditCard, FiEye, FiCheckCircle,
@@ -6,15 +6,15 @@ import {
 } from 'react-icons/fi';
 import useOrders from '../../../../hooks/useOrders';
 import useBankAccount from '../../../../hooks/useBankAccount';
-import addressService from '../../../../services/addressService';
+import useAddresses  from '../../../../hooks/useAddress';
 import './OrderWizard.scss';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 const STEPS = [
-  { id: 1, label: 'Dirección',   Icon: FiMapPin },
-  { id: 2, label: 'Pago',        Icon: FiCreditCard },
-  { id: 3, label: 'Confirmar',   Icon: FiEye },
+  { id: 1, label: 'Dirección', Icon: FiMapPin     },
+  { id: 2, label: 'Pago',      Icon: FiCreditCard },
+  { id: 3, label: 'Confirmar', Icon: FiEye        },
 ];
 
 const PAYMENT_METHODS = [
@@ -28,36 +28,16 @@ const formatCurrency = (amount) =>
 const OrderWizard = ({ items, totals, onClose, onSuccess }) => {
   const [step, setStep] = useState(1);
 
-  const [addresses, setAddresses]             = useState([]);
-  const [addressLoading, setAddressLoading]   = useState(false);
-  const [selectedAddress, setSelectedAddress] = useState(null);
-
-  const [paymentMethod, setPaymentMethod] = useState('BANK_TRANSFER');
-  const [customerNotes, setCustomerNotes] = useState('');
+  const { addresses, loading: addressLoading } = useAddresses();
+  const [selectedAddress, setSelectedAddress]  = useState(null);
+  const [paymentMethod, setPaymentMethod]      = useState('BANK_TRANSFER');
+  const [customerNotes, setCustomerNotes]      = useState('');
+  const [submitSuccess, setSubmitSuccess]      = useState(false);
 
   const { createOrder, loading: orderLoading, error: orderError, clearError } = useOrders();
-  const { account: bankAccount, fetchBankAccount } = useBankAccount();
-  const [submitSuccess, setSubmitSuccess] = useState(false);
+  const { account: bankAccount } = useBankAccount();
 
-  useEffect(() => {
-    loadAddresses();
-    fetchBankAccount();
-  }, []);
-
-  const loadAddresses = useCallback(async () => {
-    setAddressLoading(true);
-    try {
-      const data = await addressService.getMyAddresses();
-      const list = Array.isArray(data) ? data : data.addresses || [];
-      setAddresses(list);
-      const def = list.find(a => a.is_default);
-      if (def) setSelectedAddress(def);
-    } catch {
-      setAddresses([]);
-    } finally {
-      setAddressLoading(false);
-    }
-  }, []);
+  const subtotal = totals?.subtotal || totals?.total || 0;
 
   const handleSubmit = async () => {
     try {
@@ -72,8 +52,6 @@ const OrderWizard = ({ items, totals, onClose, onSuccess }) => {
       console.error('Error al crear pedido:', err);
     }
   };
-
-  const subtotal = totals?.subtotal || totals?.total || 0;
 
   if (submitSuccess) {
     return (
@@ -95,13 +73,11 @@ const OrderWizard = ({ items, totals, onClose, onSuccess }) => {
 
   return (
     <div className="ow-overlay" onClick={onClose}>
-      <div className="ow-modal" onClick={e => e.stopPropagation()}>
+      <div className="ow-modal" onClick={(e) => e.stopPropagation()}>
 
         <div className="ow-header">
           <h2>Solicitar pedido</h2>
-          <button className="ow-close-btn" onClick={onClose} aria-label="Cerrar">
-            <FiX size={18} />
-          </button>
+          <button className="ow-close-btn" onClick={onClose} aria-label="Cerrar"><FiX size={18} /></button>
         </div>
 
         <div className="ow-steps">
@@ -140,7 +116,7 @@ const OrderWizard = ({ items, totals, onClose, onSuccess }) => {
                 </div>
               ) : (
                 <div className="ow-address-list">
-                  {addresses.map(addr => (
+                  {addresses.map((addr) => (
                     <button
                       key={addr.id}
                       type="button"
@@ -154,15 +130,13 @@ const OrderWizard = ({ items, totals, onClose, onSuccess }) => {
                         </div>
                         <p className="ow-address-street">
                           {addr.street} {addr.number}
-                          {addr.floor && `, Piso ${addr.floor}`}
+                          {addr.floor     && `, Piso ${addr.floor}`}
                           {addr.apartment && `, Depto ${addr.apartment}`}
                         </p>
                         <p className="ow-address-loc">{addr.city}, {addr.province} — CP {addr.postal_code}</p>
                         {addr.additional_info && <p className="ow-address-extra">{addr.additional_info}</p>}
                       </div>
-                      <div className="ow-select-mark">
-                        <FiCheck size={14} />
-                      </div>
+                      <div className="ow-select-mark"><FiCheck size={14} /></div>
                     </button>
                   ))}
                 </div>
@@ -178,7 +152,7 @@ const OrderWizard = ({ items, totals, onClose, onSuccess }) => {
               </div>
 
               <div className="ow-payment-options">
-                {PAYMENT_METHODS.map(pm => (
+                {PAYMENT_METHODS.map((pm) => (
                   <button
                     key={pm.value}
                     type="button"
@@ -196,10 +170,7 @@ const OrderWizard = ({ items, totals, onClose, onSuccess }) => {
 
               {paymentMethod === 'BANK_TRANSFER' && bankAccount && (
                 <div className="ow-bank-info">
-                  <div className="ow-bank-info-title">
-                    <FiInfo size={15} />
-                    Datos para la transferencia
-                  </div>
+                  <div className="ow-bank-info-title"><FiInfo size={15} />Datos para la transferencia</div>
                   <div className="ow-bank-info-grid">
                     <div className="ow-bank-info-row">
                       <span className="ow-bank-info-label">Banco</span>
@@ -231,7 +202,7 @@ const OrderWizard = ({ items, totals, onClose, onSuccess }) => {
                 <textarea
                   className="ow-textarea"
                   value={customerNotes}
-                  onChange={e => setCustomerNotes(e.target.value)}
+                  onChange={(e) => setCustomerNotes(e.target.value)}
                   placeholder="Ej: Dejar en portería, llamar antes de entregar…"
                   rows={3}
                   maxLength={500}
@@ -252,12 +223,11 @@ const OrderWizard = ({ items, totals, onClose, onSuccess }) => {
                 <div className="ow-preview-title">Productos</div>
                 <div className="ow-items-list">
                   {items.map((item) => {
-                    const product = item.product || item;
-                    const name = product.name || item.name;
-                    const price = item.unit_price || item.price || product.price || 0;
-                    const mainImage = product.main_image || item.main_image;
+                    const product     = item.product || item;
+                    const name        = product.name || item.name;
+                    const price       = item.unit_price || item.price || product.price || 0;
+                    const mainImage   = product.main_image || item.main_image;
                     const subtotalItem = item.subtotal || (price * item.quantity);
-
                     return (
                       <div key={item.productId || item.product_id} className="ow-order-item">
                         {mainImage && (
@@ -265,7 +235,7 @@ const OrderWizard = ({ items, totals, onClose, onSuccess }) => {
                             src={`${API_URL}${mainImage}`}
                             alt={name}
                             className="ow-order-item-img"
-                            onError={e => { e.currentTarget.src = '/api/images/placeholder.png'; }}
+                            onError={(e) => { e.currentTarget.src = '/api/images/placeholder.png'; }}
                           />
                         )}
                         <div className="ow-order-item-info">
@@ -291,7 +261,7 @@ const OrderWizard = ({ items, totals, onClose, onSuccess }) => {
               <div className="ow-preview-section">
                 <div className="ow-preview-title">Método de pago</div>
                 <div className="ow-preview-card">
-                  <strong>{PAYMENT_METHODS.find(p => p.value === paymentMethod)?.label}</strong>
+                  <strong>{PAYMENT_METHODS.find((p) => p.value === paymentMethod)?.label}</strong>
                   {paymentMethod === 'BANK_TRANSFER' && bankAccount && (
                     <p className="ow-preview-bank-hint">
                       Transferir a <strong>{bankAccount.alias || bankAccount.cbu}</strong> — {bankAccount.holder_name}
@@ -301,18 +271,9 @@ const OrderWizard = ({ items, totals, onClose, onSuccess }) => {
               </div>
 
               <div className="ow-preview-totals">
-                <div className="ow-totals-row">
-                  <span>Subtotal</span>
-                  <span>{formatCurrency(subtotal)}</span>
-                </div>
-                <div className="ow-totals-row shipping">
-                  <span>Envío</span>
-                  <span className="ow-shipping-pending">A calcular</span>
-                </div>
-                <div className="ow-totals-row total">
-                  <span>Total (sin envío)</span>
-                  <span>{formatCurrency(subtotal)}</span>
-                </div>
+                <div className="ow-totals-row"><span>Subtotal</span><span>{formatCurrency(subtotal)}</span></div>
+                <div className="ow-totals-row shipping"><span>Envío</span><span className="ow-shipping-pending">A calcular</span></div>
+                <div className="ow-totals-row total"><span>Total (sin envío)</span><span>{formatCurrency(subtotal)}</span></div>
                 <p className="ow-shipping-note">
                   El costo de envío será calculado por nuestro equipo y lo recibirás antes de confirmar el pago.
                 </p>
@@ -335,42 +296,31 @@ const OrderWizard = ({ items, totals, onClose, onSuccess }) => {
               )}
             </div>
           )}
-
         </div>
 
         <div className="ow-footer">
           {step === 1 ? (
             <button className="ow-btn-cancel" onClick={onClose}>Cancelar</button>
           ) : (
-            <button className="ow-btn-back" onClick={() => { setStep(s => s - 1); clearError?.(); }}>
-              <FiChevronLeft size={16} />
-              Volver
+            <button className="ow-btn-back" onClick={() => { setStep((s) => s - 1); clearError?.(); }}>
+              <FiChevronLeft size={16} />Volver
             </button>
           )}
 
           {step < 3 ? (
             <button
               className="ow-btn-next"
-              onClick={() => setStep(s => s + 1)}
-              disabled={
-                (step === 1 && (!selectedAddress || addresses.length === 0)) ||
-                orderLoading
-              }
+              onClick={() => setStep((s) => s + 1)}
+              disabled={(step === 1 && (!selectedAddress || addresses.length === 0)) || orderLoading}
             >
-              Continuar
-              <FiChevronRight size={16} />
+              Continuar <FiChevronRight size={16} />
             </button>
           ) : (
-            <button
-              className="ow-btn-confirm"
-              onClick={handleSubmit}
-              disabled={orderLoading}
-            >
-              {orderLoading ? (
-                <><span className="ow-spinner-sm" /> Enviando…</>
-              ) : (
-                <><FiCheck size={16} /> Confirmar pedido</>
-              )}
+            <button className="ow-btn-confirm" onClick={handleSubmit} disabled={orderLoading}>
+              {orderLoading
+                ? <><span className="ow-spinner-sm" /> Enviando…</>
+                : <><FiCheck size={16} /> Confirmar pedido</>
+              }
             </button>
           )}
         </div>

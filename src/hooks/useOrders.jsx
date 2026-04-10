@@ -1,192 +1,101 @@
-import { useState, useCallback } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import orderService from '../services/orderService';
 
-const useOrders = () => {
-  const [orders, setOrders]   = useState([]);
-  const [order, setOrder]     = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError]     = useState(null);
-  const [pagination, setPagination] = useState({
-    page: 1, limit: 10, total: 0, total_pages: 0,
+const ORDERS_KEY = ['orders'];
+
+const useOrders = (params = {}) => {
+  const queryClient = useQueryClient();
+
+  const {
+    data,
+    isLoading: loading,
+    error: queryError,
+  } = useQuery({
+    queryKey: [...ORDERS_KEY, params],
+    queryFn: () => orderService.getOrders(params),
+    staleTime: 1000 * 60 * 2,
+    select: (d) => ({
+      orders: Array.isArray(d) ? d : (d.orders ?? d.data ?? []),
+      pagination: d.pagination ?? { page: 1, limit: 10, total: 0, total_pages: 0 },
+    }),
   });
 
-  const updateOrderInList = (orderId, updatedData) => {
-    setOrders(prev => prev.map(o => o.id === orderId ? { ...o, ...updatedData } : o));
-    setOrder(prev => prev?.id === orderId ? { ...prev, ...updatedData } : prev);
-  };
+  const orders     = data?.orders     ?? [];
+  const pagination = data?.pagination ?? { page: 1, limit: 10, total: 0, total_pages: 0 };
+  const error      = queryError?.message ?? queryError?.error ?? null;
 
-  // ── Cliente ───────────────────────────────────────────────
+  const invalidate = () => queryClient.invalidateQueries({ queryKey: ORDERS_KEY });
 
-  const fetchOrders = useCallback(async (params = {}) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await orderService.getOrders(params);
-      setOrders(Array.isArray(data) ? data : data.orders || data.data || []);
-      if (data.pagination) setPagination(data.pagination);
-      return data;
-    } catch (err) {
-      setError(err.message || err.error || 'Error al cargar pedidos');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const patchOrder = (orderId, patch) =>
+    queryClient.setQueriesData({ queryKey: ORDERS_KEY }, (prev) => {
+      if (!prev) return prev;
+      const list = prev.orders ?? prev;
+      const updated = Array.isArray(list)
+        ? list.map((o) => (o.id === orderId ? { ...o, ...patch } : o))
+        : list;
+      return prev.orders ? { ...prev, orders: updated } : updated;
+    });
 
-  const fetchOrderById = useCallback(async (orderId) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await orderService.getOrderById(orderId);
-      const o = data.order || data;
-      setOrder(o);
-      return o;
-    } catch (err) {
-      setError(err.message || err.error || 'Error al cargar pedido');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const createMutation = useMutation({
+    mutationFn: orderService.createOrder,
+    onSuccess: invalidate,
+  });
 
-  const createOrder = useCallback(async (orderData) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await orderService.createOrder(orderData);
-      const newOrder = data.order || data;
-      setOrders(prev => [newOrder, ...prev]);
-      return newOrder;
-    } catch (err) {
-      setError(err.message || err.error || 'Error al crear pedido');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const cancelMutation = useMutation({
+    mutationFn: ({ orderId, reason }) => orderService.cancelOrder(orderId, reason),
+    onSuccess: (data, { orderId }) =>
+      patchOrder(orderId, { status: 'CANCELLED', ...(data.order ?? data) }),
+  });
 
-  const cancelOrder = useCallback(async (orderId, reason = '') => {
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await orderService.cancelOrder(orderId, reason);
-      updateOrderInList(orderId, { status: 'CANCELLED', ...(data.order || data) });
-      return data;
-    } catch (err) {
-      setError(err.message || err.error || 'Error al cancelar pedido');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const confirmShippingMutation = useMutation({
+    mutationFn: ({ orderId, action, reason }) =>
+      orderService.confirmShipping(orderId, action, reason),
+    onSuccess: (data, { orderId }) => patchOrder(orderId, data.order ?? data),
+  });
 
-  // NUEVO: cliente confirma o rechaza el precio de envío
-  const confirmShipping = useCallback(async (orderId, action, cancellation_reason = '') => {
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await orderService.confirmShipping(orderId, action, cancellation_reason);
-      const updated = data.order || data;
-      updateOrderInList(orderId, updated);
-      return data;
-    } catch (err) {
-      setError(err.message || err.error || 'Error al confirmar envío');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const uploadProofMutation = useMutation({
+    mutationFn: ({ orderId, file, proofData }) =>
+      orderService.uploadPaymentProof(orderId, file, proofData),
+    onSuccess: (_, { orderId }) => patchOrder(orderId, { payment_status: 'PROOF_UPLOADED' }),
+  });
 
-  const uploadPaymentProof = useCallback(async (orderId, file, proofData = {}) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await orderService.uploadPaymentProof(orderId, file, proofData);
-      updateOrderInList(orderId, { payment_status: 'PROOF_UPLOADED' });
-      return data;
-    } catch (err) {
-      setError(err.message || err.error || 'Error al subir comprobante');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const setShippingCostMutation = useMutation({
+    mutationFn: ({ orderId, shippingData }) => orderService.setShippingCost(orderId, shippingData),
+    onSuccess: (data, { orderId }) => patchOrder(orderId, data),
+  });
 
-  // ── Admin ─────────────────────────────────────────────────
+  const reviewProofMutation = useMutation({
+    mutationFn: ({ orderId, reviewData }) => orderService.reviewProof(orderId, reviewData),
+    onSuccess: (data, { orderId }) => patchOrder(orderId, data),
+  });
 
-  const setShippingCost = useCallback(async (orderId, shippingData) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await orderService.setShippingCost(orderId, shippingData);
-      updateOrderInList(orderId, data);
-      return data;
-    } catch (err) {
-      setError(err.message || err.error || 'Error al setear costo de envío');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  const reviewProof = useCallback(async (orderId, reviewData) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await orderService.reviewProof(orderId, reviewData);
-      updateOrderInList(orderId, data);
-      return data;
-    } catch (err) {
-      setError(err.message || err.error || 'Error al revisar comprobante');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  const updateOrderStatus = useCallback(async (orderId, statusData) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await orderService.updateOrderStatus(orderId, statusData);
-      updateOrderInList(orderId, data);
-      return data;
-    } catch (err) {
-      setError(err.message || err.error || 'Error al actualizar estado');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  const clearError = useCallback(() => setError(null), []);
-
-  const clearState = useCallback(() => {
-    setOrders([]);
-    setOrder(null);
-    setError(null);
-    setPagination({ page: 1, limit: 10, total: 0, total_pages: 0 });
-  }, []);
+  const updateStatusMutation = useMutation({
+    mutationFn: ({ orderId, statusData }) => orderService.updateOrderStatus(orderId, statusData),
+    onSuccess: (data, { orderId }) => patchOrder(orderId, data),
+  });
 
   return {
     orders,
-    order,
+    order: null,
     loading,
     error,
     pagination,
-    // cliente
-    fetchOrders,
-    fetchOrderById,
-    createOrder,
-    cancelOrder,
-    confirmShipping,
-    uploadPaymentProof,
-    // admin
-    setShippingCost,
-    reviewProof,
-    updateOrderStatus,
-    clearError,
-    clearState,
+    fetchOrders: invalidate,
+    fetchOrderById: orderService.getOrderById,
+    createOrder: createMutation.mutateAsync,
+    cancelOrder: (orderId, reason = '') => cancelMutation.mutateAsync({ orderId, reason }),
+    confirmShipping: (orderId, action, reason = '') =>
+      confirmShippingMutation.mutateAsync({ orderId, action, reason }),
+    uploadPaymentProof: (orderId, file, proofData = {}) =>
+      uploadProofMutation.mutateAsync({ orderId, file, proofData }),
+    setShippingCost: (orderId, shippingData) =>
+      setShippingCostMutation.mutateAsync({ orderId, shippingData }),
+    reviewProof: (orderId, reviewData) =>
+      reviewProofMutation.mutateAsync({ orderId, reviewData }),
+    updateOrderStatus: (orderId, statusData) =>
+      updateStatusMutation.mutateAsync({ orderId, statusData }),
+    clearError: () => {},
+    clearState: () => queryClient.removeQueries({ queryKey: ORDERS_KEY }),
   };
 };
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useRef } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import useUsers from '../../../../hooks/useUsers';
 import UserFilters from './components/UserFilters/UserFilters';
 import UserTable from './components/UserTable/UserTable';
@@ -10,81 +10,65 @@ const ITEMS_PER_PAGE = 10;
 const DEBOUNCE_MS    = 450;
 
 const UserManager = () => {
+  const [search,          setSearch]          = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [roleFilter,      setRoleFilter]      = useState('');
+  const [verifiedFilter,  setVerifiedFilter]  = useState('');
+  const [addressFilter,   setAddressFilter]   = useState('');
+  const [debouncedAddress, setDebouncedAddress] = useState('');
+  const [currentPage,     setCurrentPage]     = useState(1);
+  const [roleModalUser,   setRoleModalUser]   = useState(null);
+
+  const searchTimer  = useRef(null);
+  const addressTimer = useRef(null);
+
   const {
     users,
     loading,
     error,
     pagination,
-    fetchUsers,
     changeRole,
     deleteUser,
     clearError,
-  } = useUsers();
-
-  // ── Raw filter state (bound to inputs immediately) ────────
-  const [search,         setSearch]         = useState('');
-  const [roleFilter,     setRoleFilter]      = useState('');
-  const [verifiedFilter, setVerifiedFilter]  = useState('');
-  const [addressFilter,  setAddressFilter]   = useState('');
-
-  // ── Debounced values (used for actual API calls) ──────────
-  const [debouncedSearch,  setDebouncedSearch]  = useState('');
-  const [debouncedAddress, setDebouncedAddress] = useState('');
-
-  const searchTimer  = useRef(null);
-  const addressTimer = useRef(null);
+  } = useUsers({
+    page:        currentPage,
+    limit:       ITEMS_PER_PAGE,
+    search:      debouncedSearch,
+    role:        roleFilter,
+    is_verified: verifiedFilter,
+    address:     debouncedAddress,
+  });
 
   const handleSearchChange = (val) => {
     setSearch(val);
     clearTimeout(searchTimer.current);
-    searchTimer.current = setTimeout(() => setDebouncedSearch(val), DEBOUNCE_MS);
+    searchTimer.current = setTimeout(() => {
+      setDebouncedSearch(val);
+      setCurrentPage(1);
+    }, DEBOUNCE_MS);
   };
 
   const handleAddressChange = (val) => {
     setAddressFilter(val);
     clearTimeout(addressTimer.current);
-    addressTimer.current = setTimeout(() => setDebouncedAddress(val), DEBOUNCE_MS);
+    addressTimer.current = setTimeout(() => {
+      setDebouncedAddress(val);
+      setCurrentPage(1);
+    }, DEBOUNCE_MS);
   };
 
-  const [currentPage, setCurrentPage] = useState(1);
-
-  // ── Modals ────────────────────────────────────────────────
-  const [roleModalUser, setRoleModalUser] = useState(null);
-
-  // ── Fetch — only fires on debounced values and selects ────
-  useEffect(() => {
+  const handleRoleFilterChange = (val) => {
+    setRoleFilter(val);
     setCurrentPage(1);
-    fetchUsers({
-      page:        1,
-      limit:       ITEMS_PER_PAGE,
-      search:      debouncedSearch,
-      role:        roleFilter,
-      is_verified: verifiedFilter,
-      address:     debouncedAddress,
-    });
-  }, [debouncedSearch, roleFilter, verifiedFilter, debouncedAddress]);
-
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
-    fetchUsers({
-      page,
-      limit:       ITEMS_PER_PAGE,
-      search:      debouncedSearch,
-      role:        roleFilter,
-      is_verified: verifiedFilter,
-      address:     debouncedAddress,
-    });
   };
 
-  // ── Actions ───────────────────────────────────────────────
+  const handleVerifiedFilterChange = (val) => {
+    setVerifiedFilter(val);
+    setCurrentPage(1);
+  };
 
-  const handleOpenRoleModal = useCallback((user) => {
-    setRoleModalUser(user);
-  }, []);
-
-  const handleCloseRoleModal = useCallback(() => {
-    setRoleModalUser(null);
-  }, []);
+  const handleOpenRoleModal  = useCallback((user) => setRoleModalUser(user), []);
+  const handleCloseRoleModal = useCallback(() => setRoleModalUser(null), []);
 
   const handleChangeRole = useCallback(async (userId, role) => {
     try {
@@ -104,8 +88,6 @@ const UserManager = () => {
     }
   }, [deleteUser]);
 
-  // ── Loading inicial (sin usuarios aún) ───────────────────
-
   if (loading && users.length === 0) {
     return (
       <div className="user-manager-loading">
@@ -117,15 +99,14 @@ const UserManager = () => {
 
   return (
     <div className="user-manager">
-
       <UserFilters
         total={pagination.total || users.length}
         search={search}
         onSearchChange={handleSearchChange}
         roleFilter={roleFilter}
-        onRoleFilterChange={setRoleFilter}
+        onRoleFilterChange={handleRoleFilterChange}
         verifiedFilter={verifiedFilter}
-        onVerifiedFilterChange={setVerifiedFilter}
+        onVerifiedFilterChange={handleVerifiedFilterChange}
         addressFilter={addressFilter}
         onAddressFilterChange={handleAddressChange}
         users={users}
@@ -148,19 +129,17 @@ const UserManager = () => {
             </span>
           )}
         </div>
-
         <UserTable
           users={users}
           loading={loading}
           onChangeRole={handleOpenRoleModal}
           onDelete={handleDelete}
         />
-
         {pagination.total_pages > 1 && (
           <Pagination
             currentPage={currentPage}
             totalPages={pagination.total_pages}
-            onPageChange={handlePageChange}
+            onPageChange={setCurrentPage}
           />
         )}
       </section>
@@ -173,7 +152,6 @@ const UserManager = () => {
           loading={loading}
         />
       )}
-
     </div>
   );
 };

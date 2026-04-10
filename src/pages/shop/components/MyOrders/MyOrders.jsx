@@ -19,40 +19,37 @@ const formatDate = (dateStr) => {
 };
 
 const STATUS_CONFIG = {
-  PENDING_PAYMENT: { label: 'Pago pendiente',  color: 'yellow' },
-  PROCESSING:      { label: 'En proceso',       color: 'blue' },
-  SHIPPED:         { label: 'Enviado',          color: 'orange' },
-  DELIVERED:       { label: 'Entregado',        color: 'green' },
-  CANCELLED:       { label: 'Cancelado',        color: 'red' },
-  COMPLETED:       { label: 'Completado',       color: 'success' },
+  PENDING_PAYMENT: { label: 'Pago pendiente', color: 'yellow'  },
+  PROCESSING:      { label: 'En proceso',      color: 'blue'    },
+  SHIPPED:         { label: 'Enviado',         color: 'orange'  },
+  DELIVERED:       { label: 'Entregado',       color: 'green'   },
+  CANCELLED:       { label: 'Cancelado',       color: 'red'     },
+  COMPLETED:       { label: 'Completado',      color: 'success' },
 };
 
 const SHIPPING_STATUS_CONFIG = {
-  PENDING:  { label: 'Pendiente',   color: 'yellow' },
-  QUOTED:   { label: 'Cotizado',    color: 'blue' },
-  ACCEPTED: { label: 'Aceptado',    color: 'green' },
-  REJECTED: { label: 'Rechazado',   color: 'red' },
-  SHIPPED:  { label: 'Enviado',     color: 'orange' },
+  PENDING:  { label: 'Pendiente',  color: 'yellow' },
+  QUOTED:   { label: 'Cotizado',   color: 'blue'   },
+  ACCEPTED: { label: 'Aceptado',   color: 'green'  },
+  REJECTED: { label: 'Rechazado',  color: 'red'    },
+  SHIPPED:  { label: 'Enviado',    color: 'orange' },
 };
 
 const PAYMENT_STATUS_CONFIG = {
-  PENDING_PROOF:  { label: 'Sin comprobante',       color: 'yellow' },
-  PROOF_UPLOADED: { label: 'Comprobante enviado',   color: 'blue' },
-  APPROVED:       { label: 'Pago aprobado',         color: 'green' },
-  REJECTED:       { label: 'Rechazado',             color: 'red' },
+  PENDING_PROOF:  { label: 'Sin comprobante',     color: 'yellow' },
+  PROOF_UPLOADED: { label: 'Comprobante enviado', color: 'blue'   },
+  APPROVED:       { label: 'Pago aprobado',       color: 'green'  },
+  REJECTED:       { label: 'Rechazado',           color: 'red'    },
 };
 
 const StatusBadge = ({ status, config }) => {
   const cfg = config[status] || { label: status, color: 'gray' };
-  return (
-    <span className={`mo-badge mo-badge--${cfg.color}`}>{cfg.label}</span>
-  );
+  return <span className={`mo-badge mo-badge--${cfg.color}`}>{cfg.label}</span>;
 };
 
 const ShippingConfirm = ({ order, onConfirm }) => {
-  const [loading, setLoading]     = useState(false);
-  const [rejectOpen, setRejectOpen] = useState(false);
-  const [reason, setReason]       = useState('');
+  const [loading, setLoading] = useState(false);
+  const [reason, setReason]   = useState('');
 
   const shippingCost = Number(order.shipping_cost || 0);
   const subtotal     = Number(order.subtotal || 0);
@@ -76,40 +73,19 @@ const ShippingConfirm = ({ order, onConfirm }) => {
         <FiDollarSign size={16} />
         Precio de envío cotizado
       </div>
-
       <div className="mo-shipping-confirm-breakdown">
-        <div className="mo-sc-row">
-          <span>Subtotal productos</span>
-          <span>{formatCurrency(subtotal)}</span>
-        </div>
-        <div className="mo-sc-row highlight">
-          <span>Costo de envío cotizado</span>
-          <span>{formatCurrency(shippingCost)}</span>
-        </div>
-        <div className="mo-sc-row total">
-          <span>Total a pagar</span>
-          <span>{formatCurrency(total)}</span>
-        </div>
+        <div className="mo-sc-row"><span>Subtotal productos</span><span>{formatCurrency(subtotal)}</span></div>
+        <div className="mo-sc-row highlight"><span>Costo de envío cotizado</span><span>{formatCurrency(shippingCost)}</span></div>
+        <div className="mo-sc-row total"><span>Total a pagar</span><span>{formatCurrency(total)}</span></div>
       </div>
-
       <p className="mo-shipping-confirm-note">
         Si aceptás, podrás subir el comprobante de pago. Si rechazás, la orden será cancelada.
       </p>
-
       <div className="mo-shipping-confirm-actions">
-        <button
-          className="mo-sc-btn mo-sc-btn--reject"
-          onClick={handleReject}
-          disabled={loading}
-        >
-          <FiX size={14} />
-          Rechazar precio
+        <button className="mo-sc-btn mo-sc-btn--reject" onClick={handleReject} disabled={loading}>
+          <FiX size={14} />Rechazar precio
         </button>
-        <button
-          className="mo-sc-btn mo-sc-btn--accept"
-          onClick={handleAccept}
-          disabled={loading}
-        >
+        <button className="mo-sc-btn mo-sc-btn--accept" onClick={handleAccept} disabled={loading}>
           {loading ? <><span className="mo-spinner" /> Procesando…</> : <><FiCheck size={14} /> Aceptar y pagar</>}
         </button>
       </div>
@@ -134,7 +110,7 @@ const ProofUploader = ({ order, onUpload, bankAccount }) => {
     try {
       await onUpload(order.id, file, {
         payment_type: paymentType,
-        amount:       amount ? Number(amount) : undefined,
+        amount: amount ? Number(amount) : undefined,
         transaction_reference: reference || undefined,
       });
       setFile(null);
@@ -153,38 +129,24 @@ const ProofUploader = ({ order, onUpload, bankAccount }) => {
         <div className="mo-proof-header-left">
           <FiDollarSign size={14} />
           <span className="mo-proof-label">Comprobante de pago</span>
-          {order.total && (
-            <span className="mo-proof-amount">{formatCurrency(Number(order.total))}</span>
-          )}
+          {order.total && <span className="mo-proof-amount">{formatCurrency(Number(order.total))}</span>}
         </div>
         <StatusBadge status={order.payment_status || 'PENDING_PROOF'} config={PAYMENT_STATUS_CONFIG} />
       </div>
 
       {order.payment_status === 'PROOF_UPLOADED' && (
-        <p className="mo-proof-msg mo-proof-msg--waiting">
-          <FiClock size={13} />
-          Comprobante recibido — esperando verificación del equipo.
-        </p>
+        <p className="mo-proof-msg mo-proof-msg--waiting"><FiClock size={13} />Comprobante recibido — esperando verificación del equipo.</p>
       )}
       {order.payment_status === 'APPROVED' && (
-        <p className="mo-proof-msg mo-proof-msg--confirmed">
-          <FiCheck size={13} />
-          Pago verificado y confirmado.
-        </p>
+        <p className="mo-proof-msg mo-proof-msg--confirmed"><FiCheck size={13} />Pago verificado y confirmado.</p>
       )}
       {order.payment_status === 'REJECTED' && (
-        <p className="mo-proof-msg mo-proof-msg--rejected">
-          <FiAlertCircle size={13} />
-          Tu comprobante fue rechazado. Por favor subí uno nuevo.
-        </p>
+        <p className="mo-proof-msg mo-proof-msg--rejected"><FiAlertCircle size={13} />Tu comprobante fue rechazado. Por favor subí uno nuevo.</p>
       )}
 
       {canUpload && bankAccount && (
         <div className="mo-bank-transfer-info">
-          <div className="mo-bank-transfer-title">
-            <FiInfo size={13} />
-            Datos para transferir
-          </div>
+          <div className="mo-bank-transfer-title"><FiInfo size={13} />Datos para transferir</div>
           <div className="mo-bank-transfer-grid">
             <div className="mo-bank-transfer-row">
               <span className="mo-bank-transfer-label">Banco</span>
@@ -213,26 +175,23 @@ const ProofUploader = ({ order, onUpload, bankAccount }) => {
           <div className="mo-proof-fields">
             <div className="mo-proof-field">
               <label>Método de pago</label>
-              <select value={paymentType} onChange={e => setPaymentType(e.target.value)} className="mo-proof-select">
+              <select value={paymentType} onChange={(e) => setPaymentType(e.target.value)} className="mo-proof-select">
                 <option value="BANK_TRANSFER">Transferencia bancaria</option>
                 <option value="CASH">Efectivo</option>
               </select>
             </div>
             <div className="mo-proof-field">
               <label>Monto abonado</label>
-              <input type="number" className="mo-proof-input" placeholder="Ej: 15000"
-                value={amount} onChange={e => setAmount(e.target.value)} />
+              <input type="number" className="mo-proof-input" placeholder="Ej: 15000" value={amount} onChange={(e) => setAmount(e.target.value)} />
             </div>
             <div className="mo-proof-field">
               <label>N° de referencia <span style={{ opacity: 0.6 }}>(opcional)</span></label>
-              <input type="text" className="mo-proof-input" placeholder="Ej: ABC123"
-                value={reference} onChange={e => setReference(e.target.value)} />
+              <input type="text" className="mo-proof-input" placeholder="Ej: ABC123" value={reference} onChange={(e) => setReference(e.target.value)} />
             </div>
           </div>
-
           <div className="mo-proof-file-wrapper">
             <input type="file" id={`proof-${order.id}`} accept=".pdf,.jpg,.jpeg,.png"
-              onChange={e => {
+              onChange={(e) => {
                 const f = e.target.files[0];
                 if (f && f.size > 10 * 1024 * 1024) { setUploadError('El archivo no puede superar los 10MB'); return; }
                 setFile(f);
@@ -246,14 +205,9 @@ const ProofUploader = ({ order, onUpload, bankAccount }) => {
               <small>PDF, JPG o PNG — máx 10MB</small>
             </label>
           </div>
-
           {uploadError && <p className="mo-proof-error"><FiAlertCircle size={13} /> {uploadError}</p>}
-
           <button className="mo-proof-upload-btn" onClick={handleUpload} disabled={!file || uploading}>
-            {uploading
-              ? <><span className="mo-spinner" /> Subiendo…</>
-              : <><FiUpload size={14} /> Enviar comprobante</>
-            }
+            {uploading ? <><span className="mo-spinner" /> Subiendo…</> : <><FiUpload size={14} /> Enviar comprobante</>}
           </button>
         </div>
       )}
@@ -293,20 +247,16 @@ const OrderCard = ({ order: orderProp, onUploadProof, onCancel, onConfirmShippin
         <div className="mo-card-meta">
           <span className="mo-card-date"><FiCalendar size={13} />{formatDate(order.createdAt)}</span>
           {totalAmount && (
-            <span className="mo-card-amount">
-              <FiDollarSign size={13} />
-              {formatCurrency(Number(totalAmount))}
-            </span>
+            <span className="mo-card-amount"><FiDollarSign size={13} />{formatCurrency(Number(totalAmount))}</span>
           )}
         </div>
-        <button className="mo-expand-btn" type="button" onClick={e => { e.stopPropagation(); setExpanded(!expanded); }}>
+        <button className="mo-expand-btn" type="button" onClick={(e) => { e.stopPropagation(); setExpanded(!expanded); }}>
           {expanded ? <FiChevronUp size={18} /> : <FiChevronDown size={18} />}
         </button>
       </div>
 
       {expanded && (
         <div className="mo-card-body">
-
           {items.length > 0 && (
             <div className="mo-section">
               <div className="mo-section-title"><FiPackage size={14} /> Productos</div>
@@ -320,7 +270,7 @@ const OrderCard = ({ order: orderProp, onUploadProof, onCancel, onConfirmShippin
                       {img && (
                         <img src={img.startsWith('http') ? img : `${API_URL}${img}`} alt={name}
                           className="mo-item-img"
-                          onError={e => { e.currentTarget.src = '/api/images/placeholder.jpg'; }} />
+                          onError={(e) => { e.currentTarget.src = '/api/images/placeholder.jpg'; }} />
                       )}
                       <div className="mo-item-info">
                         <span className="mo-item-name">{name}</span>
@@ -386,21 +336,12 @@ const OrderCard = ({ order: orderProp, onUploadProof, onCancel, onConfirmShippin
           {totalAmount && (
             <div className="mo-totals">
               {order.subtotal && (
-                <div className="mo-totals-row">
-                  <span>Subtotal productos</span>
-                  <span>{formatCurrency(Number(order.subtotal))}</span>
-                </div>
+                <div className="mo-totals-row"><span>Subtotal productos</span><span>{formatCurrency(Number(order.subtotal))}</span></div>
               )}
               {order.shipping_cost != null && (
-                <div className="mo-totals-row">
-                  <span>Envío</span>
-                  <span>{formatCurrency(Number(order.shipping_cost))}</span>
-                </div>
+                <div className="mo-totals-row"><span>Envío</span><span>{formatCurrency(Number(order.shipping_cost))}</span></div>
               )}
-              <div className="mo-totals-row total">
-                <span>Total</span>
-                <span>{formatCurrency(Number(totalAmount))}</span>
-              </div>
+              <div className="mo-totals-row total"><span>Total</span><span>{formatCurrency(Number(totalAmount))}</span></div>
             </div>
           )}
 
@@ -419,29 +360,20 @@ const OrderCard = ({ order: orderProp, onUploadProof, onCancel, onConfirmShippin
           )}
 
           {needsShippingConfirm && (
-            <ShippingConfirm
-              order={order}
-              onConfirm={handleConfirmShipping}
-            />
+            <ShippingConfirm order={order} onConfirm={handleConfirmShipping} />
           )}
 
           {canUploadProof && (
-            <ProofUploader
-              order={order}
-              onUpload={onUploadProof}
-              bankAccount={bankAccount}
-            />
+            <ProofUploader order={order} onUpload={onUploadProof} bankAccount={bankAccount} />
           )}
 
           {canCancel && (
             <div className="mo-card-actions">
               <button className="mo-btn-cancel" onClick={() => onCancel(order.id)}>
-                <FiX size={14} />
-                Cancelar pedido
+                <FiX size={14} />Cancelar pedido
               </button>
             </div>
           )}
-
         </div>
       )}
     </div>
@@ -454,14 +386,7 @@ const MyOrders = ({ onShop }) => {
     fetchOrders, cancelOrder, confirmShipping, uploadPaymentProof, clearError,
   } = useOrders();
 
-  const { account: bankAccount, fetchBankAccount } = useBankAccount();
-
-  const load = useCallback(() => { fetchOrders(); }, [fetchOrders]);
-
-  useEffect(() => {
-    load();
-    fetchBankAccount();
-  }, [load]);
+  const { account: bankAccount } = useBankAccount();
 
   const handleCancel = async (orderId) => {
     if (!window.confirm('¿Cancelar este pedido?')) return;
@@ -469,13 +394,11 @@ const MyOrders = ({ onShop }) => {
     catch (err) { console.error('Error al cancelar:', err); }
   };
 
-  const handleConfirmShipping = async (orderId, action, reason) => {
-    return await confirmShipping(orderId, action, reason);
-  };
+  const handleConfirmShipping = async (orderId, action, reason) =>
+    await confirmShipping(orderId, action, reason);
 
-  const handleUploadProof = async (orderId, file, proofData) => {
+  const handleUploadProof = async (orderId, file, proofData) =>
     await uploadPaymentProof(orderId, file, proofData);
-  };
 
   if (loading && orders.length === 0) {
     return (
@@ -492,7 +415,7 @@ const MyOrders = ({ onShop }) => {
         <FiAlertCircle size={32} />
         <h3>Error al cargar pedidos</h3>
         <p>{error}</p>
-        <button className="mo-retry-btn" onClick={load}>
+        <button className="mo-retry-btn" onClick={fetchOrders}>
           <FiRefreshCw size={14} /> Reintentar
         </button>
       </div>
@@ -506,8 +429,7 @@ const MyOrders = ({ onShop }) => {
         <h3>Todavía no tenés pedidos</h3>
         <p>Cuando hagas tu primer pedido, aparecerá acá con su estado de seguimiento.</p>
         <button className="mo-shop-btn" onClick={onShop} type="button">
-          <FiShoppingBag size={16} />
-          Ir a la tienda
+          <FiShoppingBag size={16} />Ir a la tienda
         </button>
       </div>
     );
@@ -517,7 +439,7 @@ const MyOrders = ({ onShop }) => {
     <div className="my-orders">
       <div className="mo-list-header">
         <h2>{orders.length} pedido{orders.length !== 1 ? 's' : ''}</h2>
-        <button className="mo-refresh-btn" onClick={load} disabled={loading}>
+        <button className="mo-refresh-btn" onClick={fetchOrders} disabled={loading}>
           <FiRefreshCw size={14} className={loading ? 'spinning' : ''} />
           Actualizar
         </button>
@@ -532,7 +454,7 @@ const MyOrders = ({ onShop }) => {
       )}
 
       <div className="mo-cards">
-        {orders.map(order => (
+        {orders.map((order) => (
           <OrderCard
             key={order.id}
             order={order}

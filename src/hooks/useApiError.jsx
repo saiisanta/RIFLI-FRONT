@@ -1,77 +1,71 @@
 import { useState, useCallback } from 'react';
 
-/**
- * Normaliza los dos formatos de error del backend:
- *   { error: 'string' }                          → error general
- *   { errors: [{ msg, path, location, ... }] }   → errores por campo (express-validator)
- *
- * @param {string[]} watchedFields - campos del formulario que queremos mapear
- */
 const useApiError = (watchedFields = []) => {
-  const [generalError, setGeneralError]   = useState(null);
-  const [fieldErrors,  setFieldErrors]    = useState({});
+  const [generalError, setGeneralError] = useState(null);
+  const [fieldErrors, setFieldErrors] = useState({});
+  const [rateLimitError, setRateLimitError] = useState(null);
 
-  /**
-   * Procesa el error capturado en el catch y lo distribuye.
-   * @param {any} err - lo que llega del catch (objeto del back o Error nativo)
-   */
   const handleApiError = useCallback((err) => {
-  setGeneralError(null);
-  setFieldErrors({});
+    setGeneralError(null);
+    setFieldErrors({});
+    setRateLimitError(null);
 
-  if (!err) return;
+    if (!err) return;
 
-  // Axios / Fetch: si viene dentro de response.data
-  const apiError = err.response?.data || err;
+    const status = err.response?.status;
+    const data = err.response?.data || err;
 
-  // ── Formato 1: express-validator ──────────
-  if (apiError.errors && Array.isArray(apiError.errors)) {
-    const fieldMap = {};
-    const general = [];
+    if (status === 429) {
+      setRateLimitError(data?.error || 'Demasiados intentos. Intentá más tarde.');
+      return;
+    }
 
-    apiError.errors.forEach(({ msg, path }) => {
-      if (path && watchedFields.includes(path)) {
-        if (!fieldMap[path]) fieldMap[path] = [];
-        fieldMap[path].push(msg);
-      } else {
-        general.push(msg);
-      }
-    });
+    if (data.errors && Array.isArray(data.errors)) {
+      const fieldMap = {};
+      const general = [];
 
-    if (Object.keys(fieldMap).length) setFieldErrors(fieldMap);
-    if (general.length) setGeneralError(general.join(' · '));
-    return;
-  }
+      data.errors.forEach(({ msg, path }) => {
+        if (path && watchedFields.includes(path)) {
+          if (!fieldMap[path]) fieldMap[path] = [];
+          fieldMap[path].push(msg);
+        } else {
+          general.push(msg);
+        }
+      });
 
-  // ── Formato 2: error simple ──────────
-  if (apiError.error && typeof apiError.error === 'string') {
-    setGeneralError(apiError.error);
-    return;
-  }
+      if (Object.keys(fieldMap).length) setFieldErrors(fieldMap);
+      if (general.length) setGeneralError(general.join(' · '));
+      return;
+    }
 
-  // ── Formato 3: message ──────────
-  if (apiError.message) {
-    setGeneralError(apiError.message);
-    return;
-  }
+    if (data.error && typeof data.error === 'string') {
+      setGeneralError(data.error);
+      return;
+    }
 
-  if (typeof apiError === 'string') {
-    setGeneralError(apiError);
-    return;
-  }
+    if (data.message) {
+      setGeneralError(data.message);
+      return;
+    }
 
-  setGeneralError('Ocurrió un error inesperado. Intentá de nuevo.');
-}, [watchedFields]);
+    if (typeof data === 'string') {
+      setGeneralError(data);
+      return;
+    }
+
+    setGeneralError('Ocurrió un error inesperado.');
+  }, [watchedFields]);
 
   const clearApiError = useCallback(() => {
     setGeneralError(null);
     setFieldErrors({});
+    setRateLimitError(null);
   }, []);
 
-  /**
-   * Helper: devuelve el primer mensaje de error de un campo específico
-   * para usarlo directamente en el JSX del input.
-   */
+  const clearRateLimitError = useCallback(() => {
+    setRateLimitError(null);
+  }, []);
+
   const getFieldError = useCallback((fieldName) => {
     const msgs = fieldErrors[fieldName];
     return msgs?.length ? msgs[0] : null;
@@ -80,8 +74,10 @@ const useApiError = (watchedFields = []) => {
   return {
     generalError,
     fieldErrors,
+    rateLimitError,
     handleApiError,
     clearApiError,
+    clearRateLimitError,
     getFieldError,
   };
 };

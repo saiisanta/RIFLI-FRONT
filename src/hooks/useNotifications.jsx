@@ -1,130 +1,83 @@
-import { useState, useCallback, useEffect, useContext } from 'react';
+import { useContext } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import notificationService from '../services/notificationService';
 import { AuthContext } from '../context/AuthContext';
 
-const POLL_INTERVAL = 30_000; // 30 segundos
+const NOTIFICATIONS_KEY = ['notifications'];
+const POLL_INTERVAL = 30_000;
 
 const useNotifications = () => {
   const { user } = useContext(AuthContext);
+  const queryClient = useQueryClient();
 
-  const [notifications, setNotifications] = useState([]);
-  const [unreadCount, setUnreadCount]     = useState(0);
-  const [loading, setLoading]             = useState(false);
-  const [error, setError]                 = useState(null);
+  const {
+    data,
+    isLoading: loading,
+    error: queryError,
+  } = useQuery({
+    queryKey: NOTIFICATIONS_KEY,
+    queryFn: () =>
+      notificationService.getAll({ limit: 20 }).then((d) => ({
+        notifications: Array.isArray(d) ? d : (d.notifications ?? []),
+      })),
+    enabled: !!user,
+    staleTime: POLL_INTERVAL,
+    refetchInterval: POLL_INTERVAL,
+  });
 
-  // ─── Fetch lista completa ──────────────────────────────────────────────────
-  const fetchNotifications = useCallback(async (params = {}) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await notificationService.getAll({ limit: 20, ...params });
-      const list = Array.isArray(data) ? data : data.notifications ?? [];
-      setNotifications(list);
-      setUnreadCount(list.filter((n) => !n.is_read).length);
-      return data;
-    } catch (err) {
-      setError(err.message || 'Error al cargar notificaciones');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const notifications = data?.notifications ?? [];
+  const unreadCount = notifications.filter((n) => !n.is_read).length;
+  const error = queryError?.message ?? null;
 
-  // ─── Polling liviano de conteo ─────────────────────────────────────────────
-  const fetchUnreadCount = useCallback(async () => {
-    try {
-      const data = await notificationService.getUnreadCount();
-      const count = data?.count ?? 0;
-      setUnreadCount((prev) => {
-        if (prev !== count) fetchNotifications();
-        return count;
-      });
-      return count;
-    } catch (err) {
-      console.error('Error al obtener conteo de notificaciones:', err);
-    }
-  }, [fetchNotifications]);
+  const invalidate = () => queryClient.invalidateQueries({ queryKey: NOTIFICATIONS_KEY });
 
-  // ─── Marcar una como leída ────────────────────────────────────────────────
-  const markAsRead = useCallback(async (id) => {
-    try {
-      setError(null);
-      await notificationService.markAsRead(id);
-      setNotifications((prev) =>
-        prev.map((n) => (n.id === id ? { ...n, is_read: true } : n))
-      );
-      setUnreadCount((prev) => Math.max(0, prev - 1));
-    } catch (err) {
-      setError(err.message || 'Error al marcar notificación como leída');
-      throw err;
-    }
-  }, []);
+  const markAsReadMutation = useMutation({
+    mutationFn: notificationService.markAsRead,
+    onSuccess: (_, id) =>
+      queryClient.setQueryData(NOTIFICATIONS_KEY, (prev) => {
+        if (!prev) return prev;
+        return {
+          notifications: prev.notifications.map((n) =>
+            n.id === id ? { ...n, is_read: true } : n
+          ),
+        };
+      }),
+  });
 
-  // ─── Marcar todas como leídas ─────────────────────────────────────────────
-  const markAllAsRead = useCallback(async () => {
-    try {
-      setError(null);
-      await notificationService.markAllAsRead();
-      setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
-      setUnreadCount(0);
-    } catch (err) {
-      setError(err.message || 'Error al marcar todas como leídas');
-      throw err;
-    }
-  }, []);
+  const markAllAsReadMutation = useMutation({
+    mutationFn: notificationService.markAllAsRead,
+    onSuccess: () =>
+      queryClient.setQueryData(NOTIFICATIONS_KEY, (prev) => {
+        if (!prev) return prev;
+        return {
+          notifications: prev.notifications.map((n) => ({ ...n, is_read: true })),
+        };
+      }),
+  });
 
-  // ─── Eliminar notificación ────────────────────────────────────────────────
-  const deleteNotification = useCallback(async (id) => {
-    try {
-      setError(null);
-      await notificationService.delete(id);
-      setNotifications((prev) => {
-        const removed = prev.find((n) => n.id === id);
-        if (removed && !removed.is_read) {
-          setUnreadCount((c) => Math.max(0, c - 1));
-        }
-        return prev.filter((n) => n.id !== id);
-      });
-    } catch (err) {
-      setError(err.message || 'Error al eliminar notificación');
-      throw err;
-    }
-  }, []);
-
-  // ─── Limpiar error ────────────────────────────────────────────────────────
-  const clearError = useCallback(() => setError(null), []);
-
-  // ─── Limpiar estado ───────────────────────────────────────────────────────
-  const clearState = useCallback(() => {
-    setNotifications([]);
-    setUnreadCount(0);
-    setError(null);
-  }, []);
-
-  // ─── Efectos ──────────────────────────────────────────────────────────────
-  useEffect(() => {
-    if (!user) return;
-    fetchNotifications();
-  }, [user, fetchNotifications]);
-
-  useEffect(() => {
-    if (!user) return;
-    const interval = setInterval(fetchUnreadCount, POLL_INTERVAL);
-    return () => clearInterval(interval);
-  }, [user, fetchUnreadCount]);
+  const deleteMutation = useMutation({
+    mutationFn: notificationService.delete,
+    onSuccess: (_, id) =>
+      queryClient.setQueryData(NOTIFICATIONS_KEY, (prev) => {
+        if (!prev) return prev;
+        return {
+          notifications: prev.notifications.filter((n) => n.id !== id),
+        };
+      }),
+  });
 
   return {
     notifications,
     unreadCount,
     loading,
     error,
-    fetchNotifications,
-    fetchUnreadCount,
-    markAsRead,
-    markAllAsRead,
-    deleteNotification,
-    clearError,
-    clearState,
+    fetchNotifications: invalidate,
+    fetchUnreadCount: invalidate,
+    markAsRead: markAsReadMutation.mutateAsync,
+    markAllAsRead: markAllAsReadMutation.mutateAsync,
+    deleteNotification: deleteMutation.mutateAsync,
+    clearError: () => {},
+    clearState: () => queryClient.removeQueries({ queryKey: NOTIFICATIONS_KEY }),
   };
 };
 

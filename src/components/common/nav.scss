@@ -50,13 +50,13 @@ $glass-hover: rgba(255, 255, 255, 0.06);
   position: relative;
   display: flex;
   align-items: center;
-  padding-left: 4%;
-  padding-top: 4%;
+  padding-left: 3.5%;
+  padding-top: 4.5%;
   z-index: 10;
 
   $var_rg_px: 180px;
   $var_rg_pr: 10%;
-
+  
   &::before {
     content: "";
     position: fixed;
@@ -315,19 +315,17 @@ $glass-hover: rgba(255, 255, 255, 0.06);
       margin-top: -20px;
     }
 
-    
     @include respond-down("mobile-sm") {
       height: 40px;
       margin-top: -10px;
       margin-left: -20px;
     }
 
-     @include respond-down("mobile-md") {
+    @include respond-down("mobile-md") {
       height: 35px;
     }
   }
 }
-
 
 .Nav__pill {
   display: flex;

@@ -1,17 +1,21 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import cartService from '../services/cartService';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import cartService from "../services/cartService";
 
-const CART_KEY = ['cart'];
+const CART_KEY = ["cart"];
 
 const parseCart = (data) => {
   const c = data?.cart ?? data;
+
   return {
     cart: c ?? null,
-    items: c?.items ?? [],
+    items: (c?.items ?? []).map((item) => ({
+      ...item,
+      product_id: item.product_id || item.product?.id || item.id,
+    })),
     totals: {
       subtotal: Number(c?.subtotal) || 0,
-      total:    Number(c?.total)    || Number(c?.subtotal) || 0,
-      tax:      Number(c?.tax)      || 0,
+      total: Number(c?.total) || Number(c?.subtotal) || 0,
+      tax: Number(c?.tax) || 0,
       shipping: Number(c?.shipping) || 0,
       discount: Number(c?.discount) || 0,
     },
@@ -33,37 +37,58 @@ const useCart = () => {
     select: parseCart,
   });
 
-  const cart   = data?.cart   ?? null;
-  const items  = data?.items  ?? [];
-  const totals = data?.totals ?? { subtotal: 0, total: 0, tax: 0, shipping: 0, discount: 0 };
-  const error  = queryError?.status === 404 ? null : (queryError?.message ?? null);
+  const cart = data?.cart ?? null;
+  const items = data?.items ?? [];
+  const totals = data?.totals ?? {
+    subtotal: 0,
+    total: 0,
+    tax: 0,
+    shipping: 0,
+    discount: 0,
+  };
 
-  const setCart = (responseData) => queryClient.setQueryData(CART_KEY, responseData);
+  const error =
+    queryError?.status === 404 ? null : (queryError?.message ?? null);
+
+  const setCart = (responseData) =>
+    queryClient.setQueryData(CART_KEY, parseCart(responseData));
 
   const addMutation = useMutation({
     mutationFn: cartService.addToCart,
-    onSuccess: setCart,
+    retry: false,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: CART_KEY });
+    },
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ productId, quantity }) => cartService.updateCartItem(productId, quantity),
-    onSuccess: setCart,
+    mutationFn: ({ productId, quantity }) =>
+      cartService.updateCartItem(productId, quantity),
+    retry: false,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: CART_KEY });
+    },
   });
 
   const removeMutation = useMutation({
     mutationFn: cartService.removeFromCart,
+    retry: false,
     onSuccess: setCart,
   });
 
   const clearMutation = useMutation({
     mutationFn: cartService.clearCart,
+    retry: false,
     onSuccess: () => queryClient.setQueryData(CART_KEY, null),
   });
 
   const isInCart = (productId) =>
-    items.some((item) => item.product_id === productId || item.product?.id === productId);
+    items.some((item) => item.product_id === productId);
 
-  const itemCount = items.reduce((total, item) => total + (item.quantity || 0), 0);
+  const itemCount = items.reduce(
+    (total, item) => total + (item.quantity || 0),
+    0
+  );
 
   return {
     cart,
@@ -74,7 +99,8 @@ const useCart = () => {
     itemCount,
     fetchCart: () => queryClient.invalidateQueries({ queryKey: CART_KEY }),
     addToCart: addMutation.mutateAsync,
-    updateQuantity: (productId, quantity) => updateMutation.mutateAsync({ productId, quantity }),
+    updateQuantity: (productId, quantity) =>
+      updateMutation.mutateAsync({ productId, quantity }),
     removeFromCart: removeMutation.mutateAsync,
     clearCart: clearMutation.mutateAsync,
     isInCart,

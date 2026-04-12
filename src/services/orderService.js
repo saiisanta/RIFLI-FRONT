@@ -1,8 +1,6 @@
 import api from "./api";
 
 const orderService = {
-  // ── Cliente ────────────────────────────────────────────────
-
   getOrders: async (params = {}) => {
     try {
       const {
@@ -12,10 +10,12 @@ const orderService = {
         payment_status = "",
         shipping_status = "",
       } = params;
+
       const query = { page, limit };
       if (status) query.status = status;
       if (payment_status) query.payment_status = payment_status;
       if (shipping_status) query.shipping_status = shipping_status;
+
       const response = await api.get("/orders", { params: query });
       return response.data;
     } catch (error) {
@@ -32,9 +32,19 @@ const orderService = {
     }
   },
 
-  createOrder: async (orderData) => {
+  createOrder: async ({ items, address_id, payment_method, customer_notes }) => {
     try {
-      const response = await api.post("/orders", orderData);
+      const payload = {
+        address_id,
+        payment_method,
+        customer_notes,
+        items: items.map((i) => ({
+          product_id: i.product_id,
+          quantity: i.quantity,
+        })),
+      };
+
+      const response = await api.post("/orders", payload);
       return response.data;
     } catch (error) {
       throw error.response?.data || error;
@@ -52,7 +62,6 @@ const orderService = {
     }
   },
 
-  // NUEVO: cliente acepta o rechaza el precio de envío cotizado
   confirmShipping: async (orderId, action, cancellation_reason = "") => {
     try {
       const response = await api.patch(`/orders/${orderId}/shipping/confirm`, {
@@ -71,13 +80,14 @@ const orderService = {
       formData.append("proof", file);
       formData.append(
         "payment_type",
-        proofData.payment_type || "BANK_TRANSFER",
+        proofData.payment_type || "BANK_TRANSFER"
       );
+
       if (proofData.amount) formData.append("amount", proofData.amount);
       if (proofData.transaction_reference)
         formData.append(
           "transaction_reference",
-          proofData.transaction_reference,
+          proofData.transaction_reference
         );
       if (proofData.transaction_date)
         formData.append("transaction_date", proofData.transaction_date);
@@ -88,13 +98,12 @@ const orderService = {
       const response = await api.post(`/orders/${orderId}/proof`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
+
       return response.data;
     } catch (error) {
       throw error.response?.data || error;
     }
   },
-
-  // ── Admin ──────────────────────────────────────────────────
 
   setShippingCost: async (orderId, { shipping_cost, internal_notes = "" }) => {
     try {
@@ -110,7 +119,7 @@ const orderService = {
 
   reviewProof: async (
     orderId,
-    { proof_id, action, admin_notes = "", rejection_reason = "" },
+    { proof_id, action, admin_notes = "", rejection_reason = "" }
   ) => {
     try {
       const response = await api.patch(`/orders/${orderId}/proof/review`, {

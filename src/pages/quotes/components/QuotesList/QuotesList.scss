@@ -1,6 +1,5 @@
 @use "../../../../styles/breakpoints" as *;
 
-
 .ql-loading {
   display: flex;
   align-items: center;
@@ -21,6 +20,17 @@
 
 @keyframes qlSpin {
   to { transform: rotate(360deg); }
+}
+
+.ql-btn-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: qlSpin 0.7s linear infinite;
+  flex-shrink: 0;
 }
 
 .ql-error,
@@ -94,7 +104,6 @@
   &:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255, 202, 44, 0.35); }
 }
 
-
 .quotes-list { display: flex; flex-direction: column; gap: 1.5rem; }
 
 .ql-list-header {
@@ -136,7 +145,6 @@
 }
 
 .ql-cards { display: flex; flex-direction: column; gap: 0.875rem; }
-
 
 .ql-card {
   background: var(--quotes-surface);
@@ -294,6 +302,8 @@
   border: 1px solid var(--quotes-border);
   border-radius: 8px;
   border-left: 3px solid var(--quotes-accent);
+
+  &--rejected { border-left-color: var(--quotes-error); color: var(--quotes-error); font-style: normal; }
 }
 
 .ql-budget-summary {
@@ -368,8 +378,10 @@
   font-weight: 700;
   cursor: pointer;
   transition: all 0.3s ease;
+  min-width: 160px;
+  justify-content: center;
   &:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4); }
-  &:disabled { opacity: 0.5; cursor: not-allowed; }
+  &:disabled { opacity: 0.65; cursor: not-allowed; transform: none; box-shadow: none; }
 }
 
 .ql-btn-reject {
@@ -385,8 +397,10 @@
   font-weight: 700;
   cursor: pointer;
   transition: all 0.3s ease;
+  min-width: 120px;
+  justify-content: center;
   &:hover:not(:disabled) { background: rgba(239, 68, 68, 0.1); border-color: var(--quotes-error); }
-  &:disabled { opacity: 0.5; cursor: not-allowed; }
+  &:disabled { opacity: 0.65; cursor: not-allowed; }
 }
 
 .ql-status-badge {
@@ -520,9 +534,7 @@
 
 .ql-proof-upload-area { display: flex; flex-direction: column; gap: 0.75rem; }
 
-.ql-proof-file-wrapper {
-  input[type='file'] { display: none; }
-}
+.ql-proof-file-wrapper { input[type='file'] { display: none; } }
 
 .ql-proof-file-label {
   display: flex;
@@ -577,35 +589,13 @@
   transition: all 0.3s ease;
   box-shadow: 0 4px 12px rgba(255, 202, 44, 0.2);
 
+  .ql-btn-spinner {
+    border-color: rgba(0, 0, 0, 0.25);
+    border-top-color: #000;
+  }
+
   &:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(255, 202, 44, 0.35); }
   &:disabled { opacity: 0.45; cursor: not-allowed; transform: none; box-shadow: none; }
-}
-
-.ql-proof-spinner {
-  display: inline-block;
-  width: 14px;
-  height: 14px;
-  border: 2px solid rgba(0, 0, 0, 0.25);
-  border-top-color: #000;
-  border-radius: 50%;
-  animation: qlSpin 0.7s linear infinite;
-}
-
-.ql-rejection-banner {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.5rem;
-  padding: 0.75rem 1.1rem;
-  background: rgba(239, 68, 68, 0.06);
-  border-top: 1px solid rgba(239, 68, 68, 0.15);
-  color: #f87171;
-  font-size: 0.82rem;
-  line-height: 1.5;
-
-  svg {
-    flex-shrink: 0;
-    margin-top: 2px;
-  }
 }
 
 .ql-bank-transfer-info {
@@ -617,7 +607,7 @@
   flex-direction: column;
   gap: 0.625rem;
 }
- 
+
 .ql-bank-transfer-title {
   display: flex;
   align-items: center;
@@ -627,10 +617,10 @@
   text-transform: uppercase;
   letter-spacing: 0.6px;
   color: var(--quotes-accent);
- 
+
   svg { flex-shrink: 0; }
 }
- 
+
 .ql-bank-transfer-grid {
   display: flex;
   flex-direction: column;
@@ -639,7 +629,7 @@
   border-radius: 8px;
   overflow: hidden;
 }
- 
+
 .ql-bank-transfer-row {
   display: flex;
   justify-content: space-between;
@@ -647,30 +637,30 @@
   padding: 0.45rem 0.875rem;
   border-bottom: 1px solid var(--quotes-border);
   gap: 0.75rem;
- 
+
   &:last-child { border-bottom: none; }
 }
- 
+
 .ql-bank-transfer-label {
   font-size: 0.75rem;
   color: var(--quotes-text-muted);
   font-weight: 500;
   flex-shrink: 0;
 }
- 
+
 .ql-bank-transfer-value {
   font-size: 0.82rem;
   font-weight: 600;
   color: var(--quotes-text);
   text-align: right;
   word-break: break-all;
- 
+
   &--mono {
     font-family: 'Courier New', Courier, monospace;
     font-size: 0.75rem;
     letter-spacing: 0.4px;
   }
- 
+
   &--highlight {
     color: var(--quotes-accent);
     font-weight: 700;

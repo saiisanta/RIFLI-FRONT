@@ -61,7 +61,7 @@ const CartPage = ({
                 const subtotal = item.subtotal || (price * item.quantity);
 
                 return (
-                  <div key={item.productId || item.product_id || item.id} className="cart-item">
+                  <div key={item.product_id} className="cart-item">
                     <img
                       src={mainImage ? `${API_URL}${mainImage}` : "/api/images/placeholder.png"}
                       alt={name}

@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import {
   FiChevronDown, FiChevronUp, FiPlusCircle, FiFileText,
   FiMapPin, FiCalendar, FiDollarSign, FiClock, FiCheck,
-  FiX, FiAlertCircle, FiRefreshCw, FiUpload, FiShield, FiInfo,
+  FiX, FiAlertCircle, FiRefreshCw, FiUpload, FiShield, FiInfo, FiLoader,
 } from 'react-icons/fi';
 import useQuotes from '../../../../hooks/useQuotes';
 import useBankAccount from '../../../../hooks/useBankAccount';
+import useApiError from '../../../../hooks/useApiError';
 import AdminDialog from '../../../../components/AdminDialog/AdminDialog';
+import RateLimitToast from '../../../../components/RateLimitToast/RateLimitToast';
 import './QuotesList.scss';
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -72,7 +74,9 @@ const renderServiceDetails = (details, formSchema) => {
   });
 };
 
-const PaymentProofUploader = ({ quote, paymentType, onUpload, bankAccount }) => {
+const BtnSpinner = () => <span className="ql-btn-spinner" />;
+
+const PaymentProofUploader = ({ quote, paymentType, onUpload, bankAccount, onApiError }) => {
   const [file, setFile]               = useState(null);
   const [uploading, setUploading]     = useState(false);
   const [uploadError, setUploadError] = useState(null);
@@ -100,7 +104,11 @@ const PaymentProofUploader = ({ quote, paymentType, onUpload, bankAccount }) => 
       await onUpload(quote.id, file, paymentType);
       setFile(null);
     } catch (err) {
-      setUploadError(err.message || 'Error al subir el comprobante');
+      if (err?.response?.status === 429) {
+        onApiError?.(err);
+      } else {
+        setUploadError(err.message || 'Error al subir el comprobante');
+      }
     } finally {
       setUploading(false);
     }
@@ -186,10 +194,7 @@ const PaymentProofUploader = ({ quote, paymentType, onUpload, bankAccount }) => 
             <p className="ql-proof-upload-error"><FiAlertCircle size={13} />{uploadError}</p>
           )}
           <button type="button" className="ql-proof-upload-btn" onClick={handleUpload} disabled={!file || uploading}>
-            {uploading
-              ? <><span className="ql-proof-spinner" /> Subiendo…</>
-              : <><FiUpload size={14} /> Enviar comprobante</>
-            }
+            {uploading ? <><BtnSpinner /> Subiendo…</> : <><FiUpload size={14} /> Enviar comprobante</>}
           </button>
         </div>
       )}
@@ -202,7 +207,7 @@ const DIALOG_CLOSED = {
   title: '', message: '', placeholder: '', confirmLabel: 'Confirmar', onConfirm: null,
 };
 
-const QuoteCard = ({ quote: quoteProp, onAccept, onReject, onUploadProof, bankAccount }) => {
+const QuoteCard = ({ quote: quoteProp, onAccept, onReject, onUploadProof, bankAccount, onApiError }) => {
   const [quote, setQuote]                 = useState(quoteProp);
   const [expanded, setExpanded]           = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
@@ -226,7 +231,11 @@ const QuoteCard = ({ quote: quoteProp, onAccept, onReject, onUploadProof, bankAc
         try {
           await onAccept(quote.id);
           setQuote((prev) => ({ ...prev, status: 'ACCEPTED', accepted_at: new Date().toISOString() }));
-        } finally { setActionLoading(false); }
+        } catch (err) {
+          onApiError?.(err);
+        } finally {
+          setActionLoading(false);
+        }
       },
     });
   };
@@ -248,7 +257,11 @@ const QuoteCard = ({ quote: quoteProp, onAccept, onReject, onUploadProof, bankAc
             rejected_at: new Date().toISOString(),
             rejection_reason: reason || '',
           }));
-        } finally { setActionLoading(false); }
+        } catch (err) {
+          onApiError?.(err);
+        } finally {
+          setActionLoading(false);
+        }
       },
     });
   };
@@ -372,10 +385,10 @@ const QuoteCard = ({ quote: quoteProp, onAccept, onReject, onUploadProof, bankAc
             {quote.status === 'QUOTED' && (
               <div className="ql-card-actions">
                 <button type="button" className="ql-btn-accept" onClick={handleAccept} disabled={actionLoading}>
-                  <FiCheck size={16} />Aceptar presupuesto
+                  {actionLoading ? <><BtnSpinner />Procesando…</> : <><FiCheck size={16} />Aceptar presupuesto</>}
                 </button>
                 <button type="button" className="ql-btn-reject" onClick={handleReject} disabled={actionLoading}>
-                  <FiX size={16} />Rechazar
+                  {actionLoading ? <><BtnSpinner />Procesando…</> : <><FiX size={16} />Rechazar</>}
                 </button>
               </div>
             )}
@@ -383,9 +396,9 @@ const QuoteCard = ({ quote: quoteProp, onAccept, onReject, onUploadProof, bankAc
             {showPayments && (
               <div className="ql-payments-section">
                 <div className="ql-payments-title"><FiShield size={14} />Comprobantes de pago</div>
-                <PaymentProofUploader quote={quote} paymentType="deposit" onUpload={onUploadProof} bankAccount={bankAccount} />
+                <PaymentProofUploader quote={quote} paymentType="deposit" onUpload={onUploadProof} bankAccount={bankAccount} onApiError={onApiError} />
                 {depositConfirmed && (
-                  <PaymentProofUploader quote={quote} paymentType="final" onUpload={onUploadProof} bankAccount={bankAccount} />
+                  <PaymentProofUploader quote={quote} paymentType="final" onUpload={onUploadProof} bankAccount={bankAccount} onApiError={onApiError} />
                 )}
               </div>
             )}
@@ -396,16 +409,22 @@ const QuoteCard = ({ quote: quoteProp, onAccept, onReject, onUploadProof, bankAc
   );
 };
 
-const QuotesList = ({ onNewQuote }) => {
+const QuotesList = ({ onNewQuote, onApiError }) => {
   const {
     quotes, loading, error,
     fetchQuotes, acceptQuote, rejectQuote, uploadPaymentProof, clearError,
   } = useQuotes();
 
   const { account: bankAccount } = useBankAccount();
+  const { rateLimitError, handleApiError, clearRateLimitError } = useApiError();
 
-  const handleAccept      = async (quoteId) => { try { await acceptQuote(quoteId); } catch (err) { console.error('Error al aceptar:', err); } };
-  const handleReject      = async (quoteId, reason) => { try { await rejectQuote(quoteId, reason); } catch (err) { console.error('Error al rechazar:', err); } };
+  const bubbleError = (err) => {
+    handleApiError(err);
+    onApiError?.(err);
+  };
+
+  const handleAccept      = async (quoteId) => { try { await acceptQuote(quoteId); } catch (err) { bubbleError(err); } };
+  const handleReject      = async (quoteId, reason) => { try { await rejectQuote(quoteId, reason); } catch (err) { bubbleError(err); } };
   const handleUploadProof = async (quoteId, file, paymentType) => { await uploadPaymentProof(quoteId, file, paymentType); };
 
   if (loading && quotes.length === 0) {
@@ -444,37 +463,42 @@ const QuotesList = ({ onNewQuote }) => {
   }
 
   return (
-    <div className="quotes-list">
-      <div className="ql-list-header">
-        <div className="ql-list-title">
-          <h2>{quotes.length} {quotes.length === 1 ? 'solicitud' : 'solicitudes'}</h2>
-        </div>
-        <button className="ql-new-btn" onClick={onNewQuote} type="button">
-          <FiPlusCircle size={16} />Nueva solicitud
-        </button>
-      </div>
+    <>
+      <RateLimitToast message={rateLimitError} onClose={clearRateLimitError} />
 
-      {error && (
-        <div className="ql-inline-error">
-          <FiAlertCircle size={15} />
-          {error}
-          <button onClick={clearError}><FiX size={14} /></button>
+      <div className="quotes-list">
+        <div className="ql-list-header">
+          <div className="ql-list-title">
+            <h2>{quotes.length} {quotes.length === 1 ? 'solicitud' : 'solicitudes'}</h2>
+          </div>
+          <button className="ql-new-btn" onClick={onNewQuote} type="button">
+            <FiPlusCircle size={16} />Nueva solicitud
+          </button>
         </div>
-      )}
 
-      <div className="ql-cards">
-        {quotes.map((quote) => (
-          <QuoteCard
-            key={quote.id}
-            quote={quote}
-            onAccept={handleAccept}
-            onReject={handleReject}
-            onUploadProof={handleUploadProof}
-            bankAccount={bankAccount}
-          />
-        ))}
+        {error && (
+          <div className="ql-inline-error">
+            <FiAlertCircle size={15} />
+            {error}
+            <button onClick={clearError}><FiX size={14} /></button>
+          </div>
+        )}
+
+        <div className="ql-cards">
+          {quotes.map((quote) => (
+            <QuoteCard
+              key={quote.id}
+              quote={quote}
+              onAccept={handleAccept}
+              onReject={handleReject}
+              onUploadProof={handleUploadProof}
+              bankAccount={bankAccount}
+              onApiError={bubbleError}
+            />
+          ))}
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

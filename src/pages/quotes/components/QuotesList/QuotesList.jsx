@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import {
   FiChevronDown, FiChevronUp, FiPlusCircle, FiFileText,
   FiMapPin, FiCalendar, FiDollarSign, FiClock, FiCheck,
-  FiX, FiAlertCircle, FiRefreshCw, FiUpload, FiShield, FiInfo, FiLoader,
+  FiX, FiAlertCircle, FiRefreshCw, FiUpload, FiShield, FiInfo,
 } from 'react-icons/fi';
 import useQuotes from '../../../../hooks/useQuotes';
 import useBankAccount from '../../../../hooks/useBankAccount';
@@ -35,12 +35,12 @@ const StatusBadge = ({ status }) => {
 };
 
 const PROOF_STATUS = {
-  PENDING:        { label: 'Sin comprobante',     color: 'gray'    },
-  PENDING_PROOF:  { label: 'Pendiente de pago',   color: 'yellow'  },
-  PROOF_UPLOADED: { label: 'Comprobante enviado', color: 'blue'    },
-  APPROVED:       { label: 'Aprobado',            color: 'green'   },
-  REJECTED:       { label: 'Rechazado',           color: 'red'     },
-  PAID:           { label: 'Pago confirmado',      color: 'success' },
+  PENDING:        { label: 'Sin comprobante',    color: 'gray'    },
+  PENDING_PROOF:  { label: 'Pendiente de pago',  color: 'yellow'  },
+  PROOF_UPLOADED: { label: 'Comprobante enviado',color: 'blue'    },
+  APPROVED:       { label: 'Aprobado',           color: 'green'   },
+  REJECTED:       { label: 'Rechazado',          color: 'red'     },
+  PAID:           { label: 'Pago confirmado',     color: 'success' },
 };
 
 const ProofStatusBadge = ({ status }) => {
@@ -82,10 +82,10 @@ const PaymentProofUploader = ({ quote, paymentType, onUpload, bankAccount, onApi
   const [uploadError, setUploadError] = useState(null);
 
   const isDeposit   = paymentType === 'deposit';
-  const proofUrl    = isDeposit ? quote.deposit_proof_url    : quote.final_proof_url;
-  const proofStatus = isDeposit ? quote.deposit_payment_status : quote.final_payment_status;
-  const amount      = isDeposit ? quote.deposit_amount       : quote.final_payment_amount;
-  const label       = isDeposit ? 'Seña'                     : 'Pago final';
+  const proofUrl    = isDeposit ? quote.deposit_proof_url        : quote.final_proof_url;
+  const proofStatus = isDeposit ? quote.deposit_payment_status   : quote.final_payment_status;
+  const amount      = isDeposit ? quote.deposit_amount           : quote.final_payment_amount;
+  const label       = isDeposit ? 'Seña'                         : 'Pago final';
   const canUpload   = !['PAID', 'APPROVED', 'PROOF_UPLOADED'].includes(proofStatus);
 
   const handleFileChange = (e) => {
@@ -104,7 +104,7 @@ const PaymentProofUploader = ({ quote, paymentType, onUpload, bankAccount, onApi
       await onUpload(quote.id, file, paymentType);
       setFile(null);
     } catch (err) {
-      if (err?.response?.status === 429) {
+      if (err?.response?.status === 429 || err?.status === 429) {
         onApiError?.(err);
       } else {
         setUploadError(err.message || 'Error al subir el comprobante');
@@ -194,7 +194,10 @@ const PaymentProofUploader = ({ quote, paymentType, onUpload, bankAccount, onApi
             <p className="ql-proof-upload-error"><FiAlertCircle size={13} />{uploadError}</p>
           )}
           <button type="button" className="ql-proof-upload-btn" onClick={handleUpload} disabled={!file || uploading}>
-            {uploading ? <><BtnSpinner /> Subiendo…</> : <><FiUpload size={14} /> Enviar comprobante</>}
+            {uploading
+              ? <><BtnSpinner /> Subiendo…</>
+              : <><FiUpload size={14} /> Enviar comprobante</>
+            }
           </button>
         </div>
       )}
@@ -210,7 +213,8 @@ const DIALOG_CLOSED = {
 const QuoteCard = ({ quote: quoteProp, onAccept, onReject, onUploadProof, bankAccount, onApiError }) => {
   const [quote, setQuote]                 = useState(quoteProp);
   const [expanded, setExpanded]           = useState(false);
-  const [actionLoading, setActionLoading] = useState(false);
+  const [acceptLoading, setAcceptLoading] = useState(false);
+  const [rejectLoading, setRejectLoading] = useState(false);
   const [dialog, setDialog]               = useState(DIALOG_CLOSED);
 
   const address    = quote.address;
@@ -227,14 +231,14 @@ const QuoteCard = ({ quote: quoteProp, onAccept, onReject, onUploadProof, bankAc
       placeholder: '', confirmLabel: 'Sí, aceptar',
       onConfirm: async () => {
         closeDialog();
-        setActionLoading(true);
+        setAcceptLoading(true);
         try {
           await onAccept(quote.id);
           setQuote((prev) => ({ ...prev, status: 'ACCEPTED', accepted_at: new Date().toISOString() }));
         } catch (err) {
           onApiError?.(err);
         } finally {
-          setActionLoading(false);
+          setAcceptLoading(false);
         }
       },
     });
@@ -249,7 +253,7 @@ const QuoteCard = ({ quote: quoteProp, onAccept, onReject, onUploadProof, bankAc
       confirmLabel: 'Rechazar',
       onConfirm: async (reason) => {
         closeDialog();
-        setActionLoading(true);
+        setRejectLoading(true);
         try {
           await onReject(quote.id, reason || '');
           setQuote((prev) => ({
@@ -260,7 +264,7 @@ const QuoteCard = ({ quote: quoteProp, onAccept, onReject, onUploadProof, bankAc
         } catch (err) {
           onApiError?.(err);
         } finally {
-          setActionLoading(false);
+          setRejectLoading(false);
         }
       },
     });
@@ -384,11 +388,27 @@ const QuoteCard = ({ quote: quoteProp, onAccept, onReject, onUploadProof, bankAc
 
             {quote.status === 'QUOTED' && (
               <div className="ql-card-actions">
-                <button type="button" className="ql-btn-accept" onClick={handleAccept} disabled={actionLoading}>
-                  {actionLoading ? <><BtnSpinner />Procesando…</> : <><FiCheck size={16} />Aceptar presupuesto</>}
+                <button
+                  type="button"
+                  className="ql-btn-accept"
+                  onClick={handleAccept}
+                  disabled={acceptLoading || rejectLoading}
+                >
+                  {acceptLoading
+                    ? <><BtnSpinner />Procesando…</>
+                    : <><FiCheck size={16} />Aceptar presupuesto</>
+                  }
                 </button>
-                <button type="button" className="ql-btn-reject" onClick={handleReject} disabled={actionLoading}>
-                  {actionLoading ? <><BtnSpinner />Procesando…</> : <><FiX size={16} />Rechazar</>}
+                <button
+                  type="button"
+                  className="ql-btn-reject"
+                  onClick={handleReject}
+                  disabled={acceptLoading || rejectLoading}
+                >
+                  {rejectLoading
+                    ? <><BtnSpinner />Procesando…</>
+                    : <><FiX size={16} />Rechazar</>
+                  }
                 </button>
               </div>
             )}
@@ -416,15 +436,15 @@ const QuotesList = ({ onNewQuote, onApiError }) => {
   } = useQuotes();
 
   const { account: bankAccount } = useBankAccount();
-  const { rateLimitError, handleApiError, clearRateLimitError } = useApiError();
+  const { rateLimitError, handleApiError: handleLocalError, clearRateLimitError } = useApiError();
 
   const bubbleError = (err) => {
-    handleApiError(err);
+    handleLocalError(err);
     onApiError?.(err);
   };
 
-  const handleAccept      = async (quoteId) => { try { await acceptQuote(quoteId); } catch (err) { bubbleError(err); } };
-  const handleReject      = async (quoteId, reason) => { try { await rejectQuote(quoteId, reason); } catch (err) { bubbleError(err); } };
+  const handleAccept      = async (quoteId) => { try { await acceptQuote(quoteId); } catch (err) { bubbleError(err); throw err; } };
+  const handleReject      = async (quoteId, reason) => { try { await rejectQuote(quoteId, reason); } catch (err) { bubbleError(err); throw err; } };
   const handleUploadProof = async (quoteId, file, paymentType) => { await uploadPaymentProof(quoteId, file, paymentType); };
 
   if (loading && quotes.length === 0) {

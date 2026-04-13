@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { FiTrash2, FiShoppingCart } from "react-icons/fi";
 import "./CartPage.scss";
@@ -7,8 +7,16 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 const formatCurrency = (amount) =>
   new Intl.NumberFormat("es-AR", {
-    style: "currency", currency: "ARS", maximumFractionDigits: 0,
+    style: "currency",
+    currency: "ARS",
+    maximumFractionDigits: 0,
   }).format(amount || 0);
+
+const BtnSpinner = ({ dark }) => (
+  <span
+    className={`cart-btn-spinner${dark ? " cart-btn-spinner--dark" : ""}`}
+  />
+);
 
 const CartPage = ({
   items,
@@ -19,13 +27,58 @@ const CartPage = ({
   onClearCart,
   onCheckout,
   loading,
+  onApiError,
 }) => {
+  const [removingId, setRemovingId] = useState(null);
+  const [clearingCart, setClearingCart] = useState(false);
+  const [checkingOut, setCheckingOut] = useState(false);
+
   const cartTotal = totals?.total || totals?.subtotal || 0;
   const itemCount = items.reduce((acc, item) => acc + (item.quantity || 0), 0);
 
+  const handleRemove = async (productId) => {
+    setRemovingId(productId);
+    try {
+      await onRemove(productId);
+    } catch (err) {
+      onApiError?.(err);
+    } finally {
+      setRemovingId(null);
+    }
+  };
+
+  const handleClearCart = async () => {
+    setClearingCart(true);
+    try {
+      await onClearCart();
+    } catch (err) {
+      onApiError?.(err);
+    } finally {
+      setClearingCart(false);
+    }
+  };
+
+  const handleCheckout = async () => {
+    setCheckingOut(true);
+    try {
+      await onCheckout();
+    } catch (err) {
+      onApiError?.(err);
+      setCheckingOut(false);
+    }
+  };
+
+  const handleUpdateQuantity = async (productId, newQuantity) => {
+    try {
+      await onUpdateQuantity(productId, newQuantity);
+    } catch (err) {
+      onApiError?.(err);
+    }
+  };
+
   return (
     <div className="cart-page-overlay" onClick={onClose}>
-      <div className="cart-page-content" onClick={e => e.stopPropagation()}>
+      <div className="cart-page-content" onClick={(e) => e.stopPropagation()}>
         <button className="cart-close" onClick={onClose} aria-label="Cerrar">
           &times;
         </button>
@@ -36,7 +89,9 @@ const CartPage = ({
             Tu Carrito
           </h2>
           {items.length > 0 && (
-            <span className="cart-item-count">{itemCount} producto{itemCount !== 1 ? 's' : ''}</span>
+            <span className="cart-item-count">
+              {itemCount} producto{itemCount !== 1 ? "s" : ""}
+            </span>
           )}
         </div>
 
@@ -53,20 +108,30 @@ const CartPage = ({
             <div className="cart-items">
               {items.map((item) => {
                 const product = item.product || item;
-                const productId = item.productId || item.product_id || product.id;
+                const productId =
+                  item.productId || item.product_id || product.id;
                 const name = product.name || item.name;
-                const price = item.unit_price || item.price || product.price || 0;
+                const price =
+                  item.unit_price || item.price || product.price || 0;
                 const mainImage = product.main_image || item.main_image;
                 const stock = product.stock ?? 999;
-                const subtotal = item.subtotal || (price * item.quantity);
+                const subtotal = item.subtotal || price * item.quantity;
+                const isRemoving = removingId === productId;
 
                 return (
-                  <div key={item.product_id} className="cart-item">
+                  <div
+                    key={item.productId || item.product_id || item.id}
+                    className="cart-item"
+                  >
                     <img
-                      src={mainImage ? `${API_URL}${mainImage}` : "/api/images/placeholder.png"}
+                      src={
+                        mainImage
+                          ? `${API_URL}${mainImage}`
+                          : "/api/images/placeholder.png"
+                      }
                       alt={name}
                       className="cart-item-image"
-                      onError={e => {
+                      onError={(e) => {
                         if (!e.currentTarget.dataset.fallback) {
                           e.currentTarget.src = "/api/images/placeholder.png";
                           e.currentTarget.dataset.fallback = "true";
@@ -80,29 +145,48 @@ const CartPage = ({
                     <div className="cart-item-controls">
                       <div className="quantity-controls">
                         <button
-                          onClick={() => onUpdateQuantity(productId, item.quantity - 1)}
-                          disabled={item.quantity <= 1 || loading}
+                          onClick={() =>
+                            handleUpdateQuantity(productId, item.quantity - 1)
+                          }
+                          disabled={item.quantity <= 1 || loading || isRemoving}
                           aria-label="Disminuir"
                         >
                           −
                         </button>
+
                         <span>{item.quantity}</span>
+
                         <button
-                          onClick={() => onUpdateQuantity(productId, item.quantity + 1)}
-                          disabled={item.quantity >= stock || loading}
+                          onClick={() =>
+                            handleUpdateQuantity(productId, item.quantity + 1)
+                          }
+                          disabled={
+                            item.quantity >= stock || loading || isRemoving
+                          }
                           aria-label="Aumentar"
                         >
                           +
                         </button>
                       </div>
-                      <p className="cart-item-subtotal">{formatCurrency(subtotal)}</p>
+                      <p className="cart-item-subtotal">
+                        {formatCurrency(subtotal)}
+                      </p>
                       <button
                         className="btn-remove"
-                        onClick={() => onRemove(productId)}
-                        disabled={loading}
+                        onClick={() => handleRemove(productId)}
+                        disabled={loading || isRemoving}
                       >
-                        <FiTrash2 size={14} />
-                        Eliminar
+                        {isRemoving ? (
+                          <>
+                            <BtnSpinner />
+                            Eliminando…
+                          </>
+                        ) : (
+                          <>
+                            <FiTrash2 size={14} />
+                            Eliminar
+                          </>
+                        )}
                       </button>
                     </div>
                   </div>
@@ -125,7 +209,9 @@ const CartPage = ({
               )}
               <div className="cart-total">
                 <span>Total</span>
-                <span className="total-amount">{formatCurrency(cartTotal)}</span>
+                <span className="total-amount">
+                  {formatCurrency(cartTotal)}
+                </span>
               </div>
 
               <p className="cart-shipping-note">
@@ -133,11 +219,33 @@ const CartPage = ({
               </p>
 
               <div className="cart-actions">
-                <button className="btn-clear" onClick={onClearCart} disabled={loading}>
-                  Vaciar carrito
+                <button
+                  className="btn-clear"
+                  onClick={handleClearCart}
+                  disabled={loading || clearingCart || checkingOut}
+                >
+                  {clearingCart ? (
+                    <>
+                      <BtnSpinner />
+                      Vaciando…
+                    </>
+                  ) : (
+                    "Vaciar carrito"
+                  )}
                 </button>
-                <button className="btn-checkout" onClick={onCheckout} disabled={loading}>
-                  {loading ? "Procesando..." : "Solicitar pedido →"}
+                <button
+                  className="btn-checkout"
+                  onClick={handleCheckout}
+                  disabled={loading || checkingOut || clearingCart}
+                >
+                  {checkingOut ? (
+                    <>
+                      <BtnSpinner dark />
+                      Procesando…
+                    </>
+                  ) : (
+                    "Solicitar pedido →"
+                  )}
                 </button>
               </div>
             </div>
@@ -149,14 +257,15 @@ const CartPage = ({
 };
 
 CartPage.propTypes = {
-  items:           PropTypes.array.isRequired,
-  totals:          PropTypes.object,
-  onClose:         PropTypes.func.isRequired,
-  onRemove:        PropTypes.func.isRequired,
-  onUpdateQuantity:PropTypes.func.isRequired,
-  onClearCart:     PropTypes.func.isRequired,
-  onCheckout:      PropTypes.func.isRequired,
-  loading:         PropTypes.bool,
+  items: PropTypes.array.isRequired,
+  totals: PropTypes.object,
+  onClose: PropTypes.func.isRequired,
+  onRemove: PropTypes.func.isRequired,
+  onUpdateQuantity: PropTypes.func.isRequired,
+  onClearCart: PropTypes.func.isRequired,
+  onCheckout: PropTypes.func.isRequired,
+  loading: PropTypes.bool,
+  onApiError: PropTypes.func,
 };
 
 export default CartPage;

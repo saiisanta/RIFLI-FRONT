@@ -11,9 +11,11 @@ import {
   FiX,
   FiInfo,
 } from "react-icons/fi";
+import { useNavigate } from "react-router-dom";
 import useOrders from "../../../../hooks/useOrders";
 import useBankAccount from "../../../../hooks/useBankAccount";
 import useAddresses from "../../../../hooks/useAddress";
+import useProfile from "../../../../hooks/useProfile";
 import "./OrderWizard.scss";
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -44,15 +46,14 @@ const formatCurrency = (amount) =>
     maximumFractionDigits: 0,
   }).format(amount || 0);
 
-const OrderWizard = ({ items, totals, onClose, onSuccess }) => {
+const OrderWizard = ({ items, totals, onClose, onSuccess, onApiError }) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [step, setStep] = useState(1);
 
-  const { addresses, loading: addressLoading } = useAddresses();
-  const [selectedAddress, setSelectedAddress] = useState(null);
-  const [paymentMethod, setPaymentMethod] = useState("BANK_TRANSFER");
-  const [customerNotes, setCustomerNotes] = useState("");
-  const [submitSuccess, setSubmitSuccess] = useState(false);
+  const navigate = useNavigate();
 
+  const { profile } = useProfile();
+  const { addresses, loading: addressLoading } = useAddresses();
   const {
     createOrder,
     loading: orderLoading,
@@ -61,9 +62,23 @@ const OrderWizard = ({ items, totals, onClose, onSuccess }) => {
   } = useOrders();
   const { account: bankAccount } = useBankAccount();
 
+  const [selectedAddress, setSelectedAddress] = useState(null);
+  const [paymentMethod, setPaymentMethod] = useState("BANK_TRANSFER");
+  const [customerNotes, setCustomerNotes] = useState("");
+  const [submitSuccess, setSubmitSuccess] = useState(false);
+
   const subtotal = totals?.subtotal || totals?.total || 0;
 
   const handleSubmit = async () => {
+    if (!profile?.phone) {
+      onApiError?.({
+        message: "Debes completar tu teléfono antes de continuar",
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+
     try {
       const payloadItems = items.map((item) => ({
         product_id: item.product_id,
@@ -80,7 +95,8 @@ const OrderWizard = ({ items, totals, onClose, onSuccess }) => {
       setSubmitSuccess(true);
       setTimeout(() => onSuccess(), 2500);
     } catch (err) {
-      console.error("Error al crear pedido:", err);
+      onApiError?.(err);
+      setIsSubmitting(false);
     }
   };
 
@@ -147,7 +163,22 @@ const OrderWizard = ({ items, totals, onClose, onSuccess }) => {
                 <p>Seleccioná la dirección de entrega</p>
               </div>
 
-              {addressLoading ? (
+              {!profile?.phone ? (
+                <div className="ow-empty">
+                  <FiAlertCircle size={36} />
+                  <h4>Falta tu número de teléfono</h4>
+                  <p>
+                    Necesitamos un teléfono para coordinar la entrega de tu
+                    pedido.
+                  </p>
+                  <button
+                    className="ow-btn-link"
+                    onClick={() => navigate("/profile")}
+                  >
+                    Completar perfil
+                  </button>
+                </div>
+              ) : addressLoading ? (
                 <div className="ow-loading">
                   <div className="ow-spinner" />
                   <span>Cargando direcciones…</span>
@@ -157,9 +188,12 @@ const OrderWizard = ({ items, totals, onClose, onSuccess }) => {
                   <FiMapPin size={36} />
                   <h4>Sin direcciones guardadas</h4>
                   <p>Agregá una dirección desde tu perfil para continuar.</p>
-                  <a href="/perfil" className="ow-btn-link">
+                  <button
+                    className="ow-btn-link"
+                    onClick={() => navigate("/profile")}
+                  >
                     Ir al perfil
-                  </a>
+                  </button>
                 </div>
               ) : (
                 <div className="ow-address-list">
@@ -443,7 +477,10 @@ const OrderWizard = ({ items, totals, onClose, onSuccess }) => {
               className="ow-btn-next"
               onClick={() => setStep((s) => s + 1)}
               disabled={
-                (step === 1 && (!selectedAddress || addresses.length === 0)) ||
+                (step === 1 &&
+                  (!selectedAddress ||
+                    addresses.length === 0 ||
+                    !profile?.phone)) ||
                 orderLoading
               }
             >
@@ -453,15 +490,17 @@ const OrderWizard = ({ items, totals, onClose, onSuccess }) => {
             <button
               className="ow-btn-confirm"
               onClick={handleSubmit}
-              disabled={orderLoading}
+              disabled={isSubmitting}
             >
-              {orderLoading ? (
+              {isSubmitting ? (
                 <>
-                  <span className="ow-spinner-sm" /> Enviando…
+                  <span className="mo-btn-spinner" />
+                  Enviando…
                 </>
               ) : (
                 <>
-                  <FiCheck size={16} /> Confirmar pedido
+                  <FiCheck size={16} />
+                  Confirmar pedido
                 </>
               )}
             </button>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   FiAlertCircle, FiCalendar, FiCheck, FiChevronDown,
   FiChevronUp, FiClock, FiDollarSign, FiInfo, FiMapPin,
@@ -6,6 +6,8 @@ import {
 } from 'react-icons/fi';
 import useOrders from '../../../../hooks/useOrders';
 import useBankAccount from '../../../../hooks/useBankAccount';
+import useApiError from '../../../../hooks/useApiError';
+import RateLimitToast from '../../../../components/RateLimitToast/RateLimitToast';
 import './MyOrders.scss';
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -47,25 +49,31 @@ const StatusBadge = ({ status, config }) => {
   return <span className={`mo-badge mo-badge--${cfg.color}`}>{cfg.label}</span>;
 };
 
-const ShippingConfirm = ({ order, onConfirm }) => {
-  const [loading, setLoading] = useState(false);
-  const [reason, setReason]   = useState('');
+const BtnSpinner = () => <span className="mo-btn-spinner" />;
+
+const ShippingConfirm = ({ order, onConfirm, onApiError }) => {
+  const [acceptLoading, setAcceptLoading] = useState(false);
+  const [rejectLoading, setRejectLoading] = useState(false);
 
   const shippingCost = Number(order.shipping_cost || 0);
   const subtotal     = Number(order.subtotal || 0);
   const total        = subtotal + shippingCost;
 
   const handleAccept = async () => {
-    setLoading(true);
+    setAcceptLoading(true);
     try { await onConfirm(order.id, 'accept'); }
-    finally { setLoading(false); }
+    catch (err) { onApiError?.(err); }
+    finally { setAcceptLoading(false); }
   };
 
   const handleReject = async () => {
-    setLoading(true);
-    try { await onConfirm(order.id, 'reject', reason); }
-    finally { setLoading(false); }
+    setRejectLoading(true);
+    try { await onConfirm(order.id, 'reject'); }
+    catch (err) { onApiError?.(err); }
+    finally { setRejectLoading(false); }
   };
+
+  const busy = acceptLoading || rejectLoading;
 
   return (
     <div className="mo-shipping-confirm">
@@ -82,18 +90,18 @@ const ShippingConfirm = ({ order, onConfirm }) => {
         Si aceptás, podrás subir el comprobante de pago. Si rechazás, la orden será cancelada.
       </p>
       <div className="mo-shipping-confirm-actions">
-        <button className="mo-sc-btn mo-sc-btn--reject" onClick={handleReject} disabled={loading}>
-          <FiX size={14} />Rechazar precio
+        <button className="mo-sc-btn mo-sc-btn--reject" onClick={handleReject} disabled={busy}>
+          {rejectLoading ? <><BtnSpinner />Procesando…</> : <><FiX size={14} />Rechazar precio</>}
         </button>
-        <button className="mo-sc-btn mo-sc-btn--accept" onClick={handleAccept} disabled={loading}>
-          {loading ? <><span className="mo-spinner" /> Procesando…</> : <><FiCheck size={14} /> Aceptar y pagar</>}
+        <button className="mo-sc-btn mo-sc-btn--accept" onClick={handleAccept} disabled={busy}>
+          {acceptLoading ? <><BtnSpinner />Procesando…</> : <><FiCheck size={14} />Aceptar y pagar</>}
         </button>
       </div>
     </div>
   );
 };
 
-const ProofUploader = ({ order, onUpload, bankAccount }) => {
+const ProofUploader = ({ order, onUpload, bankAccount, onApiError }) => {
   const [file, setFile]               = useState(null);
   const [uploading, setUploading]     = useState(false);
   const [uploadError, setUploadError] = useState(null);
@@ -117,7 +125,11 @@ const ProofUploader = ({ order, onUpload, bankAccount }) => {
       setAmount('');
       setReference('');
     } catch (err) {
-      setUploadError(err.message || err.error || 'Error al subir el comprobante');
+      if (err?.response?.status === 429 || err?.status === 429) {
+        onApiError?.(err);
+      } else {
+        setUploadError(err.message || err.error || 'Error al subir el comprobante');
+      }
     } finally {
       setUploading(false);
     }
@@ -207,7 +219,7 @@ const ProofUploader = ({ order, onUpload, bankAccount }) => {
           </div>
           {uploadError && <p className="mo-proof-error"><FiAlertCircle size={13} /> {uploadError}</p>}
           <button className="mo-proof-upload-btn" onClick={handleUpload} disabled={!file || uploading}>
-            {uploading ? <><span className="mo-spinner" /> Subiendo…</> : <><FiUpload size={14} /> Enviar comprobante</>}
+            {uploading ? <><BtnSpinner /> Subiendo…</> : <><FiUpload size={14} /> Enviar comprobante</>}
           </button>
         </div>
       )}
@@ -215,9 +227,10 @@ const ProofUploader = ({ order, onUpload, bankAccount }) => {
   );
 };
 
-const OrderCard = ({ order: orderProp, onUploadProof, onCancel, onConfirmShipping, bankAccount }) => {
-  const [order, setOrder]       = useState(orderProp);
-  const [expanded, setExpanded] = useState(false);
+const OrderCard = ({ order: orderProp, onUploadProof, onCancel, onConfirmShipping, bankAccount, onApiError }) => {
+  const [order, setOrder]             = useState(orderProp);
+  const [expanded, setExpanded]       = useState(false);
+  const [cancelLoading, setCancelLoading] = useState(false);
 
   useEffect(() => { setOrder(orderProp); }, [orderProp]);
 
@@ -233,6 +246,13 @@ const OrderCard = ({ order: orderProp, onUploadProof, onCancel, onConfirmShippin
   const handleConfirmShipping = async (orderId, action, reason) => {
     const updated = await onConfirmShipping(orderId, action, reason);
     if (updated?.order) setOrder(updated.order);
+  };
+
+  const handleCancel = async () => {
+    setCancelLoading(true);
+    try { await onCancel(order.id); }
+    catch (err) { onApiError?.(err); }
+    finally { setCancelLoading(false); }
   };
 
   const totalAmount = order.total || order.total_amount;
@@ -360,17 +380,20 @@ const OrderCard = ({ order: orderProp, onUploadProof, onCancel, onConfirmShippin
           )}
 
           {needsShippingConfirm && (
-            <ShippingConfirm order={order} onConfirm={handleConfirmShipping} />
+            <ShippingConfirm order={order} onConfirm={handleConfirmShipping} onApiError={onApiError} />
           )}
 
           {canUploadProof && (
-            <ProofUploader order={order} onUpload={onUploadProof} bankAccount={bankAccount} />
+            <ProofUploader order={order} onUpload={onUploadProof} bankAccount={bankAccount} onApiError={onApiError} />
           )}
 
           {canCancel && (
             <div className="mo-card-actions">
-              <button className="mo-btn-cancel" onClick={() => onCancel(order.id)}>
-                <FiX size={14} />Cancelar pedido
+              <button className="mo-btn-cancel" onClick={handleCancel} disabled={cancelLoading}>
+                {cancelLoading
+                  ? <><BtnSpinner />Cancelando…</>
+                  : <><FiX size={14} />Cancelar pedido</>
+                }
               </button>
             </div>
           )}
@@ -380,18 +403,24 @@ const OrderCard = ({ order: orderProp, onUploadProof, onCancel, onConfirmShippin
   );
 };
 
-const MyOrders = ({ onShop }) => {
+const MyOrders = ({ onShop, onApiError }) => {
   const {
     orders, loading, error,
     fetchOrders, cancelOrder, confirmShipping, uploadPaymentProof, clearError,
   } = useOrders();
 
   const { account: bankAccount } = useBankAccount();
+  const { rateLimitError, handleApiError: handleLocalError, clearRateLimitError } = useApiError();
+
+  const bubbleError = (err) => {
+    handleLocalError(err);
+    onApiError?.(err);
+  };
 
   const handleCancel = async (orderId) => {
     if (!window.confirm('¿Cancelar este pedido?')) return;
     try { await cancelOrder(orderId); }
-    catch (err) { console.error('Error al cancelar:', err); }
+    catch (err) { throw err; }
   };
 
   const handleConfirmShipping = async (orderId, action, reason) =>
@@ -436,36 +465,41 @@ const MyOrders = ({ onShop }) => {
   }
 
   return (
-    <div className="my-orders">
-      <div className="mo-list-header">
-        <h2>{orders.length} pedido{orders.length !== 1 ? 's' : ''}</h2>
-        <button className="mo-refresh-btn" onClick={fetchOrders} disabled={loading}>
-          <FiRefreshCw size={14} className={loading ? 'spinning' : ''} />
-          Actualizar
-        </button>
-      </div>
+    <>
+      <RateLimitToast message={rateLimitError} onClose={clearRateLimitError} />
 
-      {error && (
-        <div className="mo-inline-error">
-          <FiAlertCircle size={14} />
-          {error}
-          <button onClick={clearError}><FiX size={13} /></button>
+      <div className="my-orders">
+        <div className="mo-list-header">
+          <h2>{orders.length} pedido{orders.length !== 1 ? 's' : ''}</h2>
+          <button className="mo-refresh-btn" onClick={fetchOrders} disabled={loading}>
+            <FiRefreshCw size={14} className={loading ? 'spinning' : ''} />
+            Actualizar
+          </button>
         </div>
-      )}
 
-      <div className="mo-cards">
-        {orders.map((order) => (
-          <OrderCard
-            key={order.id}
-            order={order}
-            onUploadProof={handleUploadProof}
-            onCancel={handleCancel}
-            onConfirmShipping={handleConfirmShipping}
-            bankAccount={bankAccount}
-          />
-        ))}
+        {error && (
+          <div className="mo-inline-error">
+            <FiAlertCircle size={14} />
+            {error}
+            <button onClick={clearError}><FiX size={13} /></button>
+          </div>
+        )}
+
+        <div className="mo-cards">
+          {orders.map((order) => (
+            <OrderCard
+              key={order.id}
+              order={order}
+              onUploadProof={handleUploadProof}
+              onCancel={handleCancel}
+              onConfirmShipping={handleConfirmShipping}
+              bankAccount={bankAccount}
+              onApiError={bubbleError}
+            />
+          ))}
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

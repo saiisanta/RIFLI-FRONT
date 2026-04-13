@@ -637,3 +637,16 @@
   strong { color: var(--shop-accent); }
 }
  
+
+.mo-btn-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: mo-spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes mo-spin { to { transform: rotate(360deg); } }

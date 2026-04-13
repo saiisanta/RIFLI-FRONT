@@ -26,7 +26,7 @@
   display: inline-block;
   width: 14px;
   height: 14px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.35);
   border-top-color: currentColor;
   border-radius: 50%;
   animation: qlSpin 0.7s linear infinite;
@@ -302,8 +302,6 @@
   border: 1px solid var(--quotes-border);
   border-radius: 8px;
   border-left: 3px solid var(--quotes-accent);
-
-  &--rejected { border-left-color: var(--quotes-error); color: var(--quotes-error); font-style: normal; }
 }
 
 .ql-budget-summary {
@@ -368,6 +366,7 @@
 .ql-btn-accept {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.5rem;
   padding: 0.8rem 1.5rem;
   background: linear-gradient(135deg, var(--quotes-success) 0%, #0ea570 100%);
@@ -378,15 +377,21 @@
   font-weight: 700;
   cursor: pointer;
   transition: all 0.3s ease;
-  min-width: 160px;
-  justify-content: center;
+  min-width: 170px;
+
+  .ql-btn-spinner {
+    border-color: rgba(255, 255, 255, 0.35);
+    border-top-color: #fff;
+  }
+
   &:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4); }
-  &:disabled { opacity: 0.65; cursor: not-allowed; transform: none; box-shadow: none; }
+  &:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
 }
 
 .ql-btn-reject {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.5rem;
   padding: 0.8rem 1.5rem;
   background: transparent;
@@ -398,9 +403,14 @@
   cursor: pointer;
   transition: all 0.3s ease;
   min-width: 120px;
-  justify-content: center;
+
+  .ql-btn-spinner {
+    border-color: rgba(239, 68, 68, 0.3);
+    border-top-color: var(--quotes-error);
+  }
+
   &:hover:not(:disabled) { background: rgba(239, 68, 68, 0.1); border-color: var(--quotes-error); }
-  &:disabled { opacity: 0.65; cursor: not-allowed; }
+  &:disabled { opacity: 0.6; cursor: not-allowed; }
 }
 
 .ql-status-badge {
@@ -534,7 +544,9 @@
 
 .ql-proof-upload-area { display: flex; flex-direction: column; gap: 0.75rem; }
 
-.ql-proof-file-wrapper { input[type='file'] { display: none; } }
+.ql-proof-file-wrapper {
+  input[type='file'] { display: none; }
+}
 
 .ql-proof-file-label {
   display: flex;
@@ -596,6 +608,20 @@
 
   &:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(255, 202, 44, 0.35); }
   &:disabled { opacity: 0.45; cursor: not-allowed; transform: none; box-shadow: none; }
+}
+
+.ql-rejection-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.75rem 1.1rem;
+  background: rgba(239, 68, 68, 0.06);
+  border-top: 1px solid rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  font-size: 0.82rem;
+  line-height: 1.5;
+
+  svg { flex-shrink: 0; margin-top: 2px; }
 }
 
 .ql-bank-transfer-info {

@@ -24,9 +24,7 @@ const ServicesShowcase = () => {
       <section id="servicios" className="services-showcase">
         <div className="showcase-header">
           <span className="section-label">Nuestros Servicios</span>
-          <h2 className="section-title">
-            Soluciones <span>Profesionales</span>
-          </h2>
+          <h2 className="section-title">Soluciones <span>Profesionales</span></h2>
         </div>
         <div className="services-grid">
           {[1, 2, 3].map((i) => (
@@ -36,15 +34,9 @@ const ServicesShowcase = () => {
                 <div className="skeleton-icon" />
                 <div className="skeleton-title" />
                 <div className="skeleton-text" />
-                <div className="skeleton-text short" />
               </div>
             </div>
           ))}
-        </div>
-        <div className="showcase-decoration">
-          <div className="decoration-circle circle-1"></div>
-          <div className="decoration-circle circle-2"></div>
-          <div className="decoration-circle circle-3"></div>
         </div>
       </section>
     );
@@ -54,9 +46,7 @@ const ServicesShowcase = () => {
     <section id="servicios" className="services-showcase">
       <div className="showcase-header">
         <span className="section-label">Nuestros Servicios</span>
-        <h2 className="section-title">
-          Soluciones <span>Profesionales</span>
-        </h2>
+        <h2 className="section-title">Soluciones <span>Profesionales</span></h2>
       </div>
 
       <div className="services-grid">
@@ -67,11 +57,7 @@ const ServicesShowcase = () => {
           const features = Array.isArray(service.features) ? service.features : [];
 
           return (
-            <div
-              key={service.id}
-              className="service-card"
-              style={{ animationDelay: `${index * 0.2}s` }}
-            >
+            <div key={service.id} className="service-card" style={{ animationDelay: `${index * 0.1}s` }}>
               <div className="service-image-wrapper">
                 {mainImage ? (
                   <img src={mainImage} alt={service.type} className="service-image" />
@@ -84,11 +70,7 @@ const ServicesShowcase = () => {
               <div className="service-content">
                 <div className="service-icon-wrapper">
                   {service.icon ? (
-                    <img
-                      src={`${API_URL}${service.icon}`}
-                      alt={`${service.type} icon`}
-                      className="service-icon service-icon--img"
-                    />
+                    <img src={`${API_URL}${service.icon}`} alt="icon" className="service-icon service-icon--img" />
                   ) : (
                     <span className="service-icon service-icon--fallback">⚡</span>
                   )}
@@ -99,9 +81,9 @@ const ServicesShowcase = () => {
 
                 {features.length > 0 && (
                   <div className="service-features">
-                    {features.slice(0, 3).map((feature, idx) => (
+                    {features.slice(0, 1).map((feature, idx) => (
                       <span key={idx} className="service-feature-chip">
-                        <svg className="chip-check" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <svg className="chip-check" viewBox="0 0 16 16" fill="none">
                           <path d="M3 8l3.5 3.5L13 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                         </svg>
                         {feature}
@@ -115,7 +97,6 @@ const ServicesShowcase = () => {
                   <span className="btn-arrow">→</span>
                 </button>
               </div>
-
               <div className="card-glow"></div>
             </div>
           );

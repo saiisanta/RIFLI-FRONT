@@ -11,7 +11,8 @@ import {
   ChatDots,
   BarChartLine,
   Grid3x3,
-  Award
+  Award,
+  ShieldCheck,
 } from 'react-bootstrap-icons';
 import './AdminSidebar.scss';
 
@@ -20,15 +21,16 @@ const AdminSidebar = ({ sidebarOpen, setSidebarOpen }) => {
   const location = useLocation();
 
   const menuItems = [
-    { path: '/admin/bank',    label: 'Banco',     icon: Bank },
-    { path: '/admin/products',    label: 'Productos',     icon: Box },
-    { path: '/admin/categories',  label: 'Categorías',    icon: Grid3x3 },
-    { path: '/admin/brands',      label: 'Marcas',        icon: Award },
-    { path: '/admin/users',       label: 'Usuarios',      icon: People },
-    { path: '/admin/services',    label: 'Servicios',     icon: Tools },
-    { path: '/admin/orders',      label: 'Pedidos',       icon: Receipt },
-    { path: '/admin/quotes',      label: 'Cotizaciones',  icon: ChatDots },
-    { path: '/admin/stats',       label: 'Estadísticas',  icon: BarChartLine },
+    { path: '/admin/bank',       label: 'Banco',          icon: Bank },
+    { path: '/admin/products',   label: 'Productos',      icon: Box },
+    { path: '/admin/categories', label: 'Categorías',     icon: Grid3x3 },
+    { path: '/admin/brands',     label: 'Marcas',         icon: Award },
+    { path: '/admin/users',      label: 'Usuarios',       icon: People },
+    { path: '/admin/services',   label: 'Servicios',      icon: Tools },
+    { path: '/admin/orders',     label: 'Pedidos',        icon: Receipt },
+    { path: '/admin/quotes',     label: 'Cotizaciones',   icon: ChatDots },
+    { path: '/admin/insurance',  label: 'Seguros',        icon: ShieldCheck },
+   // { path: '/admin/stats',      label: 'Estadísticas',   icon: BarChartLine },
   ];
 
   const isActive = (path) => location.pathname === path;

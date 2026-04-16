@@ -9,6 +9,7 @@ import UserManager from './sections/UserManager/UserManager';
 import ServiceManager from './sections/ServiceManager/ServiceManager';
 import OrderManager from './sections/OrderManager/OrderManager';
 import QuoteManager from './sections/QuoteManager/QuoteManager';
+import InsuranceDocGenerator from './sections/InsuranceDocGenerator/InsuranceDocGenerator';
 import Stats from './sections/Stats/Stats';
 import './AdminPanel.scss';
 
@@ -40,6 +41,7 @@ const AdminPanel = () => {
           <Route path="services" element={<ServiceManager />} />
           <Route path="orders" element={<OrderManager />} />
           <Route path="quotes" element={<QuoteManager />} />
+          <Route path="insurance" element={<InsuranceDocGenerator />} />
           <Route path="stats" element={<Stats />} />
         </Routes>
       </main>

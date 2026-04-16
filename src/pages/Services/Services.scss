@@ -206,9 +206,8 @@
 .sdk-main-image-wrapper {
   position: relative;
   flex: 1;
-  min-height: 300px;
+  max-height: 400px;
   overflow: hidden;
-
   @include respond-down("tablet") {
     min-height: 260px;
     max-height: 320px;

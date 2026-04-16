@@ -16,9 +16,17 @@
   position: relative;
   min-height: 100vh;
   background: var(--d-bg);
-  background-image: 
-    radial-gradient(ellipse at top, rgba(255, 202, 44, 0.08) 0%, transparent 60%),
-    radial-gradient(ellipse at bottom right, rgba(255, 202, 44, 0.04) 0%, transparent 50%);
+  background-image:
+    radial-gradient(
+      ellipse at top,
+      rgba(255, 202, 44, 0.08) 0%,
+      transparent 60%
+    ),
+    radial-gradient(
+      ellipse at bottom right,
+      rgba(255, 202, 44, 0.04) 0%,
+      transparent 50%
+    );
   color: var(--d-text);
   padding-top: 8rem;
   padding-bottom: 4rem;
@@ -55,7 +63,7 @@
     display: inline-block;
     position: relative;
     text-shadow: 0 0 20px rgba(255, 202, 44, 0.4);
-    
+
     &::after {
       content: "";
       position: absolute;
@@ -64,7 +72,12 @@
       transform: translateX(-50%);
       width: 60px;
       height: 3px;
-      background: linear-gradient(90deg, transparent, var(--d-accent), transparent);
+      background: linear-gradient(
+        90deg,
+        transparent,
+        var(--d-accent),
+        transparent
+      );
       box-shadow: 0 0 10px var(--d-accent);
     }
   }
@@ -74,7 +87,7 @@
     font-weight: 900;
     margin: 0;
     line-height: 1.2;
-    
+
     span {
       color: var(--d-text-muted);
       font-weight: 400;

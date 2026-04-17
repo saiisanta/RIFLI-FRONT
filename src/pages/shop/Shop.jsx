@@ -284,7 +284,7 @@ const Shop = () => {
                 {filtered.map((prod) => {
                   const hasDiscount = prod.discount_percentage > 0;
                   const discountedPrice = hasDiscount
-                    ? prod.price * (1 - prod.discount_percentage / 100)
+                    ? (prod.price * (1 - prod.discount_percentage / 100)).toFixed(2)
                     : prod.price;
                   const category = prod.Category || prod.category;
                   const brand = prod.Brand || prod.brand;
@@ -422,7 +422,7 @@ const Shop = () => {
                     {modalProduct.discount_percentage > 0 ? (
                       <>
                         <p className="modal-price-original">${modalProduct.price}</p>
-                        <p className="modal-price">${(modalProduct.price * (1 - modalProduct.discount_percentage / 100))}</p>
+                        <p className="modal-price">${(modalProduct.price * (1 - modalProduct.discount_percentage / 100)).toFixed(2)}</p>
                         <span className="modal-discount">-{modalProduct.discount_percentage}%</span>
                       </>
                     ) : (

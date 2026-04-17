@@ -25,8 +25,8 @@ dist-ssr
 
 # Env
 .env
-.env.local
-.env.development
-.env.production
-.env.staging
+.env.docker
+Dockerfile
+.dockerignore
+nginx-frontend.conf
 !.env.example
